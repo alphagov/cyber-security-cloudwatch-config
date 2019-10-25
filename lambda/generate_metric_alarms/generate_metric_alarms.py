@@ -1,5 +1,4 @@
 """Handler."""
-import base64
 import json
 import logging
 import os
@@ -16,7 +15,10 @@ LOG = logging.getLogger('generate_metric_alarms')
 
 
 def process_alert(event):
-    """Handles a new event request"""
+    """Handles a new event request
+    Placeholder copied from alert_controller implementation
+    """
+    LOG.info(str(event))
     return create_response(200, body='All good')
 
 
@@ -119,14 +121,13 @@ def get_caller():
 
 if __name__ == "__main__":
     """Initial development of list-metrics processing logic
-    Enrich with tags 
+    Enrich with tags
     """
     metrics = get_region_metrics()
     metric_data = json.dumps(metrics, indent=2)
-    response = get_caller()
-    account = response.Account
+    caller_response = get_caller()
+    account = caller_response.Account
     file_path = f"output/{account}/"
     os.makedirs(file_path)
     var_file = open(f"{file_path}/metrics.json", "w")
     var_file.write(metric_data)
-
