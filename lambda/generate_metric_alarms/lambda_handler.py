@@ -2,7 +2,7 @@
 import logging
 import os
 
-from alert_controller import process_alert
+from generate_metric_alarms import process_alert
 
 LOG = logging.getLogger('generate_metric_alarms')
 LOG.setLevel(getattr(logging, str(os.getenv('LOGLEVEL', 'ERROR'))))

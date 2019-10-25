@@ -2,6 +2,38 @@ import pytest
 
 
 @pytest.fixture()
+def lambda_event():
+    """Create a request event"""
+    event_data = {
+        'requestContext': {
+            'elb': {
+                'targetGroupArn':
+                'arn:aws:elasticloadbalancing:eu:1234:targetgroup/test/1234'
+            }
+        },
+        'httpMethod': 'POST',
+        'path': '/',
+        'queryStringParameters': {},
+        'headers': {
+            'accept-encoding': 'identity',
+            'connection': 'close',
+            'content-length': '694',
+            'content-type': 'application/json',
+            'host': 'alert-controller.demo.cyber.digital',
+            'user-agent': 'Splunk/ABCD1234',
+            'x-amzn-trace-id': 'Root=1-1234',
+            'x-forwarded-for': '1.2.3.4',
+            'x-forwarded-port': '443',
+            'x-forwarded-proto': 'https'
+        },
+        'body': '{}',
+        'isBase64Encoded': False
+    }
+
+    return event_data
+
+
+@pytest.fixture()
 def list_metric_response():
     """Create a request event"""
     response = {

@@ -8,7 +8,7 @@ from addict import Dict
 import boto3
 from botocore.exceptions import ClientError
 
-from exceptions import BadRequestError, ServerError
+from local_exceptions import ServerError
 import enrich
 
 LOG = logging.getLogger('generate_metric_alarms')
@@ -19,7 +19,7 @@ def process_alert(event):
     Placeholder copied from alert_controller implementation
     """
     LOG.info(str(event))
-    return create_response(200, body='All good')
+    return create_response(200, body='Response to HealthCheck')
 
 
 def create_response(status_code, status_description='', body=''):
@@ -119,10 +119,10 @@ def get_caller():
     return response
 
 
-if __name__ == "__main__":
+def main():
     """Initial development of list-metrics processing logic
-    Enrich with tags
-    """
+        Enrich with tags
+        """
     metrics = get_region_metrics()
     metric_data = json.dumps(metrics, indent=2)
     caller_response = get_caller()
@@ -131,3 +131,7 @@ if __name__ == "__main__":
     os.makedirs(file_path)
     var_file = open(f"{file_path}/metrics.json", "w")
     var_file.write(metric_data)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,12 @@
-import boto3
+"""Query AWS for context about cloudwatch metric resources"""
 import json
+
+import boto3
 from addict import Dict
 
 
 def get_client_from_namespace(namespace, region):
+    """Convert cloudwatch metric namespace to a boto3 client"""
     clients = {
         "AWS/SQS": "sqs",
         "AWS/Lambda": "lambda"
@@ -17,6 +20,7 @@ def get_client_from_namespace(namespace, region):
 
 
 def get_metric_dimension_value(metric, dimension_name):
+    """Iterate metric dimensions for value of named dimension"""
     dimension_value = None
     for dim in metric.Dimensions:
         if dim.Name == dimension_name:
@@ -50,8 +54,7 @@ def get_tags_for_metric_resource(metric, region=None):
                     lambda_arn = get_function_response.Configuration.FunctionArn
                     get_tags_response = Dict(client.list_tags(Resource=lambda_arn))
                     tags = get_tags_response.Tags
-    except Exception as err:
+    except AttributeError as err:
         print(json.dumps(metric, indent=2))
         print(str(err))
     return tags
-
