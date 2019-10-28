@@ -10,6 +10,8 @@ from botocore.exceptions import ClientError
 
 from local_exceptions import ServerError
 import enrich
+import format_terraform
+
 
 LOG = logging.getLogger('generate_metric_alarms')
 
@@ -100,13 +102,22 @@ def get_region_metrics():
         type_metrics = defaultdict(list)
         print(f"Reading metrics for {region}")
         client = boto3.client("cloudwatch", region_name=region)
-        response = Dict(client.list_metrics())
-        for metric in response.Metrics:
-            metric.Region = region
-            metric_tags = enrich.get_tags_for_metric_resource(metric, region=region)
-            metric.Tags = metric_tags
-            component_type = metric.Namespace
-            type_metrics[component_type].append(metric)
+        has_next_page = True
+        next_page_token = None
+        while has_next_page:
+            if next_page_token:
+                response = Dict(client.list_metrics(NextToken=next_page_token))
+            else:
+                response = Dict(client.list_metrics())
+
+            has_next_page = "NextToken" in response
+            if has_next_page:
+                next_page_token = response.NextToken
+
+            for metric in response.Metrics:
+                metric.Region = region
+                component_type = metric.Namespace
+                type_metrics[component_type].append(metric)
         region_metrics[region] = type_metrics
 
     return region_metrics
@@ -121,17 +132,88 @@ def get_caller():
 
 def main():
     """Initial development of list-metrics processing logic
-        Enrich with tags
-        """
+    Enrich with tags
+    """
     metrics = get_region_metrics()
-    metric_data = json.dumps(metrics, indent=2)
+
     caller_response = get_caller()
     account = caller_response.Account
     file_path = f"output/{account}/"
-    os.makedirs(file_path)
-    var_file = open(f"{file_path}/metrics.json", "w")
-    var_file.write(metric_data)
+    os.makedirs(file_path, exist_ok=True)
+
+    alarms = Dict()
+
+    # implement standard monitoring rules based on namespace
+    for metric_rule in METRIC_RULES:
+        namespace = metric_rule.Namespace
+        service = enrich.get_namespace_service(namespace)
+        if service not in alarms:
+            alarms[service] = defaultdict(list)
+        # print(str(metric_rule))
+        for region in metrics:
+            print(f"Analysing metrics for {region}\n")
+            region_metrics = metrics[region]
+            namespace_metrics = region_metrics[namespace]
+            print(f"Found {len(namespace_metrics)} metrics for {namespace} in {region}\n")
+            for metric in namespace_metrics:
+                print(f"Checking rules for {metric.MetricName}")
+                if metric.MetricName == metric_rule.MetricName:
+
+                    # get tags for metric resource and add to metric
+                    metric_tags = enrich.get_tags_for_metric_resource(metric, region=region)
+                    metric.Tags = metric_tags
+
+                    # get metric-statistics and calculate health threshold
+                    threshold = enrich.get_metric_threshold(metric, metric_rule)
+                    metric.Threshold = threshold
+
+                    # annotate with service
+                    metric.Service = service
+
+                    # annotate with resource name and id derived from metric Dimensions
+                    metric.ResourceName = format_terraform.get_metric_resource_name(metric)
+                    metric.ResourceId = format_terraform.get_metric_resource_id(metric)
+
+                    alarm = metric.copy()
+                    del alarm.Dimensions
+                    alarms[service][metric.MetricName].append(alarm)
+
+    # temporarily save all metric data
+
+    metric_data = json.dumps(metrics, indent=2)
+    metric_file = open(f"{file_path}/metrics.json", "w")
+    metric_file.write(metric_data)
+
+    # LATER allow override with monitoring options from tags
+
+    # document alarms in json
+    alarm_data = json.dumps(alarms, indent=2)
+    alarm_file = open(f"{file_path}/alarms.json", "w")
+    alarm_file.write(alarm_data)
+
+    # generate in tfvars format
+    alarm_file = open(f"{file_path}/alarms.tfvars", "w")
+    for service in alarms:
+        for metric in alarms[service]:
+            group = f"{service}__{metric}"
+            # group_alarm_data = json.dumps(alarms[service][metric], indent=2)
+            group_alarm_data = format_terraform.get_tf_list(alarms[service][metric], 2)
+            alarm_file.write(f"{group} = {group_alarm_data}")
 
 
 if __name__ == "__main__":
+
+    MONITORED_REGIONS = ["eu-west-1","eu-west-2","us-east-1"]
+
+    # Match boto3 casing for consistency
+    METRIC_RULES = [
+        Dict({
+            "Namespace": "AWS/SQS",
+            "MetricName": "ApproximateAgeOfOldestMessage",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 300,
+            "Maximum": (4 * 24 * 60 * 60)
+        })
+    ]
     main()
