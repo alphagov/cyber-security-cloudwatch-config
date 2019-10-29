@@ -4,9 +4,12 @@ def get_tf_map(source, indent_size, indent_level=0):
     outer_line_prefix = "".rjust(indent_level * indent_size)
     inner_line_prefix = "".rjust((indent_level + 1) * indent_size)
     formatted = "{\n"
+    tf_items = []
     for key in source:
         item = get_tf_item(source[key], indent_size, indent_level)
-        formatted += f"{inner_line_prefix}{key} = {item},\n"
+        tf_item = f"{inner_line_prefix}{key} = {item}"
+        tf_items.append(tf_item)
+    formatted += ",\n".join(tf_items) + "\n"
     formatted += outer_line_prefix + "}"
     return formatted
 
@@ -16,8 +19,11 @@ def get_tf_list(source, indent_size, indent_level=0):
     outer_line_prefix = "".rjust(indent_level * indent_size)
     inner_line_prefix = "".rjust((indent_level + 1) * indent_size)
     formatted = "[\n"
+    tf_items = []
     for item in source:
-        formatted += inner_line_prefix + get_tf_item(item, indent_size, indent_level) + ",\n"
+        tf_item = inner_line_prefix + get_tf_item(item, indent_size, indent_level)
+        tf_items.append(tf_item)
+    formatted += ",\n".join(tf_items) + "\n"
     formatted += outer_line_prefix + "]\n"
     return formatted
 
