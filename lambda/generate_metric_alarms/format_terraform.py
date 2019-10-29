@@ -1,24 +1,4 @@
 """Utility functions to generate output in the form of a tfvars file"""
-def get_dimension_value_matching_substring(dimensions, match_string):
-    """Get Value for Name matching match_string"""
-    dim_val = None
-    for dim in dimensions:
-        if match_string in dim["Name"]:
-            dim_val = dim["Value"]
-
-    return dim_val
-
-
-def get_metric_resource_name(metric):
-    """Query dimensions for field matching *Name*"""
-    return get_dimension_value_matching_substring(metric.Dimensions, "Name")
-
-
-def get_metric_resource_id(metric):
-    """Query dimensions for field matching *Id*"""
-    return get_dimension_value_matching_substring(metric.Dimensions, "Id")
-
-
 def get_tf_map(source, indent_size, indent_level=0):
     """Turn dict object into a tf map"""
     outer_line_prefix = "".rjust(indent_level * indent_size)

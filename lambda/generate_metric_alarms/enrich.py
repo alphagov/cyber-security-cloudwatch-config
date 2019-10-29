@@ -10,13 +10,11 @@ def get_namespace_service(namespace):
     """
     Convert CloudWatch namespace to AWS service name
     """
-    client_name = None
     clients = {
         "AWS/SQS": "sqs",
         "AWS/Lambda": "lambda"
     }
-    if namespace in clients:
-        client_name = clients[namespace]
+    client_name = clients.get(namespace, None)
 
     return client_name
 
@@ -39,6 +37,26 @@ def get_metric_dimension_value(metric, dimension_name):
             dimension_value = dim.Value
 
     return dimension_value
+
+
+def get_dimension_value_matching_substring(dimensions, match_string):
+    """Get Value for Name matching match_string"""
+    dim_val = None
+    for dim in dimensions:
+        if match_string in dim["Name"]:
+            dim_val = dim["Value"]
+
+    return dim_val
+
+
+def get_metric_resource_name(metric):
+    """Query dimensions for field matching *Name*"""
+    return get_dimension_value_matching_substring(metric.Dimensions, "Name")
+
+
+def get_metric_resource_id(metric):
+    """Query dimensions for field matching *Id*"""
+    return get_dimension_value_matching_substring(metric.Dimensions, "Id")
 
 
 def get_tags_for_metric_resource(metric, region=None):
@@ -79,7 +97,8 @@ def get_metric_statistics(metric, statistic):
 
     The period is calculated to match the elapsed time
     """
-    # aws cloudwatch get-metric-statistics --start-time="2019-10-20T00:00:00Z" --end-time="2019-10-23T00:00:00Z"
+    # aws cloudwatch get-metric-statistics
+    # --start-time="2019-10-20T00:00:00Z" --end-time="2019-10-23T00:00:00Z"
     # --statistics=Maximum --namespace="AWS/SQS" --metric-name="ApproximateAgeOfOldestMessage"
     # --period=300 --unit=Seconds --dimensions=Name=QueueName,Value=csw-prod-audit-account-queue
     # --region=eu-west-1
@@ -122,6 +141,3 @@ def get_metric_threshold(metric, rule):
     print(f"Threshold: {statistic_value} * {rule.Multiplier} = {threshold}")
 
     return threshold
-
-
-

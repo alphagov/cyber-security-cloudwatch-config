@@ -1,10 +1,12 @@
 import pytest
 
+from addict import Dict
+
 
 @pytest.fixture()
 def lambda_event():
     """Create a request event"""
-    event_data = {
+    event_data = Dict({
         'requestContext': {
             'elb': {
                 'targetGroupArn':
@@ -28,7 +30,7 @@ def lambda_event():
         },
         'body': '{}',
         'isBase64Encoded': False
-    }
+    })
 
     return event_data
 
@@ -36,7 +38,7 @@ def lambda_event():
 @pytest.fixture()
 def list_metric_response():
     """Create a request event"""
-    response = {
+    response = Dict({
         "Metrics": [
             {
                 "Namespace": "AWS/Lambda",
@@ -165,8 +167,116 @@ def list_metric_response():
                 ]
             }
         ]
-    }
+    })
 
     return response
 
 
+@pytest.fixture()
+def dimension_metric():
+    metric = Dict({
+        "Namespace": "AWS/EC2",
+        "MetricName": "CPUUtilization",
+        "Dimensions": [
+            {
+                "Name": "Name",
+                "Value": "instance-name"
+            },
+            {
+                "Name": "InstanceId",
+                "Value": "i-0123456789abcdef0"
+            }
+        ]
+    })
+
+    return metric
+
+
+@pytest.fixture()
+def lambda_metric():
+    metric = Dict({
+        "Namespace": "AWS/Lambda",
+        "MetricName": "Errors",
+        "Dimensions": [
+            {
+                "Name": "FunctionName",
+                "Value": "lambda-function"
+            }
+        ]
+    })
+
+    return metric
+
+@pytest.fixture()
+def mock_get_function_response():
+    response = {
+        "Configuration": {
+            "FunctionName": "lambda-function",
+            "FunctionArn": "arn:aws:lambda:eu-west-2:123456789012:function:lambda-function",
+            "Runtime": "python3.7",
+            "Role": "arn:aws:iam::103495720024:role/role_name",
+            "Handler": "module.function",
+            "CodeSize": 1024,
+            "Description": "",
+            "Timeout": 60,
+            "MemorySize": 128,
+            "LastModified": "2019-10-18T13:05:41.164+0000",
+            "CodeSha256": "blah",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [
+                    "subnet-01234567890abcdef",
+                    "subnet-11234567890abcdef",
+                    "subnet-21234567890abcdef"
+                ],
+                "SecurityGroupIds": [
+                    "sg-01234567890abcdef"
+                ],
+                "VpcId": "vpc-01234567890abcdef"
+            },
+            "Environment": {
+                "Variables": {
+                    "COLLECTION_NAME": "collection",
+                    "DATABASE_NAME": "databasename",
+                    "DATABASE_URL": "mongodb://blah",
+                    "TOPIC_ARN": "arn:aws:sns:eu-west-2:123456789012:topic",
+                    "LOGLEVEL": "DEBUG",
+                    "VALID_TOKENS": "blah1,blah2"
+                }
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "12345678-1234-5678-9012-123456789012"
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://awslambda-eu-west-2-tasks.s3.eu-west-2.amazonaws.com/snapshots/123456789012/lambda-function"
+        },
+        "Tags": {
+            "SvcOwner": "Cyber",
+            "name": "lambda-function",
+            "Environment": "test",
+            "Service": "cyber-service",
+            "SvcCodeURL": "https://github.com/alphagov/my-madeup-repo",
+            "DeployedUsing": "Terraform",
+            "Name": "lambda-function"
+        }
+    }
+    return response
+
+@pytest.fixture()
+def mock_list_tags_response():
+
+    response = {
+        "Tags": {
+            "SvcOwner": "Cyber",
+            "name": "lambda-function",
+            "Environment": "test",
+            "Service": "cyber-service",
+            "SvcCodeURL": "https://github.com/alphagov/my-madeup-repo",
+            "DeployedUsing": "Terraform",
+            "Name": "lambda-function"
+        }
+    }
+    return response

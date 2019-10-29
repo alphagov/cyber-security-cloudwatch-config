@@ -137,8 +137,7 @@ def main():
     metrics = get_region_metrics()
 
     caller_response = get_caller()
-    account = caller_response.Account
-    file_path = f"output/{account}/"
+    file_path = f"output/{caller_response.Account}/"
     os.makedirs(file_path, exist_ok=True)
 
     alarms = Dict()
@@ -160,19 +159,17 @@ def main():
                 if metric.MetricName == metric_rule.MetricName:
 
                     # get tags for metric resource and add to metric
-                    metric_tags = enrich.get_tags_for_metric_resource(metric, region=region)
-                    metric.Tags = metric_tags
+                    metric.Tags = enrich.get_tags_for_metric_resource(metric, region=region)
 
                     # get metric-statistics and calculate health threshold
-                    threshold = enrich.get_metric_threshold(metric, metric_rule)
-                    metric.Threshold = threshold
+                    metric.Threshold = enrich.get_metric_threshold(metric, metric_rule)
 
                     # annotate with service
                     metric.Service = service
 
                     # annotate with resource name and id derived from metric Dimensions
-                    metric.ResourceName = format_terraform.get_metric_resource_name(metric)
-                    metric.ResourceId = format_terraform.get_metric_resource_id(metric)
+                    metric.ResourceName = enrich.get_metric_resource_name(metric)
+                    metric.ResourceId = enrich.get_metric_resource_id(metric)
 
                     alarm = metric.copy()
                     del alarm.Dimensions
@@ -180,16 +177,16 @@ def main():
 
     # temporarily save all metric data
 
-    metric_data = json.dumps(metrics, indent=2)
-    metric_file = open(f"{file_path}/metrics.json", "w")
-    metric_file.write(metric_data)
+    # metric_data = json.dumps(metrics, indent=2)
+    # metric_file = open(f"{file_path}/metrics.json", "w")
+    # metric_file.write(metric_data)
 
     # LATER allow override with monitoring options from tags
 
     # document alarms in json
-    alarm_data = json.dumps(alarms, indent=2)
-    alarm_file = open(f"{file_path}/alarms.json", "w")
-    alarm_file.write(alarm_data)
+    # alarm_data = json.dumps(alarms, indent=2)
+    # alarm_file = open(f"{file_path}/alarms.json", "w")
+    # alarm_file.write(alarm_data)
 
     # generate in tfvars format
     alarm_file = open(f"{file_path}/alarms.tfvars", "w")
@@ -203,7 +200,7 @@ def main():
 
 if __name__ == "__main__":
 
-    MONITORED_REGIONS = ["eu-west-1","eu-west-2","us-east-1"]
+    MONITORED_REGIONS = ["eu-west-1", "eu-west-2", "us-east-1"]
 
     # Match boto3 casing for consistency
     METRIC_RULES = [
