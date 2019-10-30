@@ -265,6 +265,7 @@ def mock_get_function_response():
     }
     return response
 
+
 @pytest.fixture()
 def mock_list_tags_response():
 
@@ -280,3 +281,21 @@ def mock_list_tags_response():
         }
     }
     return response
+
+
+@pytest.fixture()
+def tf_map_indent2_level0():
+    map = """{
+  key1 = "value1",
+  key2 = "value2"
+}"""
+    return map
+
+
+@pytest.fixture()
+def tf_list_indent4_level0():
+    map = """[
+    "value1",
+    "value2"
+]"""
+    return map
