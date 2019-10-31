@@ -21,8 +21,8 @@ copy_dir:
 
 build: clean target_dir add_deps copy_dir
 
-run: build
-	cd .target; python3 lambda_handler.py
+run:
+	python generate_metric_alarms.py
 
 zip: build
-	cd .target; zip -X -9 ../alert_controller.zip -r .
+	cd .target; zip -X -9 ../cloudwatch_config.zip -r .

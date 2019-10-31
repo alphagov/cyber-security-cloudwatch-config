@@ -146,10 +146,14 @@ def main():
     for metric_rule in METRIC_RULES:
         namespace = metric_rule.Namespace
         service = enrich.get_namespace_service(namespace)
-        if service not in alarms:
-            alarms[service] = defaultdict(list)
+
         # print(str(metric_rule))
         for region in metrics:
+            if region not in alarms:
+                alarms[region] = defaultdict(list)
+            if service not in alarms[region]:
+                alarms[region][service] = defaultdict(list)
+
             print(f"Analysing metrics for {region}\n")
             region_metrics = metrics[region]
             namespace_metrics = region_metrics[namespace]
@@ -173,7 +177,7 @@ def main():
 
                     alarm = metric.copy()
                     del alarm.Dimensions
-                    alarms[service][metric.MetricName].append(alarm)
+                    alarms[region][service][metric.MetricName].append(alarm)
 
     # temporarily save all metric data
 
@@ -190,12 +194,13 @@ def main():
 
     # generate in tfvars format
     alarm_file = open(f"{file_path}/alarms.tfvars", "w")
-    for service in alarms:
-        for metric in alarms[service]:
-            group = f"{service}__{metric}"
-            # group_alarm_data = json.dumps(alarms[service][metric], indent=2)
-            group_alarm_data = format_terraform.get_tf_list(alarms[service][metric], 2)
-            alarm_file.write(f"{group} = {group_alarm_data}")
+    for region in alarms:
+        for service in alarms[region]:
+            for metric in alarms[region][service]:
+                group = f"{region}__{service}__{metric}"
+                # group_alarm_data = json.dumps(alarms[region][service][metric], indent=2)
+                group_alarm_data = format_terraform.get_tf_list(alarms[region][service][metric], 2)
+                alarm_file.write(f"{group} = {group_alarm_data}")
 
 
 if __name__ == "__main__":
