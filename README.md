@@ -1,6 +1,24 @@
 # cyber-security-cloudwatch-config
 Analyse list-metrics to create an automated set of cloudwatch alarms as a tfvars implementing a set of modules defined in cyber-security-shared-terraform-modules
 
+## Run 
+
+```
+make run
+```
+You need to wrap this in appropriate aws credentials. 
+
+Generates output/[account]/alarms.tfvars 
+
+Creates a list of metrics per region/service/metric according to the 
+naming convention: 
+
+`[region]__[service]__[metric]`
+
+For example:
+ 
+`eu-west-1__sqs__ApproximateAgeOfOldestMessage`
+
 ## Test 
 
 It may be this doesn't end up in lambda at all. 
