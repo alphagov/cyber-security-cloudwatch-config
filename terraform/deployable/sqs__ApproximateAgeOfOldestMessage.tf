@@ -1,3 +1,14 @@
+variable "eu-west-1__sqs__ApproximateAgeOfOldestMessage" {
+  description = "List of metrics derived from aws cloudwatch list-metrics"
+  type        = "list"
+  default     = []
+}
+
+variable "eu-west-2__sqs__ApproximateAgeOfOldestMessage" {
+  description = "List of metrics derived from aws cloudwatch list-metrics"
+  type        = "list"
+  default     = []
+}
 
 resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_sqs_approx_age" {
   # iterate over count to setup multiple alarms
