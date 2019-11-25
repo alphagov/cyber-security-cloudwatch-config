@@ -1,21 +1,33 @@
-# Cyber Security CloudWatch Config
+# cyber-security-cloudwatch-config
+Analyse list-metrics to create an automated set of cloudwatch alarms as a tfvars implementing a set of modules defined in cyber-security-shared-terraform-modules
 
-The aim of this repository is to automate the generation of CloudWatch 
-alarm config. 
+## Run 
 
-We are starting to build a collection of standardised CloudWatch Alarm 
-terraform modules in 
-[cyber-security-shared-terraform-modules](https://github.com/alphagov/cyber-security-shared-terraform-modules)
+```
+make run
+```
+You need to wrap this in appropriate aws credentials. 
 
-This repository uses `cloudwatch list-metrics` to identify resources to be 
-monitored, queries the tags for those resources in order to classify them 
-into services and environments. 
+Generates `output/[account]/alarms.tfvars` 
 
-The aim is to produce a set of `tfvar` files containing lists of maps 
-containing the config for the standard modules. 
+Creates a list of metrics per region/service/metric according to the 
+naming convention: 
 
-Then we can implement the modules to count across those lists. 
+`[region]__[service]__[metric]`
 
-Hopefully we can then automatically generate a pull request to terraform 
-the alarm config. 
+For example:
+ 
+`eu-west-1__sqs__ApproximateAgeOfOldestMessage`
 
+## Test 
+
+It may be this doesn't end up in lambda at all. 
+
+We probably want to run a cron'd concourse task that generates the 
+TF config and then runs the apply all in one step. 
+(plus triggered on merge to master)
+```
+cd lambda/generate_metric_alarms
+make test 
+```
+Runs pylint, flake8 and pytest 
