@@ -111,4 +111,4 @@ venv.bak/
 lambda/generate_metric_alarms/output/*/alarms.tfvars
 
 # Lambda
-.zip
+*.zip

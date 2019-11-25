@@ -1,6 +1,6 @@
 variable "LAMBDA_FILENAME" {
   type    = string
-  default = "health_monitor_lambda.zip"
+  default = "../../lambda/health_monitor/health_monitor_lambda.zip"
 }
 
 variable "FUNCTION_NAME" {
@@ -15,7 +15,7 @@ variable "ROLE" {
 
 variable "HANDLER" {
   type    = string
-  default = "health_monitor.handler"
+  default = "health_monitor.lambda_handler"
 }
 
 variable "TIMEOUT" {
