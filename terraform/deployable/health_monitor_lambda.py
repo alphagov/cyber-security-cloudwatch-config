@@ -18,10 +18,10 @@ def lambda_handler(event, context):
     process_message(message)
 
 def process_message(message):
-	""" Process SNS message and notify PagerDuty, Slack and dashboard """
-	if 'AlarmName' and 'AlarmDescription' in message:
-		sns_message_to_send = {
-			"AlarmName": message['AlarmName'],
+    """ Process SNS message and notify PagerDuty, Slack and dashboard """
+    if 'AlarmName' and 'AlarmDescription' in message:
+        sns_message_to_send = {
+	        "AlarmName": message['AlarmName'],
 			"StateChangeTime": message['StateChangeTime'],
 			"OldStateValue": message['OldStateValue'],
 			"NewStateValue": message['NewStateValue'],
@@ -32,9 +32,9 @@ def process_message(message):
 			"NameSpace": message['Trigger']['Namespace']
 		}
 
-       		#notify_pagerduty_sns(pagerduty_sns_arn, json.dumps(sns_message_to_send))
+       	# notify_pagerduty_sns(pagerduty_sns_arn, json.dumps(sns_message_to_send))
 		notify_slack_sns(slack_sns_arn, json.dumps(sns_message_to_send))
-        	#notify_dashboard_sns(dashboard_sns_arn, json.dumps(sns_message_to_send))
+        # notify_dashboard_sns(dashboard_sns_arn, json.dumps(sns_message_to_send))
 	else:
 		pass
     
@@ -58,7 +58,7 @@ def send_to_sns(topic_arn, sns_message):
 	sns = boto3.client('sns')
 	sns.publish(
 		TopicArn=topic_arn,
-    		#Subject=sns_subject,
-    		Message=message_to_send,
-		MessageStructure='json'
-    	)
+        # Subject=sns_subject,
+        Message=message_to_send,
+        MessageStructure='json'
+    )
