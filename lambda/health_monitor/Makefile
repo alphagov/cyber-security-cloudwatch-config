@@ -22,7 +22,7 @@ copy_dir:
 build: clean target_dir add_deps copy_dir
 
 run:
-	python generate_metric_alarms.py
+	python health_monitor_lambda.py
 
 zip: build
 	cd .target; zip -X -9 ../health_monitor_lambda.zip -r .
