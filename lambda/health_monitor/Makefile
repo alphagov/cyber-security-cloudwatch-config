@@ -17,7 +17,6 @@ add_deps: target_dir
 
 copy_dir:
 	cp *.py .target/
-	cp rds-combined-ca-bundle.pem .target/
 
 build: clean target_dir add_deps copy_dir
 
