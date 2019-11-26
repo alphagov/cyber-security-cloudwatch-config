@@ -1,5 +1,19 @@
 """ Unit tests for health monitor lambda """
-from health_monitor_lambda import get_slack_channel
+import pytest
+
+from health_monitor_lambda import (
+    parse_sns_message,
+    get_slack_channel,
+    get_slack_post
+)
+
+
+@pytest.mark.usefixtures("lambda_event")
+def test_parse_sns_message(lambda_event):
+    """ Test that the parse sns message correctly
+    retrieves the right content from the test event """
+    message = parse_sns_message(lambda_event)
+    assert "AlarmName" in message
 
 
 def test_get_slack_channel():
@@ -12,3 +26,12 @@ def test_get_slack_channel():
     message["SlackChannel"] = specified_channel
     channel = get_slack_channel(message)
     assert channel == specified_channel
+
+
+@pytest.mark.usefixtures("lambda_event")
+def test_get_slack_post(lambda_event):
+    """ Test that the get slack post method returns a dictionary with the right keys """
+    message = parse_sns_message(lambda_event)
+    slack_post = get_slack_post(message)
+    assert "channel" in slack_post
+    assert "message" in slack_post

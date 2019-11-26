@@ -9,10 +9,16 @@ LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
 
+def parse_sns_message(event):
+    """ Retrieve SNS message field from lambda invoke event """
+    message = json.loads(event['Records'][0]['Sns']['Message'])
+    return message
+
+
 def lambda_handler(event, context):
     """ Parse SNS message """
     LOGGER.info("Event: %s", str(event))
-    message = json.loads(event['Records'][0]['Sns']['Message'])
+    message = parse_sns_message(event)
     process_message(message)
 
 
@@ -62,13 +68,13 @@ def get_slack_channel(message):
 
 def format_slack_message(message):
     """ Format message string for rendering in Slack """
-    namespace = message["NameSpace"]
-    metric = message["MetricName"]
-    alarm = message["AlarmName"]
-    reason = message["NewStateReason"]
-    new_state = message["NewStateValue"]
-    old_state = message["OldStateValue"]
-    region = message["Region"]
+    namespace = message.get("NameSpace", "<Missing metric namespace>")
+    metric = message.get("MetricName", "<Missing metric name>")
+    alarm = message.get("AlarmName", "<Missing cloudwatch alarm name>")
+    reason = message.get("NewStateReason", "<Missing cloudwatch state change reason>")
+    new_state = message.get("NewStateValue", "<Missing cloudwatch current state>")
+    old_state = message.get("OldStateValue", "<Missing cloudwatch previous state>")
+    region = message.get("Region", "<Missing AWS region>")
 
     slack_header = f"*{namespace} {metric} {alarm} in {region} is {new_state}"
     slack_text = f"The state changed from {old_state} for the following reason: {reason}"
