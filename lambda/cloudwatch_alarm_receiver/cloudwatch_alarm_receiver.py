@@ -41,7 +41,6 @@ def flatten_alarm_data_structure(message):
     return flattened_message
 
 
-
 def get_standard_health_event_template():
     """ Return an empty template record to implement a
         standard health component data model
@@ -72,4 +71,3 @@ def cloudwatch_to_standard_health_data_model(source_message):
     event.Resource.ID = get_metric_resource_id(source_message.Trigger)
     event.SourceData = source_message
     return event
-

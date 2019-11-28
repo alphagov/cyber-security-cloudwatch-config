@@ -1,8 +1,6 @@
 """Test enrich module"""
-import sys
 import pytest
 import boto3
-import botocore
 from botocore.stub import Stubber
 
 import enrich
@@ -10,14 +8,17 @@ import enrich
 
 @pytest.mark.usefixtures("list_metric_response")
 def test_get_namespace_service(list_metric_response):
+    """ Check that the cloudwatch namespace resolves to a
+        boto3 client name
+    """
     metric0 = list_metric_response.Metrics[0]
-    region = "eu-west-1"
     service = enrich.get_namespace_service(metric0.Namespace)
     assert service == "lambda"
 
 
 @pytest.mark.usefixtures("dimension_metric")
 def test_get_metric_dimension_value(dimension_metric):
+    """ Check that we can retrieve a dimension by name """
     instance_id = "i-0123456789abcdef0"
     dimension_value = enrich.get_metric_dimension_value(dimension_metric, "InstanceId")
     assert instance_id == dimension_value
@@ -25,6 +26,7 @@ def test_get_metric_dimension_value(dimension_metric):
 
 @pytest.mark.usefixtures("dimension_metric")
 def test_get_metric_resource_id(dimension_metric):
+    """ Check that we can get a dimension containing ID """
     instance_id = "i-0123456789abcdef0"
     dimension_value = enrich.get_metric_resource_id(dimension_metric)
     assert instance_id == dimension_value
@@ -32,6 +34,7 @@ def test_get_metric_resource_id(dimension_metric):
 
 @pytest.mark.usefixtures("dimension_metric")
 def test_get_metric_resource_name(dimension_metric):
+    """ Check that we can get a dimension matching Name """
     instance_name = "instance-name"
     dimension_value = enrich.get_metric_resource_name(dimension_metric)
     assert instance_name == dimension_value
@@ -43,6 +46,9 @@ def test_get_metric_resource_name(dimension_metric):
 def test_get_tags_for_metric_resource(lambda_metric,
                                       mock_get_function_response,
                                       mock_list_tags_response):
+    """ Check that we can resolve the metric resource
+        and from that get the tags linked to that resource
+    """
     client = boto3.client('lambda')
 
     stubber = Stubber(client)
