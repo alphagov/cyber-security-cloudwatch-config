@@ -107,4 +107,10 @@ venv.bak/
 
 # terraform
 .terraform
+*.tfstate
 *.tfvars
+lambda/generate_metric_alarms/output/*/alarms.tfvars
+
+# Lambda
+.target
+*.zip
