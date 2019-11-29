@@ -2,7 +2,7 @@
 import logging
 import os
 
-from cloudwatch_alarm_receiver import process_event
+from cloudwatch_forwarder import process_event
 
 LOG = logging.getLogger('generate_metric_alarms')
 LOG.setLevel(getattr(logging, str(os.getenv('LOGLEVEL', 'ERROR'))))

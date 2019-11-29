@@ -24,4 +24,4 @@ run:
 	python generate_metric_alarms.py
 
 zip: build
-	cd .target; zip -X -9 ../cloudwatch_config.zip -r .
+	cd .target; zip -X -9 ../cloudwatch_forwarder.zip -r .
