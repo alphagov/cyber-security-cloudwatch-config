@@ -1,7 +1,7 @@
 variable "sns_topic_names" {
   description = "SNS topic names"
   type        = list(string)
-  default     = ["health_monitoring_lambda", "notify_slack_lambda", "notify_pagerduty_lambda", "notify_dashboard_lambda"]
+  default     = ["cloudwatch_forwarder"]
 }
 
 resource "aws_sns_topic" "euw1_sns_topics" {
@@ -37,6 +37,6 @@ output "euw2_sns_arn_map" {
 }
 
 locals {
-  euw1_sns_health_topic = lookup(element(aws_sns_topic.euw1_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
-  euw2_sns_health_topic = lookup(element(aws_sns_topic.euw2_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
+  euw1_sns_cloudwatch_forwarder_topic = lookup(element(aws_sns_topic.euw1_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
+  euw2_sns_cloudwatch_forwarder_topic = lookup(element(aws_sns_topic.euw2_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
 }
