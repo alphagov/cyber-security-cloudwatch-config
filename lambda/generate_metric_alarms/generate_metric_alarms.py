@@ -137,7 +137,7 @@ def main():
     metrics = get_region_metrics()
 
     caller_response = get_caller()
-    file_path = f"output/{caller_response.Account}/"
+    file_path = f"../../terraform/cloudwatch/deployments/{caller_response.Account}/"
     os.makedirs(file_path, exist_ok=True)
 
     alarms = Dict()
