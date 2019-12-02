@@ -7,3 +7,4 @@ resource "aws_lambda_function" "health_monitor_lambda" {
   timeout          = var.TIMEOUT
   runtime          = var.RUNTIME
 }
+
