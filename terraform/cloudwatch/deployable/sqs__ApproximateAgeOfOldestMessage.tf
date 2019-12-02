@@ -26,8 +26,8 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_sqs_approx_age" {
   dimensions = {
     QueueName = var.eu-west-1__sqs__ApproximateAgeOfOldestMessage[count.index].ResourceName
   }
-  alarm_actions       = ["${local.euw1_sns_health_topic}"]
-  ok_actions          = ["${local.euw1_sns_health_topic}"]
+  alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
+  ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
 }
 
 
@@ -47,7 +47,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_sqs_approx_age" {
   dimensions = {
     QueueName = var.eu-west-2__sqs__ApproximateAgeOfOldestMessage[count.index].ResourceName
   }
-  alarm_actions       = ["${local.euw2_sns_health_topic}"]
-  ok_actions          = ["${local.euw2_sns_health_topic}"]
+  alarm_actions       = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
+  ok_actions          = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
 }
 

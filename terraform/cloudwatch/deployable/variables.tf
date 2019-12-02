@@ -1,26 +1,31 @@
+variable "LOG_LEVEL" {
+  type    = string
+  default = "DEBUG"
+}
+
 variable "LAMBDA_FILENAME" {
   type    = string
   default = "../../lambda/cloudwatch_forwarder/cloudwatch_forwarder_lambda.zip"
 }
 
-variable "FUNCTION_NAME" {
+variable "DEF_ENVIRONMENT" {
+    type    = string
+    default = "Test"
+}
+
+variable "TARGET_LAMBDA" {
   type    = string
   default = "health_monitor_lambda"
 }
 
-variable "ROLE" {
+variable "TARGET_ROLE" {
   type    = string
-  default = "health_monitor_role"
+  default = "health_monitor_forwarder_role"
 }
 
-variable "HANDLER" {
+variable "TARGET_REGION" {
   type    = string
-  default = "health_monitor.lambda_handler"
-}
-
-variable "TIMEOUT" {
-  type    = number
-  default = 60
+  default = "eu-west-2"
 }
 
 variable "RUNTIME" {

@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "health_monitor_assume_role" {
+data "aws_iam_policy_document" "cloudwatch_forwarder_assume_role" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -10,13 +10,13 @@ data "aws_iam_policy_document" "health_monitor_assume_role" {
   }
 }
 
-resource "aws_iam_role" "health_monitor_role" {
-  name               = "health_monitor_role"
-  assume_role_policy = data.aws_iam_policy_document.health_monitor_assume_role.json
+resource "aws_iam_role" "cloudwatch_forwarder_role" {
+  name               = "cloudwatch_forwarder_role"
+  assume_role_policy = data.aws_iam_policy_document.cloudwatch_forwarder_assume_role.json
 }
 
 # Publish events to SNS topic
-data "aws_iam_policy_document" "health_monitor_policy_document" {
+data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
   statement {
     effect = "Allow"
 
@@ -30,17 +30,17 @@ data "aws_iam_policy_document" "health_monitor_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "health_monitor_policy" {
-  name   = "HealthMonitorPolicy"
-  policy = data.aws_iam_policy_document.health_monitor_policy_document.json
+resource "aws_iam_policy" "cloudwatch_forwarder_policy" {
+  name   = "CloudWatchForwarderPolicy"
+  policy = data.aws_iam_policy_document.cloudwatch_forwarder_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "health_monitor_policy_attachment" {
-  role       = aws_iam_role.health_monitor_role.name
-  policy_arn = aws_iam_policy.health_monitor_policy.arn
+resource "aws_iam_role_policy_attachment" "cloudwatch_forwarder_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_forwarder_role.name
+  policy_arn = aws_iam_policy.cloudwatch_forwarder_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "health_monitor_canned_policy_attachment" {
-  role       = aws_iam_role.health_monitor_role.name
+resource "aws_iam_role_policy_attachment" "cloudwatch_forwarder_canned_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_forwarder_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
