@@ -1,9 +1,13 @@
 """Query AWS for context about cloudwatch metric resources"""
 import json
 import datetime
+import logging
 
 import boto3
+import botocore
 from addict import Dict
+
+LOG = logging.getLogger('generate_metric_alarms')
 
 
 def get_namespace_service(namespace):
@@ -59,13 +63,49 @@ def get_metric_resource_id(metric):
     return get_dimension_value_matching_substring(metric.Dimensions, "Id")
 
 
+def metric_resource_exists(metric, region=None):
+    """
+    Check the resource exists before defining an alarm
+    aws cloudwatch list-metrics returns metrics for resources that
+    no longer exists
+    """
+    namespace = metric.Namespace
+    resource_exists = True
+    try:
+        print(f"Getting boto client for {namespace} in {region}")
+        client = get_client_from_namespace(namespace, region)
+        if client:
+            if namespace == "AWS/SQS":
+                queue = get_metric_dimension_value(metric, "QueueName")
+                print(f"Get tags for sqs queue: {queue}")
+                client.get_queue_url(QueueName=queue)
+
+            elif namespace == "AWS/Lambda":
+                function_name = get_metric_dimension_value(metric, "FunctionName")
+                if function_name:
+                    print(f"Get tags for lambda function: {function_name}")
+                    client.get_function(FunctionName=function_name)
+                else:
+                    resource_exists = False
+
+    except AttributeError as err:
+        print(json.dumps(metric, indent=2))
+        print(str(err))
+    except botocore.exceptions.ClientError as err:
+        print(str(err))
+        resource_exists = False
+    return resource_exists
+
+
 def get_tags_for_metric_resource(metric, region=None):
     """
     Get QueueUrl from queue name and then get the tags if present
+    There is some duplication of the above function it would be nice to remove
     """
     namespace = metric.Namespace
     tags = None
     try:
+        print(f"Getting boto client for {namespace} in {region}")
         client = get_client_from_namespace(namespace, region)
         if client:
             if namespace == "AWS/SQS":
@@ -86,6 +126,8 @@ def get_tags_for_metric_resource(metric, region=None):
                     tags = get_tags_response.Tags
     except AttributeError as err:
         print(json.dumps(metric, indent=2))
+        print(str(err))
+    except botocore.exceptions.ClientError as err:
         print(str(err))
     return tags
 

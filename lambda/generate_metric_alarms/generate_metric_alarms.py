@@ -160,9 +160,10 @@ def main():
             print(f"Found {len(namespace_metrics)} metrics for {namespace} in {region}\n")
             for metric in namespace_metrics:
                 print(f"Checking rules for {metric.MetricName}")
-                if metric.MetricName == metric_rule.MetricName:
-
+                if (metric.MetricName == metric_rule.MetricName
+                        and enrich.metric_resource_exists(metric, region=region)):
                     # get tags for metric resource and add to metric
+                    print(f"Get tags for {metric.MetricName} in {region}")
                     metric.Tags = enrich.get_tags_for_metric_resource(metric, region=region)
 
                     # get metric-statistics and calculate health threshold
