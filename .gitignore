@@ -115,3 +115,6 @@ lambda/generate_metric_alarms/output/*/alarms.tfvars
 setup.cfg
 .target
 *.zip
+
+# PyCharm
+.idea/
