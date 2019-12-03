@@ -3,11 +3,6 @@ variable "LOG_LEVEL" {
   default = "DEBUG"
 }
 
-variable "LAMBDA_FILENAME" {
-  type    = string
-  default = "../../../lambda/cloudwatch_forwarder/cloudwatch_forwarder.zip"
-}
-
 variable "DEF_ENVIRONMENT" {
     type    = string
     default = "Test"
@@ -26,9 +21,4 @@ variable "TARGET_ROLE" {
 variable "TARGET_REGION" {
   type    = string
   default = "eu-west-2"
-}
-
-variable "RUNTIME" {
-  type    = string
-  default = "python3.7"
 }
