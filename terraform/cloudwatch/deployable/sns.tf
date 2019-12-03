@@ -1,42 +1,27 @@
-variable "sns_topic_names" {
-  description = "SNS topic names"
-  type        = list(string)
-  default     = ["cloudwatch_forwarder"]
+locals {
+  cloudwatch_alarm_sns_topic = "cloudwatch_forwarder"
 }
-
-resource "aws_sns_topic" "euw1_sns_topics" {
-  count     = length(var.sns_topic_names)
+resource "aws_sns_topic" "euw1_cloudwatch_alarm_sns_topic" {
   provider  = aws.eu-west-1
-  name      = var.sns_topic_names[count.index]
+  name      = local.cloudwatch_alarm_sns_topic
 }
 
-output "euw1_sns_arns" {
-  value       = aws_sns_topic.euw1_sns_topics[*].arn
-  description = "The ARNs for SNS topics"
+output "euw1_sns_arn" {
+  value       = aws_sns_topic.euw1_cloudwatch_alarm_sns_topic.arn
+  description = "The ARNs for SNS topic"
 }
 
-output "euw1_sns_arn_map" {
-  value       = zipmap(aws_sns_topic.euw1_sns_topics[*].name, aws_sns_topic.euw1_sns_topics[*].arn)
-  description = "A lookup for SNS topic ARNs"
-}
-
-resource "aws_sns_topic" "euw2_sns_topics" {
-  count     = length(var.sns_topic_names)
+resource "aws_sns_topic" "euw2_cloudwatch_alarm_sns_topic" {
   provider  = aws.eu-west-2
-  name      = var.sns_topic_names[count.index]
+  name      = local.cloudwatch_alarm_sns_topic
 }
 
-output "euw2_sns_arns" {
-  value       = aws_sns_topic.euw2_sns_topics[*].arn
+output "euw2_sns_arn" {
+  value       = aws_sns_topic.euw2_cloudwatch_alarm_sns_topic.arn
   description = "The ARNs for SNS topics"
-}
-
-output "euw2_sns_arn_map" {
-  value       = zipmap(aws_sns_topic.euw2_sns_topics[*].name, aws_sns_topic.euw2_sns_topics[*].arn)
-  description = "A lookup for SNS topic ARNs"
 }
 
 locals {
-  euw1_sns_cloudwatch_forwarder_topic = lookup(element(aws_sns_topic.euw1_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
-  euw2_sns_cloudwatch_forwarder_topic = lookup(element(aws_sns_topic.euw2_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
+  euw1_sns_cloudwatch_forwarder_topic = aws_sns_topic.euw1_cloudwatch_alarm_sns_topic.arn
+  euw2_sns_cloudwatch_forwarder_topic = aws_sns_topic.euw2_cloudwatch_alarm_sns_topic.arn
 }

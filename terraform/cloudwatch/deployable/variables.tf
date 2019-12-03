@@ -5,7 +5,7 @@ variable "LOG_LEVEL" {
 
 variable "LAMBDA_FILENAME" {
   type    = string
-  default = "../../lambda/cloudwatch_forwarder/cloudwatch_forwarder_lambda.zip"
+  default = "../../../lambda/cloudwatch_forwarder/cloudwatch_forwarder.zip"
 }
 
 variable "DEF_ENVIRONMENT" {
