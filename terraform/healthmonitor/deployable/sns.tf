@@ -35,8 +35,3 @@ output "euw2_sns_arn_map" {
   value       = zipmap(aws_sns_topic.euw2_sns_topics[*].name, aws_sns_topic.euw2_sns_topics[*].arn)
   description = "A lookup for SNS topic ARNs"
 }
-
-locals {
-  euw1_sns_health_topic = lookup(element(aws_sns_topic.euw1_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
-  euw2_sns_health_topic = lookup(element(aws_sns_topic.euw2_sns_topics, index(var.sns_topic_names, "health_monitoring_lambda")), "arn")
-}

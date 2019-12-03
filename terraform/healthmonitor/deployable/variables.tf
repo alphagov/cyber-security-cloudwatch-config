@@ -1,6 +1,6 @@
 variable "LAMBDA_FILENAME" {
   type    = string
-  default = "../../lambda/health_monitor/health_monitor_lambda.zip"
+  default = "../../../lambda/health_monitor/health_monitor_lambda.zip"
 }
 
 variable "FUNCTION_NAME" {
