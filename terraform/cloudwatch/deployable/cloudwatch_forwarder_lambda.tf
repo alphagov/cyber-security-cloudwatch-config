@@ -1,11 +1,15 @@
+locals {
+  zipfile = "../../../lambda/cloudwatch_forwarder/cloudwatch_forwarder.zip"
+}
+
 resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
   provider          = aws.eu-west-1
-  filename          = var.LAMBDA_FILENAME
-  source_code_hash  = filebase64sha256(var.LAMBDA_FILENAME)
+  filename          = local.zipfile
+  source_code_hash  = filebase64sha256(local.zipfile)
   function_name     = "cloudwatch_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.lambda_handler"
-  runtime           = var.RUNTIME
+  runtime           = "python3.7"
 
   environment {
     variables = {
@@ -29,12 +33,12 @@ resource "aws_sns_topic_subscription" "cloudwatch_forwarder_euw1_sns_subscriptio
 
 resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   provider          = aws.eu-west-2
-  filename          = var.LAMBDA_FILENAME
-  source_code_hash  = filebase64sha256(var.LAMBDA_FILENAME)
+  filename          = local.zipfile
+  source_code_hash  = filebase64sha256(local.zipfile)
   function_name     = "cloudwatch_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.lambda_handler"
-  runtime           = var.RUNTIME
+  runtime           = "python3.7"
 
   environment {
     variables = {
