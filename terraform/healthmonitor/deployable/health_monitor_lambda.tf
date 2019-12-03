@@ -1,10 +1,14 @@
+locals {
+  zipfile = "../../../lambda/health_monitor/health_monitor_lambda.zip"
+}
+
 resource "aws_lambda_function" "health_monitor_lambda" {
-  filename         = var.LAMBDA_FILENAME
-  source_code_hash = filebase64sha256(var.LAMBDA_FILENAME)
-  function_name    = var.FUNCTION_NAME
+  filename         = local.zipfile
+  source_code_hash = filebase64sha256(local.zipfile)
+  function_name    = "health_monitor_lambda"
   role             = aws_iam_role.health_monitor_role.arn
-  handler          = var.HANDLER
-  timeout          = var.TIMEOUT
-  runtime          = var.RUNTIME
+  handler          = "health_monitor.lambda_handler"
+  timeout          = 60
+  runtime          = "python3.7"
 }
 
