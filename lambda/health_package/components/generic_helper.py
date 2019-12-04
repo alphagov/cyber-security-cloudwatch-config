@@ -1,0 +1,121 @@
+""" Generic component helper functions """
+import os
+import datetime
+import logging
+
+import boto3
+from addict import Dict
+
+LOG = logging.getLogger()
+LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
+
+
+class GenericHelper:
+    """ Standard helper functions for cloudwatch metrics """
+    @classmethod
+    def get_namespace_service(cls, namespace):
+        """
+        Convert CloudWatch namespace to AWS service name
+        """
+        clients = {
+            "AWS/SQS": "sqs",
+            "AWS/Lambda": "lambda",
+            "AWS/Firehose": "firehose",
+            "AWS/Kinesis": "kinesis"
+        }
+        client_name = clients.get(namespace, None)
+
+        return client_name
+
+    @classmethod
+    def get_client_from_namespace(cls, namespace, region):
+        """Convert cloudwatch metric namespace to a boto3 client"""
+        client_name = cls.get_namespace_service(namespace)
+        if client_name:
+            client = boto3.client(client_name, region_name=region)
+        else:
+            client = None
+        return client
+
+    @classmethod
+    def get_metric_dimension_value(cls, metric, dimension_name):
+        """Iterate metric dimensions for value of named dimension"""
+        dimension_value = None
+        for dim in metric.Dimensions:
+            if dim.Name == dimension_name:
+                dimension_value = dim.Value
+
+        return dimension_value
+
+    @classmethod
+    def get_dimension_value_matching_substring(cls, dimensions, match_string):
+        """Get Value for Name matching match_string"""
+        dim_val = None
+        for dim in dimensions:
+            if match_string in dim["Name"]:
+                dim_val = dim["Value"]
+
+        return dim_val
+
+    @classmethod
+    def get_metric_resource_name(cls, metric):
+        """Query dimensions for field matching *Name*"""
+        return cls.get_dimension_value_matching_substring(metric.Dimensions, "Name")
+
+    @classmethod
+    def get_metric_resource_id(cls, metric):
+        """Query dimensions for field matching *Id*"""
+        return cls.get_dimension_value_matching_substring(metric.Dimensions, "Id")
+
+    @classmethod
+    def get_metric_statistics(cls, metric, statistic):
+        """
+        Use get-metric-statistics to calculate appropriate alarm thresholds
+        based on typical values eg maximum + 10%
+
+        The period is calculated to match the elapsed time
+        """
+        # aws cloudwatch get-metric-statistics
+        # --start-time="2019-10-20T00:00:00Z" --end-time="2019-10-23T00:00:00Z"
+        # --statistics=Maximum --namespace="AWS/SQS" --metric-name="ApproximateAgeOfOldestMessage"
+        # --period=300 --unit=Seconds --dimensions=Name=QueueName,Value=csw-prod-audit-account-queue
+        # --region=eu-west-1
+        client = boto3.client("cloudwatch", metric.Region)
+
+        x_days = 28
+        now = datetime.datetime.now()
+        days_ago = now - datetime.timedelta(days=x_days)
+        period = 60 * 60 * 24 * x_days
+        stats_response = client.get_metric_statistics(
+            Namespace=metric.Namespace,
+            MetricName=metric.MetricName,
+            Dimensions=metric.Dimensions,
+            StartTime=days_ago,
+            EndTime=now,
+            Period=period,
+            Unit="Seconds",
+            Statistics=[statistic]
+        )
+        return Dict(stats_response)
+
+    @classmethod
+    def get_metric_threshold(cls, metric, rule):
+        """
+        Get single value of statistic and
+        """
+        statistic_value = None
+        metric_stats = cls.get_metric_statistics(metric, rule.Statistic)
+        print(str(metric_stats))
+
+        for datapoint in metric_stats.Datapoints:
+            statistic_value = datapoint[rule.Statistic]
+
+        threshold = statistic_value * rule.Multiplier
+        if threshold < rule.Minimum:
+            threshold = rule.Minimum
+        elif threshold > rule.Maximum:
+            threshold = rule.Maximum
+
+        print(f"Threshold: {statistic_value} * {rule.Multiplier} = {threshold}")
+
+        return threshold

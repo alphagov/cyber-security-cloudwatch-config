@@ -108,9 +108,14 @@ venv.bak/
 # terraform
 .terraform
 *.tfstate
+*.tfstate.backup
 *.tfvars
 lambda/generate_metric_alarms/output/*/alarms.tfvars
 
 # Lambda
+setup.cfg
 .target
 *.zip
+
+# PyCharm
+.idea/
