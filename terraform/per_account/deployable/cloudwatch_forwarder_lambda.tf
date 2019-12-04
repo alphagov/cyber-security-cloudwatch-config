@@ -1,5 +1,5 @@
 locals {
-  zipfile = "../../../lambda/cloudwatch_forwarder/cloudwatch_forwarder.zip"
+  zipfile = "../../../lambda/health_package.zip"
 }
 
 resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
@@ -8,7 +8,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
   source_code_hash  = filebase64sha256(local.zipfile)
   function_name     = "cloudwatch_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
-  handler           = "lambda_handler.lambda_handler"
+  handler           = "lambda_handler.cloudwatch_event_handler"
   runtime           = "python3.7"
 
   environment {
