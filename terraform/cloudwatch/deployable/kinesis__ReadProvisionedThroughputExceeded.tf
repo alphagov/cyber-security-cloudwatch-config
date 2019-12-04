@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_kinesis_read_provision_t
   period              = 300
   statistic           = "Maximum"
   dimensions = {
-    QueueName = var.eu-west-1__kinesis__ReadProvisionedThroughputExceeded[count.index].ResourceName
+    StreamName = var.eu-west-1__kinesis__ReadProvisionedThroughputExceeded[count.index].ResourceName
   }
   alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_kinesis_read_provision_t
   period              = 300
   statistic           = "Maximum"
   dimensions = {
-    QueueName = var.eu-west-2__kinesis__ReadProvisionedThroughputExceeded[count.index].ResourceName
+    StreamName = var.eu-west-2__kinesis__ReadProvisionedThroughputExceeded[count.index].ResourceName
   }
   alarm_actions       = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
