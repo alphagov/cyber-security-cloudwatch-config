@@ -1,5 +1,5 @@
 locals {
-  zipfile = "../../../lambda/health_package.zip"
+  zipfile = "../../../lambda/health_package/health_package.zip"
 }
 
 resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
