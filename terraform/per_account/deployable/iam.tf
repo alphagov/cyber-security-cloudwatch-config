@@ -28,6 +28,19 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
       "*"
     ]
   }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole"
+    ]
+
+    resources = [
+      "arn:aws:iam::*:role/health_monitor_forwarder_role"
+    ]
+  }
+
 }
 
 resource "aws_iam_policy" "cloudwatch_forwarder_policy" {
