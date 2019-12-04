@@ -5,21 +5,14 @@ import os
 
 import boto3
 
-LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
+LOG = logging.getLogger()
+LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
 
 
 def parse_sns_message(event):
     """ Retrieve SNS message field from lambda invoke event """
     message = json.loads(event['Records'][0]['Sns']['Message'])
     return message
-
-
-def lambda_handler(event, context):
-    """ Parse SNS message """
-    LOGGER.info("Event: %s", str(event))
-    message = parse_sns_message(event)
-    process_message(message)
 
 
 def flatten_alarm_data_structure(message):
@@ -29,9 +22,10 @@ def flatten_alarm_data_structure(message):
     return flattened_message
 
 
-def process_message(message):
+def process_health_event(event):
     """ Process SNS message and notify PagerDuty, Slack and dashboard """
 
+    message = parse_sns_message(event)
     # These should be defined by the component type or resource tags
     # Hard-code for now
     notify_slack = True
@@ -50,13 +44,13 @@ def process_message(message):
         if notify_dashboard:
             notify_dashboard_sns(sns_message_to_send)
     else:
-        LOGGER.debug("Message missing required fields")
+        LOG.debug("Message missing required fields")
 
 
 def get_slack_channel(message):
     """ Identify target slack channel """
     if "AlarmName" in message:
-        LOGGER.debug("Get target channel for alarm: %s", message['AlarmName'])
+        LOG.debug("Get target channel for alarm: %s", message['AlarmName'])
     default_channel = "cyber-security-service-health"
     # correct this to do something that might happen
     if "SlackChannel" in message:

@@ -1,7 +1,7 @@
 """Test."""
 import pytest
 
-from generate_metric_alarms import process_alert
+from generate_metric_alarms import process_generate_metric_alarms_event
 
 
 @pytest.mark.usefixtures("lambda_event")
@@ -12,7 +12,7 @@ def test_event_helthcheck(lambda_event):
     event_healthcheck['body'] = ''
 
     lambda_event.update(event_healthcheck)
-    response = process_alert(lambda_event)
+    response = process_generate_metric_alarms_event(lambda_event)
 
     assert response['statusCode'] == 200
     assert response['body'] == 'Response to HealthCheck'

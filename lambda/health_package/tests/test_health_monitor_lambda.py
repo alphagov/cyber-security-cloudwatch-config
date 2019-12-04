@@ -8,11 +8,11 @@ from health_monitor_lambda import (
 )
 
 
-@pytest.mark.usefixtures("lambda_event")
-def test_parse_sns_message(lambda_event):
+@pytest.mark.usefixtures("health_monitor_sns_event")
+def test_parse_sns_message(health_monitor_sns_event):
     """ Test that the parse sns message correctly
     retrieves the right content from the test event """
-    message = parse_sns_message(lambda_event)
+    message = parse_sns_message(health_monitor_sns_event)
     assert "AlarmName" in message
 
 
@@ -28,10 +28,10 @@ def test_get_slack_channel():
     assert channel == specified_channel
 
 
-@pytest.mark.usefixtures("lambda_event")
-def test_get_slack_post(lambda_event):
+@pytest.mark.usefixtures("health_monitor_sns_event")
+def test_get_slack_post(health_monitor_sns_event):
     """ Test that the get slack post method returns a dictionary with the right keys """
-    message = parse_sns_message(lambda_event)
+    message = parse_sns_message(health_monitor_sns_event)
     slack_post = get_slack_post(message)
     assert "channel" in slack_post
     assert "message" in slack_post

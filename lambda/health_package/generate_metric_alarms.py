@@ -1,4 +1,4 @@
-"""Handler."""
+""" Read cloudwatch list-metrics and generate alarm config """
 import json
 import logging
 import os
@@ -13,10 +13,11 @@ import enrich
 import format_terraform
 
 
-LOG = logging.getLogger('generate_metric_alarms')
+LOG = logging.getLogger()
+LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
 
 
-def process_alert(event):
+def process_generate_metric_alarms_event(event):
     """Handles a new event request
     Placeholder copied from alert_controller implementation
     """
@@ -124,28 +125,33 @@ def get_region_metrics():
 
 
 def get_caller():
-    """Get caller based on current AWS credentials"""
+    """
+    Get caller based on current AWS credentials
+    """
     client = boto3.client("sts")
     response = Dict(client.get_caller_identity())
     return response
 
 
-def main():
-    """Initial development of list-metrics processing logic
-    Enrich with tags
-    """
-    metrics = get_region_metrics()
-
+def get_output_file_path():
+    """ Generate path to output tfvars and ensure directory exists """
     caller_response = get_caller()
     file_path = f"../../terraform/cloudwatch/deployments/{caller_response.Account}/"
     os.makedirs(file_path, exist_ok=True)
+    return file_path
 
+
+def get_metric_alarms(metrics):
+    """
+    Iterate over metrics and return alarm config
+    """
     alarms = Dict()
 
     # implement standard monitoring rules based on namespace
     for metric_rule in METRIC_RULES:
         namespace = metric_rule.Namespace
-        service = enrich.get_namespace_service(namespace)
+        helper = enrich.get_namespace_helper(namespace)
+        service = helper.get_namespace_service(namespace)
 
         # print(str(metric_rule))
         for region in metrics:
@@ -161,27 +167,36 @@ def main():
             for metric in namespace_metrics:
                 print(f"Checking rules for {metric.MetricName}")
                 if (metric.MetricName == metric_rule.MetricName
-                        and enrich.metric_resource_exists(metric, region=region)):
-                    # get tags for metric resource and add to metric
-                    print(f"Get tags for {metric.MetricName} in {region}")
-                    metric.Tags = enrich.get_tags_for_metric_resource(metric, region=region)
-
+                        and helper.metric_resource_exists(metric, region=region)):
                     # get metric-statistics and calculate health threshold
-                    metric.Threshold = enrich.get_metric_threshold(metric, metric_rule)
+                    metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
 
                     # annotate with service
                     metric.Service = service
 
                     # annotate with resource name and id derived from metric Dimensions
-                    metric.ResourceName = enrich.get_metric_resource_name(metric)
-                    metric.ResourceId = enrich.get_metric_resource_id(metric)
+                    metric.ResourceName = helper.get_metric_resource_name(metric)
+                    metric.ResourceId = helper.get_metric_resource_id(metric)
 
                     alarm = metric.copy()
                     del alarm.Dimensions
                     alarms[region][service][metric.MetricName].append(alarm)
 
-    # temporarily save all metric data
+    return alarms
 
+
+def main():
+    """
+    Initial development of list-metrics processing logic
+    Enrich with tags
+    """
+    metrics = get_region_metrics()
+
+    alarms = get_metric_alarms(metrics)
+
+    file_path = get_output_file_path()
+
+    # temporarily save all metric data
     # metric_data = json.dumps(metrics, indent=2)
     # metric_file = open(f"{file_path}/metrics.json", "w")
     # metric_file.write(metric_data)

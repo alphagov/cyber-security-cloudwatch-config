@@ -1,4 +1,6 @@
 """Utility functions to generate output in the form of a tfvars file"""
+
+
 def get_tf_map(source, indent_size, indent_level=0):
     """Turn dict object into a tf map"""
     outer_line_prefix = "".rjust(indent_level * indent_size)

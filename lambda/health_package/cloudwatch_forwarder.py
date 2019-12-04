@@ -7,17 +7,13 @@ import base64
 import boto3
 from addict import Dict
 
-from enrich import (
-    get_tags_for_metric_resource,
-    get_metric_resource_name,
-    get_metric_resource_id
-)
+import enrich
 
 LOG = logging.getLogger()
-LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL"), "DEBUG"))
+LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
 
 
-def process_event(event):
+def process_cloudwatch_event(event):
     """ Receive raw event from lambda invoke """
     message = parse_sns_message(event)
     standardised_data = cloudwatch_to_standard_health_data_model(message)
@@ -36,7 +32,7 @@ def get_client_context():
     """ Generate a context field for the lambda invoke """
     caller = get_caller_identity()
     b64 = base64.b64encode(caller.Arn.encode('utf-8'))
-    context = f"{caller.Account}/{b64}
+    context = f"{caller.Account}/{b64}"
     return context
 
 
@@ -68,8 +64,8 @@ def assume_forwarder_role(environment):
     role_arn = f"arn:aws:iam::{account_id}:role/{role_name}"
     role_session_name = f"{role_name}_{account_id}"
     session = aws_sts.assume_role(
-        RoleArn = role_arn,
-        RoleSessionName = role_session_name
+        RoleArn=role_arn,
+        RoleSessionName=role_session_name
     )
     return session
 
@@ -157,7 +153,8 @@ def cloudwatch_to_standard_health_data_model(source_message):
         into a shared data model independent of the data source
     """
     metric = source_message.Trigger
-    source_message.Tags = get_tags_for_metric_resource(metric)
+    helper = enrich.get_namespace_helper(metric.Namespace)
+    source_message.Tags = helper.get_tags_for_metric_resource(metric)
 
     event = get_standard_health_event_template()
     event.Source = "AWS/CloudWatch"
@@ -165,8 +162,8 @@ def cloudwatch_to_standard_health_data_model(source_message):
     event.Service = source_message.Tags.get("Service", "Unknown")
     event.Healthy = (source_message.NewStateValue == "OK")
     event.ComponentType = source_message.Trigger.Namespace
-    event.Resource.Name = get_metric_resource_name(source_message.Trigger)
-    event.Resource.ID = get_metric_resource_id(source_message.Trigger)
+    event.Resource.Name = helper.get_metric_resource_name(source_message.Trigger)
+    event.Resource.ID = helper.get_metric_resource_id(source_message.Trigger)
     event.SourceData = source_message
     LOG.debug("Standardised event: %s", json.dumps(event))
     return event
