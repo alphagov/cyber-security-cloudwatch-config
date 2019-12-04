@@ -70,7 +70,7 @@ def format_slack_message(message):
     old_state = message.get("OldStateValue", "<Missing cloudwatch previous state>")
     region = message.get("Region", "<Missing AWS region>")
 
-    slack_header = f"*{namespace} {metric} {alarm} in {region} is {new_state}"
+    slack_header = f"*{namespace} {metric} {alarm}* in *{region}* is *{new_state}*"
     slack_text = f"The state changed from {old_state} for the following reason: {reason}"
     slack_message = f"{slack_header}\n\n{slack_text}"
     return slack_message
