@@ -25,6 +25,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
 }
 
 resource "aws_lambda_permission" "cloudwatch_forwarder_euw1_sns_invoke" {
+  provider  = aws.eu-west-1
   statement_id  = "CloudForwarderEUW1AllowExecutionFromSNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_forwarder_euw1_lambda.function_name
@@ -61,6 +62,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
 }
 
 resource "aws_lambda_permission" "cloudwatch_forwarder_euw2_sns_invoke" {
+  provider  = aws.eu-west-2
   statement_id  = "CloudForwarderEUW2AllowExecutionFromSNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_forwarder_euw2_lambda.function_name
