@@ -44,6 +44,8 @@ class GenericHelper:
         for dim in metric.Dimensions:
             if dim.Name == dimension_name:
                 dimension_value = dim.Value
+            if dim.name == dimension_name:
+                dimension_value = dim.value
 
         return dimension_value
 
@@ -54,6 +56,8 @@ class GenericHelper:
         for dim in dimensions:
             if match_string in dim["Name"]:
                 dim_val = dim["Value"]
+            if match_string in dim["name"]:
+                dim_val = dim["value"]
 
         return dim_val
 
