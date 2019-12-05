@@ -72,5 +72,5 @@ resource "aws_sns_topic_subscription" "health_monitor_euw2_sns_subscription" {
   provider  = aws.eu-west-2
   topic_arn = local.euw2_sns_cloudwatch_forwarder_topic
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_forwarder_euw1_lambda.arn
+  endpoint  = aws_lambda_function.cloudwatch_forwarder_euw2_lambda.arn
 }
