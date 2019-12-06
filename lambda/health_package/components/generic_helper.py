@@ -13,6 +13,15 @@ LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
 class GenericHelper:
     """ Standard helper functions for cloudwatch metrics """
     @classmethod
+    def get_caller_identity(cls):
+        """ Get a session for the IAM role to invoke the health lambda """
+        session = boto3.session.Session()
+        region = session.region_name
+        aws_sts = boto3.client("sts", region_name=region)
+        caller = aws_sts.get_caller_identity()
+        return Dict(caller)
+
+    @classmethod
     def get_namespace_service(cls, namespace):
         """
         Convert CloudWatch namespace to AWS service name
@@ -30,6 +39,13 @@ class GenericHelper:
     @classmethod
     def get_client_from_namespace(cls, namespace, region):
         """Convert cloudwatch metric namespace to a boto3 client"""
+
+        # Ensure region is set to current session region if
+        # not provided
+        if region is None:
+            session = boto3.session.Session()
+            region = session.region_name
+
         client_name = cls.get_namespace_service(namespace)
         if client_name:
             client = boto3.client(client_name, region_name=region)

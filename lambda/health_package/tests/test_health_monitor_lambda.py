@@ -34,4 +34,4 @@ def test_get_slack_post(health_monitor_sns_event):
     message = parse_sns_message(health_monitor_sns_event)
     slack_post = get_slack_post(message)
     assert "channel" in slack_post
-    assert "message" in slack_post
+    assert "state" in slack_post

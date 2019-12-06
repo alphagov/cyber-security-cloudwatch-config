@@ -1,6 +1,5 @@
 """ Read cloudwatch list-metrics and generate alarm config """
 import json
-import logging
 import os
 from collections import defaultdict
 
@@ -11,10 +10,7 @@ from botocore.exceptions import ClientError
 from local_exceptions import ServerError
 import enrich
 import format_terraform
-
-
-LOG = logging.getLogger()
-LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
+from logger import LOG
 
 
 def process_generate_metric_alarms_event(event):
