@@ -60,3 +60,8 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_forwarder_canned_policy_at
   role       = aws_iam_role.cloudwatch_forwarder_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+resource "aws_iam_role_policy_attachment" "security_audit_role_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_forwarder_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecurityAudit"
+}

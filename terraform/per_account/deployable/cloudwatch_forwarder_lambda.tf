@@ -48,6 +48,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.lambda_handler"
   runtime           = "python3.7"
+  timeout           = 6
 
   environment {
     variables = {
