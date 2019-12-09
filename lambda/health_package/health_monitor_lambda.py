@@ -105,7 +105,7 @@ def format_slack_message(message):
 def get_slack_post(message):
     """ Get channel and formatted string message as dict """
 
-    emoji = "blue-pill" if message.get("Healthy", False) else "sadpanda"
+    emoji = "blue-pill" if message.get("Healthy", False) else "red-pill"
     status = "Healthy" if message.get("Healthy", False) else "Unhealthy"
     slack_post = {
         "username": f"Health Monitor: {status}",
