@@ -1,13 +1,8 @@
 """Handler."""
-import logging
-import os
-
 from generate_metric_alarms import process_generate_metric_alarms_event
 from health_monitor_lambda import process_health_event
 from cloudwatch_forwarder import process_cloudwatch_event
-
-LOG = logging.getLogger()
-LOG.setLevel(getattr(logging, str(os.getenv('LOGLEVEL', 'ERROR'))))
+from logger import LOG
 
 
 def generate_metric_alarms_handler(event, context):

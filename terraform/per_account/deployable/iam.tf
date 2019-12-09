@@ -5,7 +5,10 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+      identifiers = [
+        "lambda.amazonaws.com",
+        "sns.amazonaws.com"
+      ]
     }
   }
 }
@@ -56,4 +59,9 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_forwarder_policy_attachmen
 resource "aws_iam_role_policy_attachment" "cloudwatch_forwarder_canned_policy_attachment" {
   role       = aws_iam_role.cloudwatch_forwarder_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "security_audit_role_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_forwarder_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecurityAudit"
 }

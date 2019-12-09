@@ -5,6 +5,7 @@ import botocore
 from addict import Dict
 
 from components.generic_helper import GenericHelper
+from logger import LOG
 
 
 class SqsHelper(GenericHelper):
@@ -19,21 +20,21 @@ class SqsHelper(GenericHelper):
         namespace = metric.Namespace
         resource_exists = True
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.debug("Getting boto client for %s in %s", namespace, region)
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 queue = cls.get_metric_dimension_value(metric, "QueueName")
-                print(f"Get tags for sqs queue: {queue}")
+                LOG.debug("Get tags for sqs queue: %s", queue)
                 if queue:
                     client.get_queue_url(QueueName=queue)
                 else:
                     resource_exists = False
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.debug(json.dumps(metric, indent=2))
+            LOG.debug(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.debug(str(err))
             resource_exists = False
         return resource_exists
 
@@ -46,19 +47,21 @@ class SqsHelper(GenericHelper):
         namespace = metric.Namespace
         tags = None
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.debug("Getting boto client for %s in %s", namespace, region)
             client = cls.get_client_from_namespace(namespace, region)
             if client:
+                caller = cls.get_caller_identity()
                 queue = cls.get_metric_dimension_value(metric, "QueueName")
-                print(f"Get tags for sqs queue: {queue}")
-                get_url_response = Dict(client.get_queue_url(QueueName=queue))
-                get_tags_response = Dict(client.list_queue_tags(QueueUrl=get_url_response.QueueUrl))
-                print(json.dumps(get_tags_response.Tags, indent=2))
+                LOG.debug("Get tags for sqs queue: %s", queue)
+                # get_queue_url is not granted by security audit role
+                queue_url = f"https://{region}.queue.amazonaws.com/{caller.Account}/{queue}"
+                get_tags_response = Dict(client.list_queue_tags(QueueUrl=queue_url))
+                LOG.debug(json.dumps(get_tags_response.Tags, indent=2))
                 tags = get_tags_response.Tags
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.debug(json.dumps(metric, indent=2))
+            LOG.debug(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.debug(str(err))
         return tags

@@ -1,16 +1,13 @@
 """ Process an alarm from CloudWatch """
 import os
 import json
-import logging
 import base64
 
 import boto3
 from addict import Dict
 
 import enrich
-
-LOG = logging.getLogger()
-LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
+from logger import LOG
 
 
 def process_cloudwatch_event(event):
@@ -18,12 +15,15 @@ def process_cloudwatch_event(event):
     message = parse_sns_message(event)
     standardised_data = cloudwatch_to_standard_health_data_model(message)
     response = send_to_health_monitor(standardised_data)
+    LOG.debug("Lambda invoke status: %s", response.StatusCode)
     return response.StatusCode == 200
 
 
 def get_caller_identity():
     """ Get a session for the IAM role to invoke the health lambda """
-    aws_sts = boto3.client("sts")
+    session = boto3.session.Session()
+    region = session.region_name
+    aws_sts = boto3.client("sts", region_name=region)
     caller = aws_sts.get_caller_identity()
     return Dict(caller)
 
@@ -58,7 +58,9 @@ def get_environment_account_id(environment):
 
 def assume_forwarder_role(environment):
     """ Get a session for the IAM role to invoke the health lambda """
-    aws_sts = boto3.client("sts")
+    session = boto3.session.Session()
+    region = session.region_name
+    aws_sts = boto3.client("sts", region_name=region)
     account_id = get_environment_account_id(environment)
     role_name = os.environ.get("TARGET_ROLE")
     role_arn = f"arn:aws:iam::{account_id}:role/{role_name}"
@@ -67,7 +69,8 @@ def assume_forwarder_role(environment):
         RoleArn=role_arn,
         RoleSessionName=role_session_name
     )
-    return session
+    LOG.debug("Role assumed: %s", session["Credentials"]["AccessKeyId"])
+    return session["Credentials"]
 
 
 def get_health_target_lambda(environment):
@@ -87,9 +90,13 @@ def send_to_health_monitor(message):
     lambda_function = os.environ.get("TARGET_LAMBDA")
     target_region = os.environ.get("TARGET_REGION")
 
+    LOG.debug("Sending to %s in %s", lambda_function, target_region)
+
     payload_json = json.dumps(message)
     payload_bytes = payload_json.encode('utf-8')
     context = get_client_context()
+
+    LOG.debug("Built payload, getting assumed role lambda client")
 
     aws_lambda = boto3.client(
         "lambda",
@@ -99,13 +106,15 @@ def send_to_health_monitor(message):
         region_name=target_region,
     )
 
+    LOG.debug("Obtained lambda client with assumed session credentials")
+
     invoke_params = {
         "FunctionName": lambda_function,
         "InvocationType": 'Event',
         "ClientContext": context,
         "Payload": payload_bytes
     }
-    LOG.debug("Invoke arguments: %s", json.dumps(invoke_params))
+    LOG.debug("Invoke arguments: %s", json.dumps(message))
     response = aws_lambda.invoke(**invoke_params)
 
     return Dict(response)
@@ -152,9 +161,11 @@ def cloudwatch_to_standard_health_data_model(source_message):
     """ Transform data from native CloudWatch
         into a shared data model independent of the data source
     """
+    session = boto3.session.Session()
+    region = session.region_name
     metric = source_message.Trigger
     helper = enrich.get_namespace_helper(metric.Namespace)
-    source_message.Tags = helper.get_tags_for_metric_resource(metric)
+    source_message.Tags = helper.get_tags_for_metric_resource(metric, region=region)
 
     event = get_standard_health_event_template()
     event.Source = "AWS/CloudWatch"

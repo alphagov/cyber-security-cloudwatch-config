@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "health_monitor_forwarder_policy_document" {
     effect = "Allow"
 
     actions = [
-      "lambda:Invoke"
+      "lambda:InvokeFunction"
     ]
 
     resources = [

@@ -24,6 +24,15 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
   }
 }
 
+resource "aws_lambda_permission" "cloudwatch_forwarder_euw1_sns_invoke" {
+  provider  = aws.eu-west-1
+  statement_id  = "CloudForwarderEUW1AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_forwarder_euw1_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = local.euw1_sns_cloudwatch_forwarder_topic
+}
+
 resource "aws_sns_topic_subscription" "cloudwatch_forwarder_euw1_sns_subscription" {
   provider  = aws.eu-west-1
   topic_arn = local.euw1_sns_cloudwatch_forwarder_topic
@@ -39,6 +48,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.lambda_handler"
   runtime           = "python3.7"
+  timeout           = 6
 
   environment {
     variables = {
@@ -52,9 +62,18 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   }
 }
 
+resource "aws_lambda_permission" "cloudwatch_forwarder_euw2_sns_invoke" {
+  provider  = aws.eu-west-2
+  statement_id  = "CloudForwarderEUW2AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_forwarder_euw2_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = local.euw2_sns_cloudwatch_forwarder_topic
+}
+
 resource "aws_sns_topic_subscription" "health_monitor_euw2_sns_subscription" {
   provider  = aws.eu-west-2
   topic_arn = local.euw2_sns_cloudwatch_forwarder_topic
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_forwarder_euw1_lambda.arn
+  endpoint  = aws_lambda_function.cloudwatch_forwarder_euw2_lambda.arn
 }

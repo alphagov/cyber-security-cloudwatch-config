@@ -1,12 +1,10 @@
 """ Health monitoring lambda """
 import json
-import logging
 import os
 
 import boto3
-
-LOG = logging.getLogger()
-LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
+from addict import Dict
+from logger import LOG
 
 
 def parse_sns_message(event):
@@ -25,24 +23,26 @@ def flatten_alarm_data_structure(message):
 def process_health_event(event):
     """ Process SNS message and notify PagerDuty, Slack and dashboard """
 
-    message = parse_sns_message(event)
+    # If lambda is invoked via SNS
+    if "Records" in event:
+        message = parse_sns_message(event)
+    else:
+        message = event
     # These should be defined by the component type or resource tags
     # Hard-code for now
     notify_slack = True
     notify_pagerduty = False
     notify_dashboard = False
 
-    if 'AlarmName' and 'AlarmDescription' in message:
-        sns_message_to_send = flatten_alarm_data_structure(message)
-
+    if 'Source' and 'Resource' in message:
         if notify_pagerduty:
-            notify_pagerduty_sns(sns_message_to_send)
+            notify_pagerduty_sns(message)
 
         if notify_slack:
-            notify_slack_sns(sns_message_to_send)
+            notify_slack_sns(message)
 
         if notify_dashboard:
-            notify_dashboard_sns(sns_message_to_send)
+            notify_dashboard_sns(message)
     else:
         LOG.debug("Message missing required fields")
 
@@ -60,54 +60,88 @@ def get_slack_channel(message):
     return target_channel
 
 
+def get_resource_string(resource):
+    """
+    Return a string resource identifier
+    depending on which fields are populated
+    """
+    names = []
+    if "Name" in resource:
+        names.append(resource["Name"])
+    if "ID" in resource:
+        resource_id = resource["ID"]
+        names.append(f"(ID: {resource_id})")
+    return " ".join(names)
+
+
 def format_slack_message(message):
     """ Format message string for rendering in Slack """
-    namespace = message.get("NameSpace", "<Missing metric namespace>")
-    metric = message.get("MetricName", "<Missing metric name>")
-    alarm = message.get("AlarmName", "<Missing cloudwatch alarm name>")
-    reason = message.get("NewStateReason", "<Missing cloudwatch state change reason>")
-    new_state = message.get("NewStateValue", "<Missing cloudwatch current state>")
-    old_state = message.get("OldStateValue", "<Missing cloudwatch previous state>")
-    region = message.get("Region", "<Missing AWS region>")
+    try:
+        content = Dict()
 
-    slack_header = f"*{namespace} {metric} {alarm}* in *{region}* is *{new_state}*"
-    slack_text = f"The state changed from {old_state} for the following reason: {reason}"
-    slack_message = f"{slack_header}\n\n{slack_text}"
-    return slack_message
+        content.service = message.get("Service", "untagged")
+        content.resource = get_resource_string(message.get("Resource", {"Name": "missing"}))
+        content.component_type = message.get("ComponentType", "unknown type")
+        content.state = "healthy" if message.get("Healthy", False) else "unhealthy"
+        content.header = f"{content.component_type}: {content.resource} is {content.state}"
+
+        # namespace = message.get("NameSpace", "<Missing metric namespace>")
+        # metric = message.get("MetricName", "<Missing metric name>")
+        # alarm = message.get("AlarmName", "<Missing cloudwatch alarm name>")
+        # reason = message.get("NewStateReason", "<Missing cloudwatch state change reason>")
+        # new_state = message.get("NewStateValue", "<Missing cloudwatch current state>")
+        # old_state = message.get("OldStateValue", "<Missing cloudwatch previous state>")
+        # region = message.get("Region", "<Missing AWS region>")
+        #
+        # slack_header = f"*{namespace} {metric} {alarm}* in *{region}* is *{new_state}*"
+        # slack_text = f"The state changed from {old_state} for the following reason: {reason}"
+        # slack_message = f"{slack_header}\n\n{slack_text}"
+    except (ValueError, KeyError) as err:
+        LOG.debug("Failed to read health event: %s", str(err))
+
+    return content
 
 
 def get_slack_post(message):
     """ Get channel and formatted string message as dict """
+
+    emoji = "blue-pill" if message.get("Healthy", False) else "sadpanda"
+    status = "Healthy" if message.get("Healthy", False) else "Unhealthy"
     slack_post = {
-        "channel": get_slack_channel(message),
-        "message": format_slack_message(message)
+        "username": f"Health Monitor: {status}",
+        "icon_emoji": emoji,
+        "channel": get_slack_channel(message)
     }
+    content = format_slack_message(message)
+    slack_post.update(content)
     return slack_post
 
 
 def notify_pagerduty_sns(pagerduty_sns_message):
     """ Send message to PagerDuty SNS """
-    pagerduty_sns_arn = os.environ['pagerduty_sns_arn']
+    pagerduty_sns_arn = os.environ['PAGERDUTY_SNS_ARN']
     send_to_sns(pagerduty_sns_arn, json.dumps(pagerduty_sns_message))
 
 
 def notify_slack_sns(slack_sns_message):
     """ Send message to Slack SNS """
-    slack_sns_arn = os.environ['slack_sns_arn']
+    slack_sns_arn = os.environ['SLACK_SNS_ARN']
     slack_post = get_slack_post(slack_sns_message)
-    send_to_sns(slack_sns_arn, json.dumps(slack_post))
+    send_to_sns(slack_sns_arn, slack_post)
 
 
 def notify_dashboard_sns(dashboard_sns_message):
     """ Send message to Dashboard SNS """
-    dashboard_sns_arn = os.environ['dashboard_sns_arn']
+    dashboard_sns_arn = os.environ['DASHBOARD_SNS_ARN']
     send_to_sns(dashboard_sns_arn, json.dumps(dashboard_sns_message))
 
 
 def send_to_sns(topic_arn, sns_message):
     """ Send message to SNS """
     message_to_send = json.dumps({'default': json.dumps(sns_message)})
-    sns = boto3.client('sns')
+    session = boto3.session.Session()
+    region = session.region_name
+    sns = boto3.client('sns', region_name=region)
     sns.publish(
         TopicArn=topic_arn,
         # Subject=sns_subject,
