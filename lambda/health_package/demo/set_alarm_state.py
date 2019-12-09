@@ -1,5 +1,6 @@
 """Test set alarm state"""
 import boto3
+import fire
 
 
 def get_alarm(alarm_name, region):
@@ -41,7 +42,7 @@ def set_alarm_state(state, alarm_name, region):
     return alarm_set_response
 
 
-def toggle_alarm_state(alarm_name, region):
+def toggle_alarm_state(alarm_name, region='eu-west-2'):
     """ Toggle alarm state between OK and ALARM based on current value """
 
     state = get_alarm_state(alarm_name, region)
@@ -64,7 +65,4 @@ def toggle_alarm_state(alarm_name, region):
 
 
 if __name__ == "__main__":
-    ALARM_NAME = 'health-monitoring-test-alarm-2'
-    REGION = 'eu-west-2'
-
-    toggle_alarm_state(ALARM_NAME, REGION)
+    fire.Fire(toggle_alarm_state)
