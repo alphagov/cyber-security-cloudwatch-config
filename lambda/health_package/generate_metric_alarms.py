@@ -132,7 +132,7 @@ def get_caller():
 def get_output_file_path():
     """ Generate path to output tfvars and ensure directory exists """
     caller_response = get_caller()
-    file_path = f"../../terraform/cloudwatch/deployments/{caller_response.Account}/"
+    file_path = f"../../terraform/per_account/deployments/{caller_response.Account}/"
     os.makedirs(file_path, exist_ok=True)
     return file_path
 
@@ -209,7 +209,8 @@ def main():
     for region in alarms:
         for service in alarms[region]:
             for metric in alarms[region][service]:
-                group = f"{region}__{service}__{metric}"
+                metric_var_name = metric.replace(".", "")
+                group = f"{region}__{service}__{metric_var_name}"
                 # group_alarm_data = json.dumps(alarms[region][service][metric], indent=2)
                 group_alarm_data = format_terraform.get_tf_list(alarms[region][service][metric], 2)
                 alarm_file.write(f"{group} = {group_alarm_data}")
@@ -220,14 +221,56 @@ if __name__ == "__main__":
     MONITORED_REGIONS = ["eu-west-1", "eu-west-2", "us-east-1"]
 
     # Match boto3 casing for consistency
+    # Suggested thresholds
+    # sqs__NumberOfMessagesSent < 10
+    # for 1 datapoints within 5 minutes
+    # sqs__ApproximateAgeOfOldestMessage > 4
+    # for 1 datapoints within 5 minutes
+    # kinesis__PutRecordSuccess < 1
+    # for 1 datapoints within 5 minutes
+    # kinesis__GetRecordsIteratorAgeMilliseconds >= 43200000
+    # for 1 datapoints within 1 hour
+    # kinesis__GetRecordsSuccess < 1
+    # for 1 datapoints within 15 minutes
+    # firehose__ExecuteProcessingSuccess < 1
+    # for 1 datapoints within 5 minutes
+    # firehose__ExecuteProcessingDuration > 60
+    # for 1 datapoints within 5 minutes
+    # firehose__ThrottledGetShardIterator > 1
+    # for 1 datapoints within 5 minutes
+    # firehose__DeliveryToS3DataFreshness > 500
+    # for 1 datapoints within 5 minutes
     METRIC_RULES = [
         Dict({
             "Namespace": "AWS/SQS",
             "MetricName": "ApproximateAgeOfOldestMessage",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
+            "Minimum": 2, # 300,
+            "Maximum": 300  # (4 * 24 * 60 * 60)
+        }),
+        Dict({
+            "Namespace": "AWS/Kinesis",
+            "MetricName": "PutRecord.Success",
+            "Statistic": "Minimum",
+            "Multiplier": 0.9,
+            "Minimum": 1
+        }),
+        Dict({
+            "Namespace": "AWS/Kinesis",
+            "MetricName": "GetRecords.IteratorAgeMilliseconds",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
             "Minimum": 300,
-            "Maximum": (4 * 24 * 60 * 60)
+            "Maximum": 43200000
+        }),
+        Dict({
+            "Namespace": "AWS/Firehose",
+            "MetricName": "ThrottledGetShardIterator",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 2,
+            "Maximum": 10
         })
     ]
     main()
