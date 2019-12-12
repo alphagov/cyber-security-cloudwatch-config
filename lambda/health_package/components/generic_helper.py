@@ -123,7 +123,7 @@ class GenericHelper:
         """
         Get single value of statistic and
         """
-        statistic_value = None
+        statistic_value = 0
         metric_stats = cls.get_metric_statistics(metric, rule.Statistic)
         print(str(metric_stats))
 
@@ -131,11 +131,28 @@ class GenericHelper:
             statistic_value = datapoint[rule.Statistic]
 
         threshold = statistic_value * rule.Multiplier
-        if threshold < rule.Minimum:
+        LOG.info(
+            "Baseline threshold: %s * %s = %s",
+            statistic_value,
+            rule.Multiplier,
+            threshold
+        )
+        # The min/max overrides do not have to be set
+        # If they are set they override the calculated
+        # threshold value
+        if "Minimum" in rule and threshold < rule.Minimum:
+            LOG.info(
+                "Baseline threshold (%n) is less than rule min (%n)",
+                threshold,
+                rule.Minimum
+            )
             threshold = rule.Minimum
-        elif threshold > rule.Maximum:
+        elif "Maximum" in rule and threshold > rule.Maximum:
+            LOG.info(
+                "Baseline threshold (%n) is greater than rule max (%n)",
+                threshold,
+                rule.Minimum
+            )
             threshold = rule.Maximum
-
-        print(f"Threshold: {statistic_value} * {rule.Multiplier} = {threshold}")
 
         return threshold
