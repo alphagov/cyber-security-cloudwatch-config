@@ -46,7 +46,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   source_code_hash  = filebase64sha256(local.zipfile)
   function_name     = "cloudwatch_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
-  handler           = "lambda_handler.lambda_handler"
+  handler           = "lambda_handler.cloudwatch_event_handler"
   runtime           = "python3.7"
   timeout           = 6
 
