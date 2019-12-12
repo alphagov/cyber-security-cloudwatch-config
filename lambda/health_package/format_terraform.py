@@ -43,8 +43,12 @@ def get_tf_item(source, indent_size, indent_level=0):
         formatted += f"\"{source}\""
     elif isinstance(source, int):
         formatted += f"{source}"
+    elif isinstance(source, float):
+        formatted += f"{source}"
     elif source is None:
         formatted += f"\"\""
+    else:
+        print(str(type(source)))
     return formatted
 
 
