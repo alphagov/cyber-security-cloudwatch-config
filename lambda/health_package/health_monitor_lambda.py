@@ -32,7 +32,7 @@ def process_health_event(event):
     # Hard-code for now
     notify_slack = True
     notify_pagerduty = False
-    notify_dashboard = False
+    notify_dashboard = True 
 
     if 'Source' and 'Resource' in message:
         if notify_pagerduty:
