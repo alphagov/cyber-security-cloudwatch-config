@@ -7,7 +7,8 @@ data "aws_iam_policy_document" "health_monitor_forwarder_assume_role" {
       type        = "AWS"
       identifiers = [
         "arn:aws:iam::${module.reference_accounts.staging}:role/cloudwatch_forwarder_role",
-        "arn:aws:iam::${module.reference_accounts.csls}:role/cloudwatch_forwarder_role"
+        "arn:aws:iam::${module.reference_accounts.csls}:role/cloudwatch_forwarder_role",
+        "arn:aws:iam::${module.reference_accounts.demo}:role/cloudwatch_forwarder_role"
       ]
     }
   }
