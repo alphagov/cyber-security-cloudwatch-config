@@ -10,6 +10,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw1_lambda" {
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_event_handler"
   runtime           = "python3.7"
+  timeout           = 30
 
   environment {
     variables = {
@@ -48,7 +49,7 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_event_handler"
   runtime           = "python3.7"
-  timeout           = 6
+  timeout           = 30
 
   environment {
     variables = {
