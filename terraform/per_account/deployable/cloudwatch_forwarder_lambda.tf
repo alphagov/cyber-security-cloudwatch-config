@@ -56,9 +56,10 @@ resource "aws_lambda_function" "cloudwatch_forwarder_euw2_lambda" {
       LOGLEVEL = ""
       PROD_ACCOUNT = module.reference_accounts.production
       TEST_ACCOUNT = module.reference_accounts.staging
-      TARGET_ROLE = "health_monitor_forwarder"
-      TARGET_LAMBDA = "health_monitor_lambda"
-      TARGET_REGION = "eu-west-2"
+      TARGET_ROLE = var.TARGET_ROLE
+      TARGET_LAMBDA = var.TARGET_LAMBDA
+      TARGET_REGION = var.TARGET_REGION
+      DEF_ENVIRONMENT = var.DEF_ENVIRONMENT
     }
   }
 }
