@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "health_monitor_update_dashboard_ssm_policy" {
       "ssm:GetParameter"
     ]
 
-    resources = ["arn:aws:ssm:eu-west-2:${module.reference_accounts.staging}:parameter/health-monitoring/updated-dashboard/splunk-hec-token"
+    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/health-monitoring/updated-dashboard/splunk-hec-token"
     ]
   }
 }
