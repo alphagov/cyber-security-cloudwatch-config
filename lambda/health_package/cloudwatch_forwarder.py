@@ -169,7 +169,7 @@ def cloudwatch_to_standard_health_data_model(source_message):
 
     event = get_standard_health_event_template()
     event.Source = "AWS/CloudWatch"
-    event.Environment = source_message.Tags.get("Environment", "Test")
+    event.Environment = source_message.Tags.get("Environment", "Test").lower()
     event.Service = source_message.Tags.get("Service", "Unknown")
     event.Healthy = (source_message.NewStateValue == "OK")
     event.ComponentType = source_message.Trigger.Namespace
