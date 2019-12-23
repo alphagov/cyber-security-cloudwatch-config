@@ -246,8 +246,8 @@ if __name__ == "__main__":
             "MetricName": "ApproximateAgeOfOldestMessage",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Minimum": 2, # 300,
-            "Maximum": 300  # (4 * 24 * 60 * 60)
+            "Minimum": 2,       # 300,
+            "Maximum": 300      # (4 * 24 * 60 * 60)
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
