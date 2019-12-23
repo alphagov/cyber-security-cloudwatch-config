@@ -80,6 +80,7 @@ def format_slack_message(message):
         content = Dict()
 
         content.service = message.get("Service", "untagged")
+        content.environment = message.get("Environment", "Test").title()
         content.resource = get_resource_string(message.get("Resource", {"Name": "missing"}))
         content.component_type = message.get("ComponentType", "unknown type")
         content.state = "healthy" if message.get("Healthy", False) else "unhealthy"
