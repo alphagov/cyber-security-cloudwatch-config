@@ -48,9 +48,9 @@ def reset_all_alarm_states(state):
         for region in REGIONS:
             alarms = get_alarms(region)
             for alarm in alarms:
+                alarm_name = alarm["AlarmName"]
                 is_health_alarm = is_health_monitor_alarm(alarm)
                 if is_health_alarm:
-                    alarm_name = alarm["AlarmName"]
                     print(f"Setting {alarm_name} to {state} in {region}")
                     set_alarm_state(state, alarm_name, region)
                 else:
