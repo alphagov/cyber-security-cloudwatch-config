@@ -30,6 +30,15 @@ def set_alarm_state(state, alarm_name, region):
     return alarm_set_response
 
 
+def is_health_monitor_alarm(alarm):
+    """ Check that the alarm target is the cloudwatch forwarder """
+    is_health_alarm = False
+    if len(alarm["OKActions"]) > 0:
+        action = alarm["OKActions"][0]
+        is_health_alarm = "cloudwatch_forwarder" in action
+    return is_health_alarm
+
+
 def reset_all_alarm_states(state):
     """
     Set state of all configured alarms to the state value
@@ -39,9 +48,13 @@ def reset_all_alarm_states(state):
         for region in REGIONS:
             alarms = get_alarms(region)
             for alarm in alarms:
-                alarm_name = alarm["AlarmName"]
-                print(f"Setting {alarm_name} to {state} in {region}")
-                set_alarm_state(state, alarm_name, region)
+                is_health_alarm = is_health_monitor_alarm(alarm)
+                if is_health_alarm:
+                    alarm_name = alarm["AlarmName"]
+                    print(f"Setting {alarm_name} to {state} in {region}")
+                    set_alarm_state(state, alarm_name, region)
+                else:
+                    print(f"Not setting state: {alarm_name} is not ours")
 
     else:
         print(
