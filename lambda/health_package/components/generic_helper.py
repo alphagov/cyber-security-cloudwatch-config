@@ -142,14 +142,14 @@ class GenericHelper:
         # threshold value
         if "Minimum" in rule and threshold < rule.Minimum:
             LOG.info(
-                "Baseline threshold (%n) is less than rule min (%n)",
+                "Baseline threshold (%s) is less than rule min (%s)",
                 threshold,
                 rule.Minimum
             )
             threshold = rule.Minimum
         elif "Maximum" in rule and threshold > rule.Maximum:
             LOG.info(
-                "Baseline threshold (%n) is greater than rule max (%n)",
+                "Baseline threshold (%s) is greater than rule max (%s)",
                 threshold,
                 rule.Minimum
             )

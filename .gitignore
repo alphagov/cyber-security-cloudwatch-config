@@ -119,3 +119,5 @@ setup.cfg
 
 # PyCharm
 .idea/
+
+deployments

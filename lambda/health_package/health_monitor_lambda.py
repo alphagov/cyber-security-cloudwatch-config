@@ -32,7 +32,7 @@ def process_health_event(event):
     # Hard-code for now
     notify_slack = True
     notify_pagerduty = False
-    notify_dashboard = False
+    notify_dashboard = True
 
     if 'Source' and 'Resource' in message:
         if notify_pagerduty:
@@ -80,6 +80,7 @@ def format_slack_message(message):
         content = Dict()
 
         content.service = message.get("Service", "untagged")
+        content.environment = message.get("Environment", "Test").title()
         content.resource = get_resource_string(message.get("Resource", {"Name": "missing"}))
         content.component_type = message.get("ComponentType", "unknown type")
         content.state = "healthy" if message.get("Healthy", False) else "unhealthy"

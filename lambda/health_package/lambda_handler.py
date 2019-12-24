@@ -2,6 +2,7 @@
 from generate_metric_alarms import process_generate_metric_alarms_event
 from health_monitor_lambda import process_health_event
 from cloudwatch_forwarder import process_cloudwatch_event
+from splunk_forwarder import process_update_dashboard_event
 from logger import LOG
 
 
@@ -21,3 +22,12 @@ def cloudwatch_event_handler(event, context):
     """ Lambda entrypoint for cloudwatch alarm event """
     LOG.info("Cloudwatch event: %s", str(event))
     process_cloudwatch_event(event)
+
+
+def splunk_forwarder_event_handler(event, context):
+    """ Receive and process Health Monitoring message """
+    try:
+        process_update_dashboard_event(event)
+
+    except (ValueError, KeyError):
+        LOG.error('Failed to build Splunk payload for health monitoring data')
