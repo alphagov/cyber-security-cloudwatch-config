@@ -86,7 +86,6 @@ def format_slack_message(message):
         content.state = "healthy" if message.get("Healthy", False) else "unhealthy"
         content.header = f"{content.component_type}: {content.resource} is {content.state}"
         content.message = message.get("Message", None)
-        content.context = message.get("Context", None)
 
         # namespace = message.get("NameSpace", "<Missing metric namespace>")
         # metric = message.get("MetricName", "<Missing metric name>")
