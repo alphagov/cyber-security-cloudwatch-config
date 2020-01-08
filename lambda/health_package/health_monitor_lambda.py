@@ -87,17 +87,6 @@ def format_slack_message(message):
         content.header = f"{content.component_type}: {content.resource} is {content.state}"
         content.message = message.get("Message", None)
 
-        # namespace = message.get("NameSpace", "<Missing metric namespace>")
-        # metric = message.get("MetricName", "<Missing metric name>")
-        # alarm = message.get("AlarmName", "<Missing cloudwatch alarm name>")
-        # reason = message.get("NewStateReason", "<Missing cloudwatch state change reason>")
-        # new_state = message.get("NewStateValue", "<Missing cloudwatch current state>")
-        # old_state = message.get("OldStateValue", "<Missing cloudwatch previous state>")
-        # region = message.get("Region", "<Missing AWS region>")
-        #
-        # slack_header = f"*{namespace} {metric} {alarm}* in *{region}* is *{new_state}*"
-        # slack_text = f"The state changed from {old_state} for the following reason: {reason}"
-        # slack_message = f"{slack_header}\n\n{slack_text}"
     except (ValueError, KeyError) as err:
         LOG.debug("Failed to read health event: %s", str(err))
 
