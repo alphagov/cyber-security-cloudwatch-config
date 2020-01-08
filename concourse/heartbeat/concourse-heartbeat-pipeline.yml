@@ -16,16 +16,12 @@ success_notify: &success_notify
   params:
     health: healthy
     message: Pipeline completed succesfully
-    context: "Should pass"
-    invert: False
 
 failure_notify: &failure_notify
   put: health-notification
   params:
     health: unhealthy
     message: Pipeline failed
-    context: "Should pass"
-    invert: False
 
 heartbeat_pass_task: &heartbeat_pass_task
   platform: linux
@@ -72,13 +68,15 @@ resources:
       headers:
         Authorization: "Bearer ((health_token_test))"
       json:
-        context: "{context}"
         state: "{health}"
-        invert: "{invert}"
+        context: "{CONTEXT}"
+        invert: "{INVERT}"
         message: "{message}"
         pipeline: "{BUILD_PIPELINE_NAME}"
         job: "{BUILD_JOB_NAME}"
         build_number: "{BUILD_NAME}"
+      CONTEXT: "{CONTEXT}"
+      INVERT: "{INVERT}"
 
 
 jobs:
@@ -95,19 +93,9 @@ jobs:
 
     on_success:
       <<: *success_notify
-      params:
-        health: healthy
-        message: Pipeline completed succesfully
-        context: "Should pass"
-        invert: False
 
     on_failure:
       <<: *failure_notify
-      params:
-        health: unhealthy
-        message: Pipeline failed
-        context: "Should pass"
-        invert: False
 
 - name: concourse-heartbeat-fail
   plan:
@@ -119,20 +107,11 @@ jobs:
       params:
         ENVIRONMENT: "test"
         CONTEXT: "Should fail"
+        INVERT: true
 
     on_success:
       <<: *success_notify
-      params:
-        health: healthy
-        message: Pipeline completed succesfully
-        context: "Should fail"
-        invert: True
 
     on_failure:
       <<: *failure_notify
-      params:
-        health: unhealthy
-        message: Pipeline failed
-        context: "Should fail"
-        invert: True
 
