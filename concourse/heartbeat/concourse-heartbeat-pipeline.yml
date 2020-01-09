@@ -11,17 +11,8 @@ heartbeat_image_resource: &heartbeat_image_resource
     repository: ubuntu
     tag: '18.04'
 
-success_notify: &success_notify
+health_status_notify: &health_status_notify
   put: health-notification
-  params:
-    health: healthy
-    message: Pipeline completed succesfully
-
-failure_notify: &failure_notify
-  put: health-notification
-  params:
-    health: unhealthy
-    message: Pipeline failed
 
 heartbeat_pass_task: &heartbeat_pass_task
   platform: linux
@@ -68,15 +59,13 @@ resources:
       headers:
         Authorization: "Bearer ((health_token_test))"
       json:
+        service: "{service}"
         state: "{health}"
-        context: "{CONTEXT}"
-        invert: "{INVERT}"
         message: "{message}"
         pipeline: "{BUILD_PIPELINE_NAME}"
         job: "{BUILD_JOB_NAME}"
         build_number: "{BUILD_NAME}"
-      CONTEXT: "{CONTEXT}"
-      INVERT: "{INVERT}"
+      service: "Concourse"
 
 
 jobs:
@@ -87,15 +76,18 @@ jobs:
   - task: heartbeat
     config:
       <<: *heartbeat_pass_task
-      params:
-        ENVIRONMENT: "test"
-        CONTEXT: "Should pass"
 
     on_success:
-      <<: *success_notify
+      <<: *health_status_notify
+      params:
+        message: "Pipeline completed successfully"
+        health: healthy
 
     on_failure:
-      <<: *failure_notify
+      <<: *health_status_notify
+      params:
+        message: "Pipeline failed"
+        health: unhealthy
 
 - name: concourse-heartbeat-fail
   plan:
@@ -104,14 +96,16 @@ jobs:
   - task: heartbeat
     config:
       <<: *heartbeat_fail_task
-      params:
-        ENVIRONMENT: "test"
-        CONTEXT: "Should fail"
-        INVERT: true
 
     on_success:
-      <<: *success_notify
+      <<: *health_status_notify
+      params:
+        message: "Pipeline completed successfully but should fail"
+        health: unhealthy
 
     on_failure:
-      <<: *failure_notify
+      <<: *health_status_notify
+      params:
+        message: "Pipeline failed and should fail"
+        health: healthy
 
