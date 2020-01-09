@@ -47,9 +47,9 @@ resource_types:
       tag: latest
 
 resources:
-  - name: every_hour
+  - name: every_6_hours
     type: time
-    source: {interval: 1h}
+    source: {interval: 6h}
 
   - name: health-notification
     type: http-api
@@ -71,7 +71,7 @@ resources:
 jobs:
 - name: concourse-heartbeat-pass
   plan:
-  - get: every_hour
+  - get: every_6_hours
     trigger: true
   - task: heartbeat
     config:
@@ -91,7 +91,7 @@ jobs:
 
 - name: concourse-heartbeat-fail
   plan:
-  - get: every_hour
+  - get: every_6_hours
     trigger: true
   - task: heartbeat
     config:
