@@ -54,8 +54,8 @@ slack_webhook_check_task: &slack_webhook_check_task
       	echo "HookURL: ${hook}"
 
         echo "Testing hook for channel ${channel}"
-        message="*Slack webhook testing*\\nPlease ignore this message"
-        json="{\"channel\": \"$channel\", \"icon_emoji\": \":drill:\", \"text\": \"$message\"}"
+        message="*This is a drill*\\nPlease ignore this message"
+        json="{\"channel\": \"$channel\", \"username\": \"Slack Webhook Testing\", \"icon_emoji\": \":drill:\", \"text\": \"$message\"}"
         status_code=$(curl -s -o /dev/null -w '%{http_code}' -d "payload=$json" $hook)
         echo "Status code: ${status_code}"
 
