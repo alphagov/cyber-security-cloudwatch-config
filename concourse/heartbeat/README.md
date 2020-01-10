@@ -15,5 +15,6 @@ resources to other pipelines.
 ## Deploy 
 
 ```fly
-fly -t cd sp -p heartbeat -c concourse-heartbeat-pipeline.yml
+fly -t cd sp -p heartbeat \
+    -c concourse-heartbeat-pipeline.yml
 ```
