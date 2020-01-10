@@ -11,3 +11,9 @@ and correctly responding to non-zero exit statuses.
 
 It's also there as an example of how to add the health monitoring 
 resources to other pipelines. 
+
+## Deploy 
+
+```fly
+fly -t cd sp -p heartbeat -c concourse-heartbeat-pipeline.yml
+```
