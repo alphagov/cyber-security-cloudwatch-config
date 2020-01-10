@@ -49,7 +49,7 @@ resource_types:
 resources:
   - name: once_per_day
     type: time
-    source: {interval: 1d}
+    source: {interval: 24h}
 
   - name: health-notification
     type: http-api
