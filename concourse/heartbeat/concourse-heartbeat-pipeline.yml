@@ -2,7 +2,6 @@
 groups:
 - name: concourse-heartbeat
   jobs:
-  - concourse-heartbeat-fail
   - concourse-heartbeat-pass
 
 heartbeat_image_resource: &heartbeat_image_resource
@@ -25,19 +24,6 @@ heartbeat_pass_task: &heartbeat_pass_task
     - |
       set -x
       echo "Testing concourse reporting: success"
-
-heartbeat_fail_task: &heartbeat_fail_task
-  platform: linux
-  image_resource: *heartbeat_image_resource
-  run:
-    path: sh
-    args:
-    - -eu
-    - -c
-    - |
-      set -x
-      echo "Testing concourse reporting: failure"
-      exit(1)
 
 resource_types:
   - name: http-api
@@ -88,24 +74,3 @@ jobs:
       params:
         message: "Pipeline failed"
         health: unhealthy
-
-- name: concourse-heartbeat-fail
-  plan:
-  - get: once_per_day
-    trigger: true
-  - task: heartbeat
-    config:
-      <<: *heartbeat_fail_task
-
-    on_success:
-      <<: *health_status_notify
-      params:
-        message: "Pipeline completed successfully but should fail"
-        health: unhealthy
-
-    on_failure:
-      <<: *health_status_notify
-      params:
-        message: "Pipeline failed and should fail"
-        health: healthy
-
