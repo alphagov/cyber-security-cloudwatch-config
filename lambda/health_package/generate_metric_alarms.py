@@ -250,6 +250,12 @@ if __name__ == "__main__":
             "Maximum": 300      # (4 * 24 * 60 * 60)
         }),
         Dict({
+            "Namespace": "AWS/SQS",
+            "MetricName": "NumberOfMessagesSent",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1
+        }),
+        Dict({
             "Namespace": "AWS/Kinesis",
             "MetricName": "PutRecord.Success",
             "Statistic": "Minimum",
