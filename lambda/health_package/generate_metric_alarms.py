@@ -251,9 +251,11 @@ if __name__ == "__main__":
         }),
         Dict({
             "Namespace": "AWS/SQS",
-            "MetricName": "NumberOfMessagesSent",
+            "MetricName": "ApproximateNumberOfMessagesVisible",
             "Statistic": "Maximum",
-            "Multiplier": 1.1
+            "Multiplier": 1.1,
+            "Minimum": 500,
+            "Maximum": 5000
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
