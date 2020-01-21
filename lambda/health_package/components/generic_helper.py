@@ -156,3 +156,8 @@ class GenericHelper:
             threshold = rule.Maximum
 
         return threshold
+
+    @classmethod
+    def get_tags_for_metric_resource(cls, metric, region=None):
+        """ Default method return empty dict if no namespace handler """
+        return {}

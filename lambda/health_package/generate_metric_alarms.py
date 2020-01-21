@@ -271,6 +271,13 @@ if __name__ == "__main__":
             "Multiplier": 1.1,
             "Minimum": 2,
             "Maximum": 10
+        }),
+        Dict({
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Errors",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Maximum": 0
         })
     ]
     main()

@@ -30,7 +30,7 @@ def process_health_event(event):
         message = event
     # These should be defined by the component type or resource tags
     # Hard-code for now
-    notify_slack = True
+    notify_slack = event.get("NotifySlack", True)
     notify_pagerduty = False
     notify_dashboard = True
 
