@@ -56,7 +56,20 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
       "*"
     ]
   }
-}
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "lambda:GetFunction",
+      "lambda:ListTags"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+}`
 
 resource "aws_iam_policy" "cloudwatch_forwarder_policy" {
   name   = "CloudWatchForwarderPolicy"
