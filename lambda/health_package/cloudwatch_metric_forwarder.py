@@ -27,8 +27,11 @@ def process_cloudwatch_metric_event():
     for alarm in alarms:
         alarm = Dict(alarm)
         current_state = alarm.StateValue
+        statistics = None
         if current_state != "INSUFFICIENT_DATA":
             statistics = get_cloudwatch_metric_statistics(alarm)
+
+        if statistics is not None:
             metric_event = cloudwatch_metric_to_standard_health_data_model(alarm, statistics)
             response = send_to_health_monitor(metric_event)
             LOG.debug("Lambda invoke status: %s", response.StatusCode)
@@ -37,7 +40,7 @@ def process_cloudwatch_metric_event():
             else:
                 stats["failed"] += 1
         else:
-            stats["insufficient"] += 1
+            stats["no_data"] += 1
             LOG.debug("%s state is %s", alarm.MetricName, current_state)
 
     return stats
@@ -76,7 +79,7 @@ def get_cloudwatch_metric_statistics(alarm):
         Statistics=[statistic],
     )
 
-    datapoints = response.get("Datapoints", [])
+    datapoints = response.get("Datapoints", None)
 
     return datapoints
 
@@ -91,10 +94,13 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     metric.update(alarm)
     metric.update(alarm.Dimensions)
     helper = enrich.get_namespace_helper(metric.Namespace)
+    LOG.debug("Using %s helper", helper.__class__.__name__)
     tags = helper.get_tags_for_metric_resource(
         metric,
         region=region
     )
+    alarm.Tags = tags
+    LOG.debug("Tags: %s", json.dumps(tags))
 
     event = get_standard_health_event_template()
     event.Source = "AWS/CloudWatch"
