@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
       "*"
     ]
   }
-}`
+}
 
 resource "aws_iam_policy" "cloudwatch_forwarder_policy" {
   name   = "CloudWatchForwarderPolicy"
