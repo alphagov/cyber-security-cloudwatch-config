@@ -45,7 +45,7 @@ class SqsHelper(GenericHelper):
         There is some duplication of the above function it would be nice to remove
         """
         namespace = metric.Namespace
-        tags = None
+        tags = {}
         try:
             LOG.debug("Getting boto client for %s in %s", namespace, region)
             client = cls.get_client_from_namespace(namespace, region)

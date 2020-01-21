@@ -45,7 +45,7 @@ class KinesisHelper(GenericHelper):
         There is some duplication of the above function it would be nice to remove
         """
         namespace = metric.Namespace
-        tags = None
+        tags = {}
         try:
             print(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
