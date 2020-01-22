@@ -64,7 +64,7 @@ def assume_forwarder_role(environment):
 
 
 def get_health_target_lambda(environment):
-    """ Return production instance for matching environments or staging otherwise """
+    """ Return calculated ARN for lambda target function """
     account_id = get_environment_account_id(environment)
     target_region = os.environ.get("TARGET_REGION")
     target_lambda = os.environ.get("TARGET_LAMBDA")
@@ -72,40 +72,71 @@ def get_health_target_lambda(environment):
     return lambda_arn
 
 
-def send_to_health_monitor(message):
-    """ Us boto3 to invoke lamdba x-region """
-    env = get_environment(message)
-    session = assume_forwarder_role(env)
-    # lambda_arn = get_health_target_lambda(env)
-    lambda_function = os.environ.get("TARGET_LAMBDA")
+def get_health_target_queue_arn(environment):
+    """ Return calculated ARN for SQS target queue """
+    account_id = get_environment_account_id(environment)
     target_region = os.environ.get("TARGET_REGION")
+    target_queue = os.environ.get("TARGET_SQS_QUEUE")
+    queue_arn = f"arn:aws:sqs:{target_region}:{account_id}:{target_queue}"
+    return queue_arn
 
-    LOG.debug("Sending to %s in %s", lambda_function, target_region)
 
+def get_health_target_queue_url(environment):
+    """ Return calculated URL for SQS target queue """
+    account_id = get_environment_account_id(environment)
+    target_region = os.environ.get("TARGET_REGION")
+    target_queue = os.environ.get("TARGET_SQS_QUEUE")
+    # https://sqs.<region>.amazonaws.com/<account>/<queue_name>
+    queue_url = f"https://sqs.{target_region}.amazonaws.com/{account_id}/{target_queue}"
+    return queue_url
+
+
+def send_to_health_monitor(message):
+    """ Us boto3 to send cross-account SQS to health monitoring environment """
+    # """ Us boto3 to invoke lamdba x-region """
+    # env = get_environment(message)
+    # session = assume_forwarder_role(env)
+    # # lambda_arn = get_health_target_lambda(env)
+    # lambda_function = os.environ.get("TARGET_LAMBDA")
+    # target_region = os.environ.get("TARGET_REGION")
+    #
+    # LOG.debug("Sending to %s in %s", lambda_function, target_region)
+    #
+    # payload_json = json.dumps(message, default=str)
+    # payload_bytes = payload_json.encode('utf-8')
+    # context = get_client_context()
+    #
+    # LOG.debug("Built payload, getting assumed role lambda client")
+    #
+    # aws_lambda = boto3.client(
+    #     "lambda",
+    #     aws_access_key_id=session["AccessKeyId"],
+    #     aws_secret_access_key=session["SecretAccessKey"],
+    #     aws_session_token=session["SessionToken"],
+    #     region_name=target_region,
+    # )
+    #
+    # LOG.debug("Obtained lambda client with assumed session credentials")
+    #
+    # invoke_params = {
+    #     "FunctionName": lambda_function,
+    #     "InvocationType": 'Event',
+    #     "ClientContext": context,
+    #     "Payload": payload_bytes
+    # }
+    # LOG.debug("Invoke arguments: %s", json.dumps(message, default=str))
+    # response = aws_lambda.invoke(**invoke_params)
+    #
+    env = get_environment(message)
+    target_region = os.environ.get("TARGET_REGION")
+    aws_sqs = boto3.client("sqs", region_name=target_region)
     payload_json = json.dumps(message, default=str)
-    payload_bytes = payload_json.encode('utf-8')
-    context = get_client_context()
-
-    LOG.debug("Built payload, getting assumed role lambda client")
-
-    aws_lambda = boto3.client(
-        "lambda",
-        aws_access_key_id=session["AccessKeyId"],
-        aws_secret_access_key=session["SecretAccessKey"],
-        aws_session_token=session["SessionToken"],
-        region_name=target_region,
+    queue_url = get_health_target_queue_url(env)
+    LOG.debug("Send to SQS: %s", queue_url)
+    response = aws_sqs.send_message(
+        QueueUrl=queue_url,
+        MessageBody=payload_json
     )
-
-    LOG.debug("Obtained lambda client with assumed session credentials")
-
-    invoke_params = {
-        "FunctionName": lambda_function,
-        "InvocationType": 'Event',
-        "ClientContext": context,
-        "Payload": payload_bytes
-    }
-    LOG.debug("Invoke arguments: %s", json.dumps(message, default=str))
-    response = aws_lambda.invoke(**invoke_params)
 
     return Dict(response)
 

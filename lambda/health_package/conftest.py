@@ -284,6 +284,19 @@ def mock_list_tags_response():
 
 
 @pytest.fixture()
+def mock_sqs_send_message_response():
+    response = {
+        'MD5OfMessageBody': '5a436cac350d96eb5c9ff594907f9397',
+        'MD5OfMessageAttributes': 'da09782a09540a4e759f7666815ab16e',
+        'MD5OfMessageSystemAttributes': '39ee2b4055f6b0173cc6bf9e701a59f4',
+        'MessageId': 'aa641d09283a0f86f9f0c80a81eeb048',
+        'SequenceNumber': '00001'
+    }
+
+    return response
+
+
+@pytest.fixture()
 def health_monitor_sns_event():
     """Create a request event"""
 
@@ -336,3 +349,51 @@ def health_monitor_sns_event():
     })
 
     return event_data
+
+
+@pytest.fixture()
+def standard_health_alarm_event():
+    event = {
+        "ComponentType": "AWS/Lambda",
+        "Environment": "prod",
+        "EventType": "Alarm",
+        "Healthy": True,
+        "Resource": {
+            "ID": None,
+            "Name": "cloudwatch_alarm_forwarder"
+        },
+        "Service": "Unknown",
+        "Source": "AWS/CloudWatch",
+        "SourceData": {
+            "AWSAccountId": "885513274347",
+            "AlarmDescription": "Tracks number of errors from lambda functions.",
+            "AlarmName": "cloudwatch_alarm_forwarder_alarm",
+            "NewStateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+            "NewStateValue": "OK",
+            "OldStateValue": "ALARM",
+            "Region": "EU (London)",
+            "StateChangeTime": "2020-01-22T11:09:02.049+0000",
+            "Tags": {},
+            "Trigger": {
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "Dimensions": [
+                    {
+                        "name": "FunctionName",
+                        "value": "cloudwatch_alarm_forwarder"
+                    }
+                ],
+                "EvaluateLowSampleCountPercentile": "",
+                "EvaluationPeriods": 1,
+                "MetricName": "Errors",
+                "Namespace": "AWS/Lambda",
+                "Period": 300,
+                "Statistic": "MAXIMUM",
+                "StatisticType": "Statistic",
+                "Threshold": 0.0,
+                "TreatMissingData": "- TreatMissingData:                    notBreaching",
+                "Unit": None
+            }
+        }
+    }
+
+    return Dict(event)
