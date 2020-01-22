@@ -5,12 +5,7 @@ import os
 import boto3
 from addict import Dict
 from logger import LOG
-
-
-def parse_sns_message(event):
-    """ Retrieve SNS message field from lambda invoke event """
-    message = json.loads(event['Records'][0]['Sns']['Message'])
-    return message
+from cloudwatch_forwarder import parse_messages
 
 
 def flatten_alarm_data_structure(message):
@@ -24,13 +19,21 @@ def process_health_event(event):
     """ Process SNS message and notify PagerDuty, Slack and dashboard """
 
     # If lambda is invoked via SNS
+    LOG.debug("Raw event: %s", json.dumps(event))
     if "Records" in event:
-        message = parse_sns_message(event)
+        messages = parse_messages(event)
     else:
-        message = event
+        messages = [event]
+
+    for message in messages:
+        process_health_message(message)
+
+
+def process_health_message(message):
+    """ Process each message from the parent invocation event """
     # These should be defined by the component type or resource tags
     # Hard-code for now
-    notify_slack = event.get("NotifySlack", True)
+    notify_slack = message.get("NotifySlack", True)
     notify_pagerduty = False
     notify_dashboard = True
 
