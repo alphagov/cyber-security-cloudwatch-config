@@ -17,3 +17,7 @@ resource "aws_lambda_function" "health_monitor_lambda" {
   }
 }
 
+resource "aws_lambda_event_source_mapping" "health_monitor_invoke_from_sqs" {
+  event_source_arn = aws_sqs_queue.incoming_health_events.arn
+  function_name    = aws_lambda_function.health_monitor_lambda.arn
+}
