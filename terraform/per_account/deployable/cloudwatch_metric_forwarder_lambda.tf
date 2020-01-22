@@ -10,13 +10,14 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL        = ""
-      PROD_ACCOUNT    = module.reference_accounts.production
-      TEST_ACCOUNT    = module.reference_accounts.staging
-      TARGET_ROLE     = var.TARGET_ROLE
-      TARGET_LAMBDA   = var.TARGET_LAMBDA
-      TARGET_REGION   = var.TARGET_REGION
-      DEF_ENVIRONMENT = var.DEF_ENVIRONMENT
+      LOGLEVEL          = ""
+      PROD_ACCOUNT      = module.reference_accounts.production
+      TEST_ACCOUNT      = module.reference_accounts.staging
+      TARGET_ROLE       = var.TARGET_ROLE
+      TARGET_LAMBDA     = var.TARGET_LAMBDA
+      TARGET_SQS_QUEUE  = var.TARGET_SQS_QUEUE
+      TARGET_REGION     = var.TARGET_REGION
+      DEF_ENVIRONMENT   = var.DEF_ENVIRONMENT
     }
   }
 }
@@ -56,13 +57,14 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL        = ""
-      PROD_ACCOUNT    = module.reference_accounts.production
-      TEST_ACCOUNT    = module.reference_accounts.staging
-      TARGET_ROLE     = var.TARGET_ROLE
-      TARGET_LAMBDA   = var.TARGET_LAMBDA
-      TARGET_REGION   = var.TARGET_REGION
-      DEF_ENVIRONMENT = var.DEF_ENVIRONMENT
+      LOGLEVEL          = ""
+      PROD_ACCOUNT      = module.reference_accounts.production
+      TEST_ACCOUNT      = module.reference_accounts.staging
+      TARGET_ROLE       = var.TARGET_ROLE
+      TARGET_LAMBDA     = var.TARGET_LAMBDA
+      TARGET_SQS_QUEUE  = var.TARGET_SQS_QUEUE
+      TARGET_REGION     = var.TARGET_REGION
+      DEF_ENVIRONMENT   = var.DEF_ENVIRONMENT
     }
   }
 }
@@ -71,7 +73,7 @@ resource "aws_cloudwatch_event_rule" "every_hour_euw2" {
   provider            = aws.eu-west-2
   name                = "every-hour"
   description         = "Fires every hour"
-  schedule_expression = "cron(0 * ? * * *)"
+  schedule_expression = "cron(0/5 * ? * * *)"
 }
 
 resource "aws_cloudwatch_event_target" "run_every_hour_euw2" {

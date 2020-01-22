@@ -10,13 +10,14 @@ resource "aws_lambda_function" "cloudwatch_alarm_forwarder_euw1_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL        = ""
-      PROD_ACCOUNT    = module.reference_accounts.production
-      TEST_ACCOUNT    = module.reference_accounts.staging
-      TARGET_ROLE     = var.TARGET_ROLE
-      TARGET_LAMBDA   = var.TARGET_LAMBDA
-      TARGET_REGION   = var.TARGET_REGION
-      DEF_ENVIRONMENT = var.DEF_ENVIRONMENT
+      LOGLEVEL          = ""
+      PROD_ACCOUNT      = module.reference_accounts.production
+      TEST_ACCOUNT      = module.reference_accounts.staging
+      TARGET_ROLE       = var.TARGET_ROLE
+      TARGET_LAMBDA     = var.TARGET_LAMBDA
+      TARGET_SQS_QUEUE  = var.TARGET_SQS_QUEUE
+      TARGET_REGION     = var.TARGET_REGION
+      DEF_ENVIRONMENT   = var.DEF_ENVIRONMENT
     }
   }
 }
@@ -49,13 +50,14 @@ resource "aws_lambda_function" "cloudwatch_alarm_forwarder_euw2_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL        = ""
-      PROD_ACCOUNT    = module.reference_accounts.production
-      TEST_ACCOUNT    = module.reference_accounts.staging
-      TARGET_ROLE     = var.TARGET_ROLE
-      TARGET_LAMBDA   = var.TARGET_LAMBDA
-      TARGET_REGION   = var.TARGET_REGION
-      DEF_ENVIRONMENT = var.DEF_ENVIRONMENT
+      LOGLEVEL          = ""
+      PROD_ACCOUNT      = module.reference_accounts.production
+      TEST_ACCOUNT      = module.reference_accounts.staging
+      TARGET_ROLE       = var.TARGET_ROLE
+      TARGET_LAMBDA     = var.TARGET_LAMBDA
+      TARGET_SQS_QUEUE  = var.TARGET_SQS_QUEUE
+      TARGET_REGION     = var.TARGET_REGION
+      DEF_ENVIRONMENT   = var.DEF_ENVIRONMENT
     }
   }
 }
