@@ -285,7 +285,8 @@ if __name__ == "__main__":
             "MetricName": "Errors",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Maximum": 0
+            "Minimum": 10,
+            "Maximum": 200
         })
     ]
     main()
