@@ -44,6 +44,44 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
     ]
   }
 
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:GetMetricStatistics"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "lambda:GetFunction",
+      "lambda:ListTags"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sqs:SendMessage"
+    ]
+
+    resources = [
+      "arn:aws:sqs:${var.TARGET_REGION}:${module.reference_accounts.production}:${var.TARGET_SQS_QUEUE}",
+      "arn:aws:sqs:${var.TARGET_REGION}:${module.reference_accounts.staging}:${var.TARGET_SQS_QUEUE}"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "cloudwatch_forwarder_policy" {

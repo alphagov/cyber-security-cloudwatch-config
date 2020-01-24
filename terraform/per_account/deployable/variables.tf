@@ -13,6 +13,11 @@ variable "TARGET_LAMBDA" {
   default = "health_monitor_lambda"
 }
 
+variable "TARGET_SQS_QUEUE" {
+  type    = string
+  default = "incoming_health_events"
+}
+
 variable "TARGET_ROLE" {
   type    = string
   default = "health_monitor_forwarder_role"

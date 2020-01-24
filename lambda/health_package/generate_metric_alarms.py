@@ -250,6 +250,14 @@ if __name__ == "__main__":
             "Maximum": 300      # (4 * 24 * 60 * 60)
         }),
         Dict({
+            "Namespace": "AWS/SQS",
+            "MetricName": "ApproximateNumberOfMessagesVisible",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 500,
+            "Maximum": 5000
+        }),
+        Dict({
             "Namespace": "AWS/Kinesis",
             "MetricName": "PutRecord.Success",
             "Statistic": "Minimum",
@@ -271,6 +279,14 @@ if __name__ == "__main__":
             "Multiplier": 1.1,
             "Minimum": 2,
             "Maximum": 10
+        }),
+        Dict({
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Errors",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 10,
+            "Maximum": 200
         })
     ]
     main()

@@ -1,7 +1,8 @@
 """Handler."""
 from generate_metric_alarms import process_generate_metric_alarms_event
 from health_monitor_lambda import process_health_event
-from cloudwatch_forwarder import process_cloudwatch_event
+from cloudwatch_alarm_forwarder import process_cloudwatch_alarm_event
+from cloudwatch_metric_forwarder import process_cloudwatch_metric_event
 from splunk_forwarder import process_update_dashboard_event
 from logger import LOG
 
@@ -18,10 +19,16 @@ def health_monitor_handler(event, context):
     process_health_event(event)
 
 
-def cloudwatch_event_handler(event, context):
+def cloudwatch_alarm_event_handler(event, context):
     """ Lambda entrypoint for cloudwatch alarm event """
-    LOG.info("Cloudwatch event: %s", str(event))
-    process_cloudwatch_event(event)
+    LOG.info("Cloudwatch alarm event: %s", str(event))
+    process_cloudwatch_alarm_event(event)
+
+
+def cloudwatch_metric_event_handler(event, context):
+    """ Lambda entrypoint for cloudwatch alarm event """
+    LOG.info("Cloudwatch metric event: %s", str(event))
+    process_cloudwatch_metric_event()
 
 
 def splunk_forwarder_event_handler(event, context):

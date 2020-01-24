@@ -33,11 +33,24 @@ data "aws_iam_policy_document" "health_monitor_policy_document" {
       "*"
     ]
   }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes"
+    ]
+
+    resources = list(aws_sqs_queue.incoming_health_events.arn)
+  }
 }
 
 data "aws_iam_policy_document" "health_monitor_update_dashboard_ssm_policy" {
   statement {
-    actions = ["ssm:DescribeParameters",
+    actions = [
+      "ssm:DescribeParameters",
       "ssm:GetParameter"
     ]
 

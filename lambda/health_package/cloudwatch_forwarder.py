@@ -6,17 +6,7 @@ import base64
 import boto3
 from addict import Dict
 
-import enrich
 from logger import LOG
-
-
-def process_cloudwatch_event(event):
-    """ Receive raw event from lambda invoke """
-    message = parse_sns_message(event)
-    standardised_data = cloudwatch_to_standard_health_data_model(message)
-    response = send_to_health_monitor(standardised_data)
-    LOG.debug("Lambda invoke status: %s", response.StatusCode)
-    return response.StatusCode == 200
 
 
 def get_caller_identity():
@@ -56,68 +46,62 @@ def get_environment_account_id(environment):
     return account_id
 
 
-def assume_forwarder_role(environment):
-    """ Get a session for the IAM role to invoke the health lambda """
-    session = boto3.session.Session()
-    region = session.region_name
-    aws_sts = boto3.client("sts", region_name=region)
-    account_id = get_environment_account_id(environment)
-    role_name = os.environ.get("TARGET_ROLE")
-    role_arn = f"arn:aws:iam::{account_id}:role/{role_name}"
-    role_session_name = f"{role_name}_{account_id}"
-    session = aws_sts.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName=role_session_name
-    )
-    LOG.debug("Role assumed: %s", session["Credentials"]["AccessKeyId"])
-    return session["Credentials"]
-
-
-def get_health_target_lambda(environment):
-    """ Return production instance for matching environments or staging otherwise """
+def get_health_target_queue_url(environment):
+    """ Return calculated URL for SQS target queue """
     account_id = get_environment_account_id(environment)
     target_region = os.environ.get("TARGET_REGION")
-    target_lambda = os.environ.get("TARGET_LAMBDA")
-    lambda_arn = f"arn:aws:lambda:{target_region}:{account_id}:function:{target_lambda}"
-    return lambda_arn
+    target_queue = os.environ.get("TARGET_SQS_QUEUE")
+    # https://sqs.<region>.amazonaws.com/<account>/<queue_name>
+    queue_url = f"https://sqs.{target_region}.amazonaws.com/{account_id}/{target_queue}"
+    return queue_url
 
 
 def send_to_health_monitor(message):
-    """ Us boto3 to invoke lamdba x-region """
+    """ Us boto3 to send cross-account SQS to health monitoring environment """
     env = get_environment(message)
-    session = assume_forwarder_role(env)
-    # lambda_arn = get_health_target_lambda(env)
-    lambda_function = os.environ.get("TARGET_LAMBDA")
     target_region = os.environ.get("TARGET_REGION")
-
-    LOG.debug("Sending to %s in %s", lambda_function, target_region)
-
-    payload_json = json.dumps(message)
-    payload_bytes = payload_json.encode('utf-8')
-    context = get_client_context()
-
-    LOG.debug("Built payload, getting assumed role lambda client")
-
-    aws_lambda = boto3.client(
-        "lambda",
-        aws_access_key_id=session["AccessKeyId"],
-        aws_secret_access_key=session["SecretAccessKey"],
-        aws_session_token=session["SessionToken"],
-        region_name=target_region,
+    aws_sqs = boto3.client("sqs", region_name=target_region)
+    payload_json = json.dumps(message, default=str)
+    queue_url = get_health_target_queue_url(env)
+    LOG.debug("Send to SQS: %s", queue_url)
+    response = aws_sqs.send_message(
+        QueueUrl=queue_url,
+        MessageBody=payload_json
     )
 
-    LOG.debug("Obtained lambda client with assumed session credentials")
-
-    invoke_params = {
-        "FunctionName": lambda_function,
-        "InvocationType": 'Event',
-        "ClientContext": context,
-        "Payload": payload_bytes
-    }
-    LOG.debug("Invoke arguments: %s", json.dumps(message))
-    response = aws_lambda.invoke(**invoke_params)
-
     return Dict(response)
+
+
+def get_message_body(message):
+    """ Return json decoded message body from either SNS or SQS event model """
+    print(str(message))
+    try:
+        message_text = message["body"]
+        # catch addict default behaviour for missing keys
+        if message_text == {}:
+            raise KeyError
+
+    except KeyError:
+        message_text = message["Sns"]["Message"]
+
+    try:
+        message_body = json.loads(message_text)
+    except (TypeError, json.JSONDecodeError):
+        message_body = message_text
+
+    print(str(message_body))
+    return message_body
+
+
+def parse_messages(event):
+    """ Parse the escaped message body from each of the SQS messages in event.Records """
+    messages = [
+        get_message_body(record)
+        for record
+        in event["Records"]
+    ]
+    print(str(messages))
+    return messages
 
 
 def parse_sns_message(event):
@@ -146,6 +130,7 @@ def get_standard_health_event_template():
     return Dict({
         "Source": "Unknown",
         "Environment": os.environ.get("DEF_ENVIRONMENT"),
+        "EventType": "Alarm/Metric",
         "Service": "Unknown",
         "Healthy": True,
         "ComponentType": "",
@@ -155,26 +140,3 @@ def get_standard_health_event_template():
         },
         "SourceData": {}
     })
-
-
-def cloudwatch_to_standard_health_data_model(source_message):
-    """ Transform data from native CloudWatch
-        into a shared data model independent of the data source
-    """
-    session = boto3.session.Session()
-    region = session.region_name
-    metric = source_message.Trigger
-    helper = enrich.get_namespace_helper(metric.Namespace)
-    source_message.Tags = helper.get_tags_for_metric_resource(metric, region=region)
-
-    event = get_standard_health_event_template()
-    event.Source = "AWS/CloudWatch"
-    event.Environment = source_message.Tags.get("Environment", "Test").lower()
-    event.Service = source_message.Tags.get("Service", "Unknown")
-    event.Healthy = (source_message.NewStateValue == "OK")
-    event.ComponentType = source_message.Trigger.Namespace
-    event.Resource.Name = helper.get_metric_resource_name(source_message.Trigger)
-    event.Resource.ID = helper.get_metric_resource_id(source_message.Trigger)
-    event.SourceData = source_message
-    LOG.debug("Standardised event: %s", json.dumps(event))
-    return event
