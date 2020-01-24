@@ -7,7 +7,6 @@ from addict import Dict
 from cloudwatch_forwarder import (
     get_environment,
     get_environment_account_id,
-    get_health_target_queue_arn,
     get_health_target_queue_url,
     send_to_health_monitor,
     parse_messages
@@ -54,26 +53,6 @@ def test_get_environment_account_id():
     assert account == prod_account
     account = get_environment_account_id('production')
     assert account == prod_account
-
-
-def test_get_health_target_queue_arn():
-    """ Test health queue ARN generation """
-    region = "eu-west-2"
-    queue_name = "insert_valid_queue_name"
-    os.environ["TARGET_REGION"] = region
-    os.environ["TARGET_SQS_QUEUE"] = queue_name
-    prod_account = "123456789012"
-    test_account = "012345678901"
-    os.environ["PROD_ACCOUNT"] = prod_account
-    os.environ["TEST_ACCOUNT"] = test_account
-
-    calculated_arn = get_health_target_queue_arn('test')
-    expected_arn = f"arn:aws:sqs:{region}:{test_account}:{queue_name}"
-    assert calculated_arn == expected_arn
-
-    calculated_arn = get_health_target_queue_arn('prod')
-    expected_arn = f"arn:aws:sqs:{region}:{prod_account}:{queue_name}"
-    assert calculated_arn == expected_arn
 
 
 def test_get_health_target_queue_url():

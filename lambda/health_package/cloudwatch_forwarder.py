@@ -46,41 +46,6 @@ def get_environment_account_id(environment):
     return account_id
 
 
-def assume_forwarder_role(environment):
-    """ Get a session for the IAM role to invoke the health lambda """
-    session = boto3.session.Session()
-    region = session.region_name
-    aws_sts = boto3.client("sts", region_name=region)
-    account_id = get_environment_account_id(environment)
-    role_name = os.environ.get("TARGET_ROLE")
-    role_arn = f"arn:aws:iam::{account_id}:role/{role_name}"
-    role_session_name = f"{role_name}_{account_id}"
-    session = aws_sts.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName=role_session_name
-    )
-    LOG.debug("Role assumed: %s", session["Credentials"]["AccessKeyId"])
-    return session["Credentials"]
-
-
-def get_health_target_lambda(environment):
-    """ Return calculated ARN for lambda target function """
-    account_id = get_environment_account_id(environment)
-    target_region = os.environ.get("TARGET_REGION")
-    target_lambda = os.environ.get("TARGET_LAMBDA")
-    lambda_arn = f"arn:aws:lambda:{target_region}:{account_id}:function:{target_lambda}"
-    return lambda_arn
-
-
-def get_health_target_queue_arn(environment):
-    """ Return calculated ARN for SQS target queue """
-    account_id = get_environment_account_id(environment)
-    target_region = os.environ.get("TARGET_REGION")
-    target_queue = os.environ.get("TARGET_SQS_QUEUE")
-    queue_arn = f"arn:aws:sqs:{target_region}:{account_id}:{target_queue}"
-    return queue_arn
-
-
 def get_health_target_queue_url(environment):
     """ Return calculated URL for SQS target queue """
     account_id = get_environment_account_id(environment)

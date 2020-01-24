@@ -66,7 +66,7 @@ def get_cloudwatch_metric_statistics(alarm):
     now_timestamp = now.timestamp()
     now_offset = now_timestamp % PERIOD
     period_start = datetime.fromtimestamp(now_timestamp - now_offset - PERIOD)
-    period_end = datetime.fromtimestamp(now_timestamp-now_offset)
+    period_end = datetime.fromtimestamp(now_timestamp - now_offset)
 
     aws_cloudwatch = boto3.client("cloudwatch")
     response = aws_cloudwatch.get_metric_statistics(
