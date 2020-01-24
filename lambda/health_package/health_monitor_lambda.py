@@ -4,6 +4,7 @@ import os
 from collections import defaultdict
 
 import boto3
+from botocore.exceptions import ClientError
 from addict import Dict
 
 from logger import LOG
@@ -30,7 +31,7 @@ def process_health_event(event):
     for message in messages:
         processed = process_health_message(message)
         status = 'sent' if processed else 'failed'
-        event_processed_status[status] +=1
+        event_processed_status[status] += 1
     return event_processed_status
 
 
@@ -159,7 +160,7 @@ def send_to_sns(topic_arn, sns_message):
             Message=message_to_send,
             MessageStructure='json'
         )
-    except boto3.ClientError:
+    except ClientError:
         response = None
     return response
 
