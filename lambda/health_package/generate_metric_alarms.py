@@ -281,12 +281,28 @@ if __name__ == "__main__":
             "Maximum": 10
         }),
         Dict({
+            "Namespace": "AWS/Firehose",
+            "MetricName": "KinesisMillisBehindLatest",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 3000,    # Not interested in less than 3 seconds delay
+            "Maximum": 60000    # We'd want to know if there was a minute delay in kinesis
+        }),
+        Dict({
             "Namespace": "AWS/Lambda",
             "MetricName": "Errors",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Minimum": 10,
-            "Maximum": 200
+            "Minimum": 10,      # We probably don't want to know the first few times a lambda errors
+            "Maximum": 200      # We definitely want to know if it errors frequently
+        }),
+        Dict({
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Duration",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 3,       # Any lambda running for less than 3 secs should be fine
+            "Maximum": 60       # Any lambda running longer than 1 minute probably needs breaking up
         })
     ]
     main()

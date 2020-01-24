@@ -58,7 +58,8 @@ class FirehoseHelper(GenericHelper):
                     list_tags_response = Dict(client.list_tags_for_delivery_stream(
                         DeliveryStreamName=stream_name
                     ))
-                    tags = list_tags_response.Tags
+                    tag_list = list_tags_response.Tags
+                    tags = cls.tag_list_to_dict(tag_list)
 
         except AttributeError as err:
             print(json.dumps(metric, indent=2))
