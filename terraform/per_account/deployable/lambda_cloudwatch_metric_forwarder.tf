@@ -26,7 +26,7 @@ resource "aws_cloudwatch_event_rule" "every_hour_euw1" {
   provider            = aws.eu-west-1
   name                = "every-hour"
   description         = "Fires every hour"
-  schedule_expression = "cron(0 * ? * * *)"
+  schedule_expression = local.metric_cron
 }
 
 resource "aws_cloudwatch_event_target" "run_every_hour_euw1" {
@@ -73,7 +73,7 @@ resource "aws_cloudwatch_event_rule" "every_hour_euw2" {
   provider            = aws.eu-west-2
   name                = "every-hour"
   description         = "Fires every hour"
-  schedule_expression = "cron(0 * ? * * *)"
+  schedule_expression = local.metric_cron
 }
 
 resource "aws_cloudwatch_event_target" "run_every_hour_euw2" {

@@ -15,7 +15,11 @@ from cloudwatch_forwarder import (
     send_to_health_monitor
 )
 
-
+# This is the frequency of shipping metrics to Splunk
+# If this value is changed you should also change
+# local.metric_cron in
+# terraform/per_account_deployable/locals.tf
+# so that the cron is fired on the same frequency
 PERIOD = 3600
 
 
