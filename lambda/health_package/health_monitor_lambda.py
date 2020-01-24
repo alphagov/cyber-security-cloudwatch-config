@@ -1,9 +1,11 @@
 """ Health monitoring lambda """
 import json
 import os
+from collections import defaultdict
 
 import boto3
 from addict import Dict
+
 from logger import LOG
 from cloudwatch_forwarder import parse_messages
 
@@ -17,7 +19,7 @@ def flatten_alarm_data_structure(message):
 
 def process_health_event(event):
     """ Process SNS message and notify PagerDuty, Slack and dashboard """
-
+    event_processed_status = defaultdict(int)
     # If lambda is invoked via SNS
     LOG.debug("Raw event: %s", json.dumps(event))
     if "Records" in event:
@@ -26,28 +28,39 @@ def process_health_event(event):
         messages = [event]
 
     for message in messages:
-        process_health_message(message)
+        processed = process_health_message(message)
+        status = 'sent' if processed else 'failed'
+        event_processed_status[status] +=1
+    return event_processed_status
 
 
 def process_health_message(message):
     """ Process each message from the parent invocation event """
     # These should be defined by the component type or resource tags
     # Hard-code for now
-    notify_slack = message.get("NotifySlack", True)
-    notify_pagerduty = False
-    notify_dashboard = True
+    try:
+        notify_slack = message.get("NotifySlack", True)
+        notify_pagerduty = False
+        notify_dashboard = True
+        processed = True
+        if 'Source' and 'Resource' in message:
+            if notify_pagerduty:
+                pd_response = notify_pagerduty_sns(message)
+                processed = ('MessageId' in pd_response) and processed
+            if notify_slack:
+                slack_response = notify_slack_sns(message)
+                processed = ('MessageId' in slack_response) and processed
+            if notify_dashboard:
+                dash_response = notify_dashboard_sns(message)
+                processed = ('MessageId' in dash_response) and processed
+        else:
+            LOG.error("Message missing required fields")
+            processed = False
+    except KeyError as err:
+        LOG.error("Error processing health message: %s", err)
+        processed = False
 
-    if 'Source' and 'Resource' in message:
-        if notify_pagerduty:
-            notify_pagerduty_sns(message)
-
-        if notify_slack:
-            notify_slack_sns(message)
-
-        if notify_dashboard:
-            notify_dashboard_sns(message)
-    else:
-        LOG.debug("Message missing required fields")
+    return processed
 
 
 def get_slack_channel(message):
@@ -114,34 +127,41 @@ def get_slack_post(message):
 def notify_pagerduty_sns(pagerduty_sns_message):
     """ Send message to PagerDuty SNS """
     pagerduty_sns_arn = os.environ['PAGERDUTY_SNS_ARN']
-    send_to_sns(pagerduty_sns_arn, json.dumps(pagerduty_sns_message))
+    response = send_to_sns(pagerduty_sns_arn, json.dumps(pagerduty_sns_message))
+    return response
 
 
 def notify_slack_sns(slack_sns_message):
     """ Send message to Slack SNS """
     slack_sns_arn = os.environ['SLACK_SNS_ARN']
     slack_post = get_slack_post(slack_sns_message)
-    send_to_sns(slack_sns_arn, slack_post)
+    response = send_to_sns(slack_sns_arn, slack_post)
+    return response
 
 
 def notify_dashboard_sns(dashboard_sns_message):
     """ Send message to Dashboard SNS """
     dashboard_sns_arn = os.environ['DASHBOARD_SNS_ARN']
-    send_to_sns(dashboard_sns_arn, json.dumps(dashboard_sns_message))
+    response = send_to_sns(dashboard_sns_arn, json.dumps(dashboard_sns_message))
+    return response
 
 
 def send_to_sns(topic_arn, sns_message):
     """ Send message to SNS """
-    message_to_send = json.dumps({'default': json.dumps(sns_message)})
-    session = boto3.session.Session()
-    region = session.region_name
-    sns = boto3.client('sns', region_name=region)
-    sns.publish(
-        TopicArn=topic_arn,
-        # Subject=sns_subject,
-        Message=message_to_send,
-        MessageStructure='json'
-    )
+    try:
+        message_to_send = json.dumps({'default': json.dumps(sns_message, default=str)})
+        session = boto3.session.Session()
+        region = session.region_name
+        sns = boto3.client('sns', region_name=region)
+        response = sns.publish(
+            TopicArn=topic_arn,
+            # Subject=sns_subject,
+            Message=message_to_send,
+            MessageStructure='json'
+        )
+    except boto3.ClientError:
+        response = None
+    return response
 
 
 if __name__ == "__main__":
