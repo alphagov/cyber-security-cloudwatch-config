@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_firehose_execute_process
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-1__firehose__ExecuteProcessingDuration)
   provider            = aws.eu-west-1
-  alarm_name          = "${var.eu-west-1__firehose__ExecuteProcessingDuration[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-1__firehose__ExecuteProcessingDuration[count.index].ResourceName}_ExecuteProcessingDuration_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-1__firehose__ExecuteProcessingDuration[count.index].Threshold
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_firehose_execute_process
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-2__firehose__ExecuteProcessingDuration)
   provider            = aws.eu-west-2
-  alarm_name          = "${var.eu-west-2__firehose__ExecuteProcessingDuration[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-2__firehose__ExecuteProcessingDuration[count.index].ResourceName}_ExecuteProcessingDuration_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-2__firehose__ExecuteProcessingDuration[count.index].Threshold

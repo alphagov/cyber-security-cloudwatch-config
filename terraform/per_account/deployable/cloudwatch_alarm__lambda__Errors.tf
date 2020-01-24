@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_lambda_errors" {
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-1__lambda__Errors)
   provider            = aws.eu-west-1
-  alarm_name          = "${var.eu-west-1__lambda__Errors[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-1__lambda__Errors[count.index].ResourceName}_Errors_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = var.eu-west-1__lambda__Errors[count.index].Threshold
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_lambda_errors" {
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-2__lambda__Errors)
   provider            = aws.eu-west-2
-  alarm_name          = "${var.eu-west-2__lambda__Errors[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-2__lambda__Errors[count.index].ResourceName}_Errors_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = var.eu-west-2__lambda__Errors[count.index].Threshold
