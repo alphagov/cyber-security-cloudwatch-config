@@ -26,10 +26,11 @@ def get_client_context():
     return context
 
 
-def get_environment(message):
+def get_environment(event):
     """ Get environment from resource tags or default to DEF_ENVIRONMENT var """
-    if "Environment" in message:
-        environment = message.Environment
+    event_env = event.get_attribute("environment")
+    if event_env is not None:
+        environment = event_env
     else:
         environment = os.environ.get("DEF_ENVIRONMENT")
 
@@ -56,12 +57,13 @@ def get_health_target_queue_url(environment):
     return queue_url
 
 
-def send_to_health_monitor(message):
+def send_to_health_monitor(event):
     """ Us boto3 to send cross-account SQS to health monitoring environment """
-    env = get_environment(message)
+    env = get_environment(event)
     target_region = os.environ.get("TARGET_REGION")
     aws_sqs = boto3.client("sqs", region_name=target_region)
-    payload_json = json.dumps(message, default=str)
+    # payload_json = json.dumps(message, default=str)
+    payload_json = event.to_json()
     queue_url = get_health_target_queue_url(env)
     LOG.debug("Send to SQS: %s", queue_url)
     response = aws_sqs.send_message(
@@ -121,22 +123,3 @@ def flatten_alarm_data_structure(message):
     flattened_message = message.copy()
     flattened_message.update(message["Trigger"])
     return flattened_message
-
-
-def get_standard_health_event_template():
-    """ Return an empty template record to implement a
-        standard health component data model
-    """
-    return Dict({
-        "Source": "Unknown",
-        "Environment": os.environ.get("DEF_ENVIRONMENT"),
-        "EventType": "Alarm/Metric",
-        "Service": "Unknown",
-        "Healthy": True,
-        "ComponentType": "",
-        "Resource": {
-            "Name": "",
-            "ID": ""
-        },
-        "SourceData": {}
-    })

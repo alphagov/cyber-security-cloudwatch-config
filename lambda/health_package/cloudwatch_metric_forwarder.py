@@ -11,9 +11,10 @@ import boto3
 from logger import LOG
 import enrich
 from cloudwatch_forwarder import (
-    get_standard_health_event_template,
     send_to_health_monitor
 )
+from health_event import HealthEvent
+
 
 # This is the frequency of shipping metrics to Splunk
 # If this value is changed you should also change
@@ -106,21 +107,33 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     alarm.Tags = tags
     LOG.debug("Tags: %s", json.dumps(tags))
 
-    event = get_standard_health_event_template()
-    event.Source = "AWS/CloudWatch"
-    event.EventType = "Metric"
-    event.NotifySlack = False
-    event.Environment = tags.get("Environment", "Test").lower()
-    event.Service = tags.get("Service", "Unknown")
-    event.Healthy = (alarm.StateValue == "OK")
-    event.ComponentType = alarm.Namespace
-    event.Resource.Name = helper.get_metric_resource_name(metric)
-    event.Resource.ID = helper.get_metric_resource_id(metric)
-    event.SourceData = alarm
-    event.MetricData = metric_data
+    event = HealthEvent()
+    # event.set_source("AWS/CloudWatch")
+    # event.set_component_type(alarm.Namespace)
+    # event.set_event_type("Metric")
+    # event.set_notify_target("slack", False)
+    # event.set_environment(tags.get("Environment", "Test").lower())
+    # event.set_service(tags.get("Service", "Unknown"))
+    # event.set_healthy(alarm.StateValue == "OK")
 
-    if metric_data is not None:
-        event.MetricData = metric_data
+    resource_name = helper.get_metric_resource_name(metric)
+    resource_id = helper.get_metric_resource_id(metric)
+    # event.set_resource(resource_name, resource_id)
+    #
+    # event.set_source_data(alarm)
+    # event.set_metric_data(metric_data)
+    event.populate(
+        source="AWS/CloudWatch",
+        component_type=alarm.Namespace,
+        event_type="Metric",
+        environment=tags.get("Environment", "Test").lower(),
+        service=tags.get("Service", "Unknown"),
+        healthy=alarm.StateValue == "OK",
+        resource_name=resource_name,
+        resource_id=resource_id,
+        source_data=alarm,
+        metric_data=metric_data
+    )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))
     return event
