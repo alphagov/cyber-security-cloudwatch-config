@@ -1,6 +1,4 @@
 """ Create mock boto3 clients for testing """
-import json
-
 import boto3
 from botocore.stub import Stubber
 
@@ -11,18 +9,18 @@ def _keep_it_real():
         boto3.real_client = boto3.client
 
 
-def mock_sqs(queue_url, message, mock_sqs_send_message_response):
+def mock_sqs(queue_url, event, mock_sqs_send_message_response):
     """ Mock SQS send message  """
     _keep_it_real()
     client = boto3.real_client('sqs')
 
     stubber = Stubber(client)
 
-    message_body = json.dumps(message)
+    event_json = event.to_json()
 
     function_params = {
         "QueueUrl": queue_url,
-        "MessageBody": message_body
+        "MessageBody": event_json
     }
     stubber.add_response('send_message', mock_sqs_send_message_response, function_params)
 

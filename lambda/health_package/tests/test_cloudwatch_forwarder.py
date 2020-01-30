@@ -2,7 +2,6 @@
 import os
 
 import pytest
-from addict import Dict
 
 from cloudwatch_forwarder import (
     get_environment,
@@ -11,6 +10,7 @@ from cloudwatch_forwarder import (
     send_to_health_monitor,
     parse_messages
 )
+from health_event import HealthEvent
 import stubs
 
 
@@ -22,15 +22,16 @@ def test_parse_messages(health_monitor_sns_event):
     assert "AlarmName" in messages[0]
 
 
-@pytest.mark.usefixtures("standard_health_alarm_event")
-def test_get_environment(standard_health_alarm_event):
+def test_get_environment():
     """ Test get_environment function returns based on event or default """
     os.environ["DEF_ENVIRONMENT"] = 'test'
-    env = get_environment(standard_health_alarm_event)
-    assert env == 'prod'
-    del standard_health_alarm_event["Environment"]
-    env = get_environment(standard_health_alarm_event)
+
+    event = HealthEvent()
+    env = get_environment(event)
     assert env == 'test'
+    event.set_environment('prod')
+    env = get_environment(event)
+    assert env == 'prod'
 
 
 def test_get_environment_account_id():
@@ -80,23 +81,24 @@ def test_send_to_health_monitor(mock_sqs_send_message_response):
     """ Test send to health monitor with mock boto client """
     queue_name = "insert_valid_queue_name"
     region = "eu-west-2"
-    os.environ["TARGET_REGION"] = region
-    os.environ["TARGET_SQS_QUEUE"] = queue_name
     prod_account = "123456789012"
     test_account = "012345678901"
+
+    # Setup default environment variables
+    os.environ["TARGET_REGION"] = region
+    os.environ["TARGET_SQS_QUEUE"] = queue_name
     os.environ["PROD_ACCOUNT"] = prod_account
     os.environ["TEST_ACCOUNT"] = test_account
 
     # mock get_function response
     test_environment = "test"
     queue_url = get_health_target_queue_url(test_environment)
-    message_dict = Dict({
-        "Environment": test_environment,
-        "Genus": "monkeys"
-    })
+    event = HealthEvent()
+    event.set_environment(test_environment)
+    event.set_component_type("monkeys")
 
-    stubber = stubs.mock_sqs(queue_url, message_dict, mock_sqs_send_message_response)
+    stubber = stubs.mock_sqs(queue_url, event, mock_sqs_send_message_response)
 
     with stubber:
-        response = send_to_health_monitor(message_dict)
+        response = send_to_health_monitor(event)
         assert response == mock_sqs_send_message_response

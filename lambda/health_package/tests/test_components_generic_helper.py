@@ -1,4 +1,4 @@
-"""Test enrich module"""
+""" Test GenericHelper class """
 import pytest
 
 from components.generic_helper import GenericHelper

@@ -1,5 +1,6 @@
-import pytest
+"""fixtures for tests"""
 import json
+import pytest
 
 from addict import Dict
 
@@ -175,6 +176,8 @@ def list_metric_response():
 
 @pytest.fixture()
 def dimension_metric():
+    """Create dimension metric"""
+
     metric = Dict({
         "Namespace": "AWS/EC2",
         "MetricName": "CPUUtilization",
@@ -195,6 +198,8 @@ def dimension_metric():
 
 @pytest.fixture()
 def lambda_metric():
+    """Create lambda metric"""
+
     metric = Dict({
         "Namespace": "AWS/Lambda",
         "MetricName": "Errors",
@@ -208,8 +213,11 @@ def lambda_metric():
 
     return metric
 
+
 @pytest.fixture()
 def mock_get_function_response():
+    """Create mock for lambda get function"""
+
     response = {
         "Configuration": {
             "FunctionName": "lambda-function",
@@ -266,8 +274,10 @@ def mock_get_function_response():
     }
     return response
 
+
 @pytest.fixture()
 def mock_list_tags_response():
+    """Create mock for lambda list tags"""
 
     response = {
         "Tags": {
@@ -285,6 +295,8 @@ def mock_list_tags_response():
 
 @pytest.fixture()
 def mock_sqs_send_message_response():
+    """Create more for sqs send message"""
+
     response = {
         'MD5OfMessageBody': '5a436cac350d96eb5c9ff594907f9397',
         'MD5OfMessageAttributes': 'da09782a09540a4e759f7666815ab16e',
@@ -353,6 +365,8 @@ def health_monitor_sns_event():
 
 @pytest.fixture()
 def standard_health_alarm_event():
+    """Create a health alarm event"""
+
     event = {
         "ComponentType": "AWS/Lambda",
         "Environment": "prod",
@@ -397,3 +411,28 @@ def standard_health_alarm_event():
     }
 
     return Dict(event)
+
+
+@pytest.fixture()
+def event_args():
+    """Create default event data"""
+
+    return {
+        "source": "AWS/CloudWatch",
+        "component_type": "AWS/SQS",
+        "event_type": "Metric",
+        "environment": "MyDevEnv",
+        "service": "MyService",
+        "healthy": "OK",
+        "resource_name": "MyQueue",
+        "source_data": {
+            "field_1": "value_1"
+        },
+        "metric_data": [
+            {
+                "Maximum": 12.0,
+                "Timestamp": "2020-01-29 09:00:00+00:00",
+                "Unit": "Milliseconds"
+            }
+        ]
+    }
