@@ -246,8 +246,8 @@ if __name__ == "__main__":
             "MetricName": "ApproximateAgeOfOldestMessage",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Minimum": 2,       # 300,
-            "Maximum": 300      # (4 * 24 * 60 * 60)
+            "Minimum": 2,
+            "Maximum": 300      # this is an initial guess to be tuned later
         }),
         Dict({
             "Namespace": "AWS/SQS",
@@ -255,14 +255,14 @@ if __name__ == "__main__":
             "Statistic": "Maximum",
             "Multiplier": 1.1,
             "Minimum": 500,
-            "Maximum": 5000
+            "Maximum": 5000     # this is an initial guess to be tuned later
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
             "MetricName": "PutRecord.Success",
             "Statistic": "Minimum",
-            "Multiplier": 0.9,
-            "Minimum": 1
+            "Multiplier": 1,
+            "Minimum": 0.99     # alert on 1% failure
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
@@ -270,7 +270,7 @@ if __name__ == "__main__":
             "Statistic": "Maximum",
             "Multiplier": 1.1,
             "Minimum": 300,
-            "Maximum": 43200000
+            "Maximum": 43200000     # 12 hours
         }),
         Dict({
             "Namespace": "AWS/Firehose",
@@ -281,12 +281,28 @@ if __name__ == "__main__":
             "Maximum": 10
         }),
         Dict({
+            "Namespace": "AWS/Firehose",
+            "MetricName": "KinesisMillisBehindLatest",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 3000,    # Not interested in less than 3 seconds delay
+            "Maximum": 60000    # We'd want to know if there was a minute delay in kinesis
+        }),
+        Dict({
             "Namespace": "AWS/Lambda",
             "MetricName": "Errors",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Minimum": 10,
-            "Maximum": 200
+            "Minimum": 10,      # We probably don't want to know the first few times a lambda errors
+            "Maximum": 200      # We definitely want to know if it errors frequently
+        }),
+        Dict({
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Duration",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 3,       # Any lambda running for less than 3 secs should be fine
+            "Maximum": 60       # Any lambda running longer than 1 minute probably needs breaking up
         })
     ]
     main()

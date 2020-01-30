@@ -158,6 +158,12 @@ class GenericHelper:
         return threshold
 
     @classmethod
+    def tag_list_to_dict(cls, tag_list):
+        """ Convert list of Key,Value dicts to dict of Key:Value"""
+        tags = {tag["Key"]: tag["Value"] for tag in tag_list}
+        return tags
+
+    @classmethod
     def get_tags_for_metric_resource(cls, metric, region=None):
         """ Default method return empty dict if no namespace handler """
         return {}

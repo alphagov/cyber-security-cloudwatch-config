@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_sqs_num_of_messages_sent
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-1__sqs__NumberOfMessagesSent)
   provider            = aws.eu-west-1
-  alarm_name          = "${var.eu-west-1__sqs__NumberOfMessagesSent[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-1__sqs__NumberOfMessagesSent[count.index].ResourceName}_NumberOfMessagesSent_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-1__sqs__NumberOfMessagesSent[count.index].Threshold
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_sqs_num_of_messages_sent
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-2__sqs__NumberOfMessagesSent)
   provider            = aws.eu-west-2
-  alarm_name          = "${var.eu-west-2__sqs__NumberOfMessagesSent[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-2__sqs__NumberOfMessagesSent[count.index].ResourceName}_NumberOfMessagesSent_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-2__sqs__NumberOfMessagesSent[count.index].Threshold

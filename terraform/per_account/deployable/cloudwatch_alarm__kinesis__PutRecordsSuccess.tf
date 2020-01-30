@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_kinesis_put_records_succ
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-1__kinesis__PutRecordsSuccess)
   provider            = aws.eu-west-1
-  alarm_name          = "${var.eu-west-1__kinesis__PutRecordsSuccess[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-1__kinesis__PutRecordsSuccess[count.index].ResourceName}_PutRecordsSuccess_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-1__kinesis__PutRecordsSuccess[count.index].Threshold
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_kinesis_put_records_succ
   # iterate over count to setup multiple alarms
   count               = length(var.eu-west-2__kinesis__PutRecordsSuccess)
   provider            = aws.eu-west-2
-  alarm_name          = "${var.eu-west-2__kinesis__PutRecordsSuccess[count.index].ResourceName}_alarm"
+  alarm_name          = "${var.eu-west-2__kinesis__PutRecordsSuccess[count.index].ResourceName}_PutRecordsSuccess_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 2
   threshold           = var.eu-west-2__kinesis__PutRecordsSuccess[count.index].Threshold
