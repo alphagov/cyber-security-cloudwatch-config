@@ -103,13 +103,13 @@ class HealthEvent():
         if healthy is not None:
             self.healthy = healthy
 
-    def set_resource(self, name=None, resource_id=None):
+    def set_resource(self, resource_name=None, resource_id=None):
         """ Set the resource name and/or id
             Different resources in AWS have
             either no name or no id.
         """
         self.resource = {
-            "Name": name,
+            "Name": resource_name,
             "ID": resource_id
         }
 
