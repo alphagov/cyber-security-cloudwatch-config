@@ -246,8 +246,8 @@ if __name__ == "__main__":
             "MetricName": "ApproximateAgeOfOldestMessage",
             "Statistic": "Maximum",
             "Multiplier": 1.1,
-            "Minimum": 2,       # 300,
-            "Maximum": 300      # (4 * 24 * 60 * 60)
+            "Minimum": 2,
+            "Maximum": 300      # this is an initial guess to be tuned later
         }),
         Dict({
             "Namespace": "AWS/SQS",
@@ -255,14 +255,14 @@ if __name__ == "__main__":
             "Statistic": "Maximum",
             "Multiplier": 1.1,
             "Minimum": 500,
-            "Maximum": 5000
+            "Maximum": 5000     # this is an initial guess to be tuned later
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
             "MetricName": "PutRecord.Success",
             "Statistic": "Minimum",
-            "Multiplier": 0.9,
-            "Minimum": 1
+            "Multiplier": 1,
+            "Minimum": 0.99     # alert on 1% failure
         }),
         Dict({
             "Namespace": "AWS/Kinesis",
@@ -270,7 +270,7 @@ if __name__ == "__main__":
             "Statistic": "Maximum",
             "Multiplier": 1.1,
             "Minimum": 300,
-            "Maximum": 43200000
+            "Maximum": 43200000     # 12 hours
         }),
         Dict({
             "Namespace": "AWS/Firehose",
