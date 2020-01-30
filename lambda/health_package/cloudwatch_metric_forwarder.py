@@ -108,20 +108,10 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     LOG.debug("Tags: %s", json.dumps(tags))
 
     event = HealthEvent()
-    # event.set_source("AWS/CloudWatch")
-    # event.set_component_type(alarm.Namespace)
-    # event.set_event_type("Metric")
-    # event.set_notify_target("slack", False)
-    # event.set_environment(tags.get("Environment", "Test").lower())
-    # event.set_service(tags.get("Service", "Unknown"))
-    # event.set_healthy(alarm.StateValue == "OK")
 
     resource_name = helper.get_metric_resource_name(metric)
     resource_id = helper.get_metric_resource_id(metric)
-    # event.set_resource(resource_name, resource_id)
-    #
-    # event.set_source_data(alarm)
-    # event.set_metric_data(metric_data)
+
     event.populate(
         source="AWS/CloudWatch",
         component_type=alarm.Namespace,

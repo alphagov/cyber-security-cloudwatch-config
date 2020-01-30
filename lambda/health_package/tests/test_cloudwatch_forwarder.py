@@ -2,7 +2,6 @@
 import os
 
 import pytest
-# from addict import Dict
 
 from cloudwatch_forwarder import (
     get_environment,
@@ -94,14 +93,9 @@ def test_send_to_health_monitor(mock_sqs_send_message_response):
     # mock get_function response
     test_environment = "test"
     queue_url = get_health_target_queue_url(test_environment)
-    # message_dict = Dict({
-    #     "Environment": test_environment,
-    #     "Genus": "monkeys"
-    # })
     event = HealthEvent()
     event.set_environment(test_environment)
     event.set_component_type("monkeys")
-    # event_json = event.to_json()
 
     stubber = stubs.mock_sqs(queue_url, event, mock_sqs_send_message_response)
 

@@ -36,18 +36,10 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     )
 
     event = HealthEvent()
-    # event.set_source("AWS/CloudWatch")
-    # event.set_component_type(source_message.Trigger.Namespace)
-    # event.set_event_type("Alarm")
-    # event.set_environment(source_message.Tags.get("Environment", "Test").lower())
-    # event.set_service(source_message.Tags.get("Service", "Unknown"))
-    # event.set_healthy(source_message.NewStateValue == "OK")
 
     resource_name = helper.get_metric_resource_name(metric)
     resource_id = helper.get_metric_resource_id(metric)
-    # event.set_resource(resource_name, resource_id)
 
-    # event.set_source_data(source_message)
     event.populate(
         source="AWS/CloudWatch",
         component_type=source_message.Trigger.Namespace,
