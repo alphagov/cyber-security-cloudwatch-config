@@ -32,11 +32,11 @@ def process_cloudwatch_metric_event():
     for alarm in alarms:
         alarm = Dict(alarm)
         current_state = alarm.StateValue
-        statistics = None
+        statistics = []
         if current_state != "INSUFFICIENT_DATA":
             statistics = get_cloudwatch_metric_statistics(alarm)
 
-        if statistics is not None:
+        if len(statistics) > 0:
             metric_event = cloudwatch_metric_to_standard_health_data_model(alarm, statistics)
             response = send_to_health_monitor(metric_event)
             LOG.debug("Lambda invoke status: %s", response.StatusCode)
@@ -67,6 +67,9 @@ def get_cloudwatch_metric_statistics(alarm):
     statistic = alarm.get("Statistic")
     dimensions = alarm.get("Dimensions")
 
+    LOG.debug("Get metric stats for %s %s", namespace, metric_name)
+    LOG.debug("Dimensions: %s", json.dumps(dimensions, default=str))
+
     now = datetime.utcnow()
     now_timestamp = now.timestamp()
     now_offset = now_timestamp % PERIOD
@@ -84,7 +87,9 @@ def get_cloudwatch_metric_statistics(alarm):
         Statistics=[statistic],
     )
 
-    datapoints = response.get("Datapoints", None)
+    datapoints = response.get("Datapoints", [])
+
+    LOG.debug("Metric data: %s", json.dumps(datapoints, default=str))
 
     return datapoints
 
@@ -125,7 +130,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
         metric_data=metric_data
     )
 
-    LOG.debug("Standardised event: %s", json.dumps(event, default=str))
+    LOG.debug("Standardised event: %s", event.to_json())
     return event
 
 

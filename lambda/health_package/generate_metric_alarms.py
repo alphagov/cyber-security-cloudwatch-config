@@ -291,7 +291,7 @@ if __name__ == "__main__":
         Dict({
             "Namespace": "AWS/Lambda",
             "MetricName": "Errors",
-            "Statistic": "Maximum",
+            "Statistic": "Sum",
             "Multiplier": 1.1,
             "Minimum": 10,      # We probably don't want to know the first few times a lambda errors
             "Maximum": 200      # We definitely want to know if it errors frequently

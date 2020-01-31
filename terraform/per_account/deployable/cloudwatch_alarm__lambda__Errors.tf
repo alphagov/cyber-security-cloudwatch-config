@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_lambda_errors" {
   metric_name         = "Errors"
   namespace           = "AWS/Lambda"
   period              = 300
-  statistic           = "Maximum"
+  statistic           = "Sum"
   dimensions = {
     FunctionName = var.eu-west-1__lambda__Errors[count.index].ResourceName
   }
@@ -43,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_lambda_errors" {
   metric_name         = "Errors"
   namespace           = "AWS/Lambda"
   period              = 300
-  statistic           = "Maximum"
+  statistic           = "Sum"
   dimensions = {
     FunctionName = var.eu-west-2__lambda__Errors[count.index].ResourceName
   }
