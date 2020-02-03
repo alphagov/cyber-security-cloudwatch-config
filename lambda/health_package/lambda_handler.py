@@ -37,4 +37,4 @@ def splunk_forwarder_event_handler(event, context):
         process_update_dashboard_event(event)
 
     except (ValueError, KeyError):
-        LOG.error('Failed to build Splunk payload for health monitoring data')
+        LOG.error("Failed to build Splunk payload for health monitoring data")

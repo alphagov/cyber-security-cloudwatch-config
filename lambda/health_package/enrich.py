@@ -4,6 +4,7 @@ from components.firehose_helper import FirehoseHelper
 from components.kinesis_helper import KinesisHelper
 from components.lambda_helper import LambdaHelper
 from components.sqs_helper import SqsHelper
+
 # from logger import LOG
 
 
@@ -16,7 +17,7 @@ def get_namespace_helper(namespace):
         "AWS/SQS": SqsHelper,
         "AWS/Lambda": LambdaHelper,
         "AWS/Firehose": FirehoseHelper,
-        "AWS/Kinesis": KinesisHelper
+        "AWS/Kinesis": KinesisHelper,
     }
     ComponentHelper = clients.get(namespace, GenericHelper)
 

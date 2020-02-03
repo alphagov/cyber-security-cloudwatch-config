@@ -30,7 +30,7 @@ def process_health_event(event):
 
     for message in messages:
         processed = process_health_message(message)
-        status = 'sent' if processed else 'failed'
+        status = "sent" if processed else "failed"
         event_processed_status[status] += 1
     return event_processed_status
 
@@ -44,16 +44,16 @@ def process_health_message(message):
         notify_pagerduty = False
         notify_dashboard = True
         processed = True
-        if 'Source' and 'Resource' in message:
+        if "Source" and "Resource" in message:
             if notify_pagerduty:
                 pd_response = notify_pagerduty_sns(message)
-                processed = ('MessageId' in pd_response) and processed
+                processed = ("MessageId" in pd_response) and processed
             if notify_slack:
                 slack_response = notify_slack_sns(message)
-                processed = ('MessageId' in slack_response) and processed
+                processed = ("MessageId" in slack_response) and processed
             if notify_dashboard:
                 dash_response = notify_dashboard_sns(message)
-                processed = ('MessageId' in dash_response) and processed
+                processed = ("MessageId" in dash_response) and processed
         else:
             LOG.error("Message missing required fields")
             processed = False
@@ -67,7 +67,7 @@ def process_health_message(message):
 def get_slack_channel(message):
     """ Identify target slack channel """
     if "AlarmName" in message:
-        LOG.debug("Get target channel for alarm: %s", message['AlarmName'])
+        LOG.debug("Get target channel for alarm: %s", message["AlarmName"])
     default_channel = "cyber-security-service-health"
     # correct this to do something that might happen
     if "SlackChannel" in message:
@@ -98,10 +98,14 @@ def format_slack_message(message):
 
         content.service = message.get("Service", "untagged")
         content.environment = message.get("Environment", "Test").title()
-        content.resource = get_resource_string(message.get("Resource", {"Name": "missing"}))
+        content.resource = get_resource_string(
+            message.get("Resource", {"Name": "missing"})
+        )
         content.component_type = message.get("ComponentType", "unknown type")
         content.state = "healthy" if message.get("Healthy", False) else "unhealthy"
-        content.header = f"{content.component_type}: {content.resource} is {content.state}"
+        content.header = (
+            f"{content.component_type}: {content.resource} is {content.state}"
+        )
         content.message = message.get("Message", None)
 
     except (ValueError, KeyError) as err:
@@ -118,7 +122,7 @@ def get_slack_post(message):
     slack_post = {
         "username": f"Health Monitor: {status}",
         "icon_emoji": emoji,
-        "channel": get_slack_channel(message)
+        "channel": get_slack_channel(message),
     }
     content = format_slack_message(message)
     slack_post.update(content)
@@ -127,14 +131,14 @@ def get_slack_post(message):
 
 def notify_pagerduty_sns(pagerduty_sns_message):
     """ Send message to PagerDuty SNS """
-    pagerduty_sns_arn = os.environ['PAGERDUTY_SNS_ARN']
+    pagerduty_sns_arn = os.environ["PAGERDUTY_SNS_ARN"]
     response = send_to_sns(pagerduty_sns_arn, json.dumps(pagerduty_sns_message))
     return response
 
 
 def notify_slack_sns(slack_sns_message):
     """ Send message to Slack SNS """
-    slack_sns_arn = os.environ['SLACK_SNS_ARN']
+    slack_sns_arn = os.environ["SLACK_SNS_ARN"]
     slack_post = get_slack_post(slack_sns_message)
     response = send_to_sns(slack_sns_arn, slack_post)
     return response
@@ -142,7 +146,7 @@ def notify_slack_sns(slack_sns_message):
 
 def notify_dashboard_sns(dashboard_sns_message):
     """ Send message to Dashboard SNS """
-    dashboard_sns_arn = os.environ['DASHBOARD_SNS_ARN']
+    dashboard_sns_arn = os.environ["DASHBOARD_SNS_ARN"]
     response = send_to_sns(dashboard_sns_arn, json.dumps(dashboard_sns_message))
     return response
 
@@ -150,15 +154,15 @@ def notify_dashboard_sns(dashboard_sns_message):
 def send_to_sns(topic_arn, sns_message):
     """ Send message to SNS """
     try:
-        message_to_send = json.dumps({'default': json.dumps(sns_message, default=str)})
+        message_to_send = json.dumps({"default": json.dumps(sns_message, default=str)})
         session = boto3.session.Session()
         region = session.region_name
-        sns = boto3.client('sns', region_name=region)
+        sns = boto3.client("sns", region_name=region)
         response = sns.publish(
             TopicArn=topic_arn,
             # Subject=sns_subject,
             Message=message_to_send,
-            MessageStructure='json'
+            MessageStructure="json",
         )
     except ClientError:
         response = None

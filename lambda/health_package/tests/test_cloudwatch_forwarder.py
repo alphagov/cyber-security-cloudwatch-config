@@ -8,7 +8,7 @@ from cloudwatch_forwarder import (
     get_environment_account_id,
     get_health_target_queue_url,
     send_to_health_monitor,
-    parse_messages
+    parse_messages,
 )
 from health_event import HealthEvent
 import stubs
@@ -24,14 +24,14 @@ def test_parse_messages(health_monitor_sns_event):
 
 def test_get_environment():
     """ Test get_environment function returns based on event or default """
-    os.environ["DEF_ENVIRONMENT"] = 'test'
+    os.environ["DEF_ENVIRONMENT"] = "test"
 
     event = HealthEvent()
     env = get_environment(event)
-    assert env == 'test'
-    event.set_environment('prod')
+    assert env == "test"
+    event.set_environment("prod")
     env = get_environment(event)
-    assert env == 'prod'
+    assert env == "prod"
 
 
 def test_get_environment_account_id():
@@ -40,19 +40,19 @@ def test_get_environment_account_id():
     test_account = "012345678901"
     os.environ["PROD_ACCOUNT"] = prod_account
     os.environ["TEST_ACCOUNT"] = test_account
-    account = get_environment_account_id('test')
+    account = get_environment_account_id("test")
     assert account == test_account
-    account = get_environment_account_id('Test')
+    account = get_environment_account_id("Test")
     assert account == test_account
-    account = get_environment_account_id('monkeys')
+    account = get_environment_account_id("monkeys")
     assert account == test_account
-    account = get_environment_account_id('live')
+    account = get_environment_account_id("live")
     assert account == prod_account
-    account = get_environment_account_id('prod')
+    account = get_environment_account_id("prod")
     assert account == prod_account
-    account = get_environment_account_id('PROD')
+    account = get_environment_account_id("PROD")
     assert account == prod_account
-    account = get_environment_account_id('production')
+    account = get_environment_account_id("production")
     assert account == prod_account
 
 
@@ -67,11 +67,11 @@ def test_get_health_target_queue_url():
     os.environ["PROD_ACCOUNT"] = prod_account
     os.environ["TEST_ACCOUNT"] = test_account
 
-    calculated_url = get_health_target_queue_url('test')
+    calculated_url = get_health_target_queue_url("test")
     expected_url = f"https://sqs.{region}.amazonaws.com/{test_account}/{queue_name}"
     assert calculated_url == expected_url
 
-    calculated_url = get_health_target_queue_url('prod')
+    calculated_url = get_health_target_queue_url("prod")
     expected_url = f"https://sqs.{region}.amazonaws.com/{prod_account}/{queue_name}"
     assert calculated_url == expected_url
 

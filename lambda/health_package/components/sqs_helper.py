@@ -10,6 +10,7 @@ from logger import LOG
 
 class SqsHelper(GenericHelper):
     """ Helper functions for SQS """
+
     @classmethod
     def metric_resource_exists(cls, metric, region=None):
         """
@@ -54,7 +55,9 @@ class SqsHelper(GenericHelper):
                 queue = cls.get_metric_dimension_value(metric, "QueueName")
                 LOG.debug("Get tags for sqs queue: %s", queue)
                 # get_queue_url is not granted by security audit role
-                queue_url = f"https://{region}.queue.amazonaws.com/{caller.Account}/{queue}"
+                queue_url = (
+                    f"https://{region}.queue.amazonaws.com/{caller.Account}/{queue}"
+                )
                 get_tags_response = Dict(client.list_queue_tags(QueueUrl=queue_url))
                 LOG.debug(json.dumps(get_tags_response.Tags, indent=2))
                 tags = get_tags_response.Tags

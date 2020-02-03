@@ -21,7 +21,7 @@ def get_caller_identity():
 def get_client_context():
     """ Generate a context field for the lambda invoke """
     caller = get_caller_identity()
-    b64 = base64.b64encode(caller.Arn.encode('utf-8'))
+    b64 = base64.b64encode(caller.Arn.encode("utf-8"))
     context = f"{caller.Account}/{b64}"
     return context
 
@@ -66,10 +66,7 @@ def send_to_health_monitor(event):
     payload_json = event.to_json()
     queue_url = get_health_target_queue_url(env)
     LOG.debug("Send to SQS: %s", queue_url)
-    response = aws_sqs.send_message(
-        QueueUrl=queue_url,
-        MessageBody=payload_json
-    )
+    response = aws_sqs.send_message(QueueUrl=queue_url, MessageBody=payload_json)
 
     return Dict(response)
 
@@ -96,24 +93,22 @@ def get_message_body(message):
 
 
 def parse_messages(event):
-    """ Parse the escaped message body from each of the SQS messages in event.Records """
-    messages = [
-        get_message_body(record)
-        for record
-        in event["Records"]
-    ]
+    """
+    Parse the escaped message body from each of the SQS messages in event.Records
+    """
+    messages = [get_message_body(record) for record in event["Records"]]
     print(str(messages))
     return messages
 
 
 def parse_sns_message(event):
     """ Retrieve SNS message field from lambda invoke event """
-    message = Dict(json.loads(event['Records'][0]['Sns']['Message']))
+    message = Dict(json.loads(event["Records"][0]["Sns"]["Message"]))
 
     # We don't think SNS sends multiple records in the same invocation
     # but that's an assumption so if it does we can see it happen in
     # the logs and make the case to code for it.
-    if len(event['Records']) > 1:
+    if len(event["Records"]) > 1:
         LOG.error("More than one record received from SNS event")
     return message
 

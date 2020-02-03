@@ -9,6 +9,7 @@ from components.generic_helper import GenericHelper
 
 class KinesisHelper(GenericHelper):
     """ Helper functions for SQS """
+
     @classmethod
     def metric_resource_exists(cls, metric, region=None):
         """
@@ -24,9 +25,7 @@ class KinesisHelper(GenericHelper):
             if client:
                 stream_name = cls.get_metric_dimension_value(metric, "StreamName")
                 if stream_name:
-                    client.describe_stream(
-                        StreamName=stream_name
-                    )
+                    client.describe_stream(StreamName=stream_name)
                 else:
                     resource_exists = False
 
@@ -53,9 +52,9 @@ class KinesisHelper(GenericHelper):
                 stream_name = cls.get_metric_dimension_value(metric, "StreamName")
                 if stream_name:
                     print(f"Get tags for kinesis stream: {stream_name}")
-                    list_tags_response = Dict(client.list_tags_for_stream(
-                        StreamName=stream_name
-                    ))
+                    list_tags_response = Dict(
+                        client.list_tags_for_stream(StreamName=stream_name)
+                    )
                     tag_list = list_tags_response.Tags
                     tags = cls.tag_list_to_dict(tag_list)
 
