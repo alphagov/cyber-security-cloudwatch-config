@@ -10,9 +10,7 @@ import boto3
 
 from logger import LOG
 import enrich
-from cloudwatch_forwarder import (
-    send_to_health_monitor
-)
+from cloudwatch_forwarder import send_to_health_monitor
 from health_event import HealthEvent
 
 
@@ -37,7 +35,9 @@ def process_cloudwatch_metric_event():
             statistics = get_cloudwatch_metric_statistics(alarm)
 
         if statistics is not None:
-            metric_event = cloudwatch_metric_to_standard_health_data_model(alarm, statistics)
+            metric_event = cloudwatch_metric_to_standard_health_data_model(
+                alarm, statistics
+            )
             response = send_to_health_monitor(metric_event)
             LOG.debug("Lambda invoke status: %s", response.StatusCode)
             if response.StatusCode == 200:
@@ -100,10 +100,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     metric.update(alarm.Dimensions)
     helper = enrich.get_namespace_helper(metric.Namespace)
     LOG.debug("Using %s helper", helper.__class__.__name__)
-    tags = helper.get_tags_for_metric_resource(
-        metric,
-        region=region
-    )
+    tags = helper.get_tags_for_metric_resource(metric, region=region)
     alarm.Tags = tags
     LOG.debug("Tags: %s", json.dumps(tags))
 
@@ -122,7 +119,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
         resource_name=resource_name,
         resource_id=resource_id,
         source_data=alarm,
-        metric_data=metric_data
+        metric_data=metric_data,
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))

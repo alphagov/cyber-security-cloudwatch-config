@@ -9,7 +9,7 @@ REGIONS = ["eu-west-1", "eu-west-2"]
 def get_alarms(region):
     """ Get alarm by name """
 
-    client = boto3.client('cloudwatch', region_name=region)
+    client = boto3.client("cloudwatch", region_name=region)
 
     describe_response = client.describe_alarms()
 
@@ -20,12 +20,12 @@ def get_alarms(region):
 
 def set_alarm_state(state, alarm_name, region):
     """ Set alarm state """
-    client = boto3.client('cloudwatch', region_name=region)
+    client = boto3.client("cloudwatch", region_name=region)
 
     alarm_set_response = client.set_alarm_state(
         AlarmName=str(alarm_name),
         StateValue=str(state),
-        StateReason='testing set alarm state'
+        StateReason="testing set alarm state",
     )
     return alarm_set_response
 
@@ -58,8 +58,7 @@ def reset_all_alarm_states(state):
 
     else:
         print(
-            f"State={state} is not valid. Valid values are: " +
-            ", ".join(valid_states)
+            f"State={state} is not valid. Valid values are: " + ", ".join(valid_states)
         )
 
 

@@ -6,7 +6,7 @@ import pytest
 from health_event import HealthEvent
 
 
-@pytest.mark.usefixtures('event_args')
+@pytest.mark.usefixtures("event_args")
 def test_event_populate(event_args):
     """
     Test populate method correctly assigns object attributes
@@ -27,7 +27,7 @@ def test_event_populate(event_args):
     assert event.metric_data == event_args.get("metric_data")
 
 
-@pytest.mark.usefixtures('event_args')
+@pytest.mark.usefixtures("event_args")
 def test_to_json(event_args):
     """
     Test to_json method correctly converts object instance to JSON
@@ -51,7 +51,7 @@ def test_to_json(event_args):
     assert event_dictionary["SourceData"] == event_args.get("source_data")
 
     timestamp = event_dictionary.get("MetricData")[0]["Timestamp"]
-    assert datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f') == now
+    assert datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f") == now
 
 
 def test_set_resource():

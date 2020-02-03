@@ -3,7 +3,7 @@ import os
 import json
 
 
-class HealthEvent():
+class HealthEvent:
     """ Create an event and handle convert to JSON nicely """
 
     def __init__(self):
@@ -20,18 +20,18 @@ class HealthEvent():
         self.metric_data = None
 
     def populate(
-            self,
-            source=None,
-            component_type=None,
-            event_type=None,
-            notify_slack=None,
-            environment=None,
-            service=None,
-            healthy=None,
-            resource_name=None,
-            resource_id=None,
-            source_data=None,
-            metric_data=None
+        self,
+        source=None,
+        component_type=None,
+        event_type=None,
+        notify_slack=None,
+        environment=None,
+        service=None,
+        healthy=None,
+        resource_name=None,
+        resource_id=None,
+        source_data=None,
+        metric_data=None,
     ):
         """" set all event properties as optional keywords"""
         args = locals()  # gets a dictionary of all local parameters
@@ -108,10 +108,7 @@ class HealthEvent():
             Different resources in AWS have
             either no name or no id.
         """
-        self.resource = {
-            "Name": resource_name,
-            "ID": resource_id
-        }
+        self.resource = {"Name": resource_name, "ID": resource_id}
 
     def set_source_data(self, source_data):
         """ Pass the original source event unaltered """
@@ -131,8 +128,8 @@ class HealthEvent():
         event_dict = vars(self)
         camel_dict = {}
         for key, val in event_dict.items():
-            key_words = key.split('_')
-            camel_key = ''.join(x.title() for x in key_words)
+            key_words = key.split("_")
+            camel_key = "".join(x.title() for x in key_words)
             camel_dict[camel_key] = val
         event_json = json.dumps(camel_dict, default=str)
         return event_json

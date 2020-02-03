@@ -40,15 +40,13 @@ def get_tf_item(source, indent_size, indent_level=0):
     elif isinstance(source, list):
         formatted += get_tf_list(source, indent_size, indent_level + 1)
     elif isinstance(source, str):
-        formatted += f"\"{source}\""
+        formatted += f'"{source}"'
     elif isinstance(source, int):
         formatted += f"{source}"
     elif isinstance(source, float):
         formatted += f"{source}"
     elif source is None:
-        formatted += f"\"\""
+        formatted += f'""'
     else:
         print(str(type(source)))
     return formatted
-
-

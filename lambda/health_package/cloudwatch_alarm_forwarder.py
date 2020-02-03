@@ -6,10 +6,7 @@ import boto3
 
 from logger import LOG
 import enrich
-from cloudwatch_forwarder import (
-    parse_sns_message,
-    send_to_health_monitor
-)
+from cloudwatch_forwarder import parse_sns_message, send_to_health_monitor
 from health_event import HealthEvent
 
 
@@ -30,10 +27,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     region = session.region_name
     metric = source_message.Trigger
     helper = enrich.get_namespace_helper(metric.Namespace)
-    source_message.Tags = helper.get_tags_for_metric_resource(
-        metric,
-        region=region
-    )
+    source_message.Tags = helper.get_tags_for_metric_resource(metric, region=region)
 
     event = HealthEvent()
 
@@ -49,7 +43,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
         healthy=source_message.NewStateValue == "OK",
         resource_name=resource_name,
         resource_id=resource_id,
-        source_data=source_message
+        source_data=source_message,
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event))

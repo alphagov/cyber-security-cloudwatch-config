@@ -12,6 +12,7 @@ LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
 
 class GenericHelper:
     """ Standard helper functions for cloudwatch metrics """
+
     @classmethod
     def get_caller_identity(cls):
         """ Get a session for the IAM role to invoke the health lambda """
@@ -30,7 +31,7 @@ class GenericHelper:
             "AWS/SQS": "sqs",
             "AWS/Lambda": "lambda",
             "AWS/Firehose": "firehose",
-            "AWS/Kinesis": "kinesis"
+            "AWS/Kinesis": "kinesis",
         }
         client_name = clients.get(namespace, None)
 
@@ -97,9 +98,12 @@ class GenericHelper:
         """
         # aws cloudwatch get-metric-statistics
         # --start-time="2019-10-20T00:00:00Z" --end-time="2019-10-23T00:00:00Z"
-        # --statistics=Maximum --namespace="AWS/SQS" --metric-name="ApproximateAgeOfOldestMessage"
-        # --period=300 --unit=Seconds --dimensions=Name=QueueName,Value=csw-prod-audit-account-queue
+        # --statistics=Maximum --namespace="AWS/SQS" /
+        #    --metric-name="ApproximateAgeOfOldestMessage"
+        # --period=300 --unit=Seconds --dimensions=Name=QueueName,/
+        # Value=csw-prod-audit-account-queue
         # --region=eu-west-1
+
         client = boto3.client("cloudwatch", metric.Region)
 
         x_days = 28
@@ -114,7 +118,7 @@ class GenericHelper:
             EndTime=now,
             Period=period,
             Unit="Seconds",
-            Statistics=[statistic]
+            Statistics=[statistic],
         )
         return Dict(stats_response)
 
@@ -135,7 +139,7 @@ class GenericHelper:
             "Baseline threshold: %s * %s = %s",
             statistic_value,
             rule.Multiplier,
-            threshold
+            threshold,
         )
         # The min/max overrides do not have to be set
         # If they are set they override the calculated
@@ -144,14 +148,14 @@ class GenericHelper:
             LOG.info(
                 "Baseline threshold (%s) is less than rule min (%s)",
                 threshold,
-                rule.Minimum
+                rule.Minimum,
             )
             threshold = rule.Minimum
         elif "Maximum" in rule and threshold > rule.Maximum:
             LOG.info(
                 "Baseline threshold (%s) is greater than rule max (%s)",
                 threshold,
-                rule.Minimum
+                rule.Minimum,
             )
             threshold = rule.Maximum
 

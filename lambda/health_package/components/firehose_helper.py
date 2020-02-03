@@ -24,11 +24,11 @@ class FirehoseHelper(GenericHelper):
             client = cls.get_client_from_namespace(namespace, region)
 
             if client:
-                stream_name = cls.get_metric_dimension_value(metric, "DeliveryStreamName")
+                stream_name = cls.get_metric_dimension_value(
+                    metric, "DeliveryStreamName"
+                )
                 if stream_name:
-                    client.describe_delivery_stream(
-                        DeliveryStreamName=stream_name
-                    )
+                    client.describe_delivery_stream(DeliveryStreamName=stream_name)
                 else:
                     resource_exists = False
 
@@ -52,12 +52,16 @@ class FirehoseHelper(GenericHelper):
             print(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
-                stream_name = cls.get_metric_dimension_value(metric, "DeliveryStreamName")
+                stream_name = cls.get_metric_dimension_value(
+                    metric, "DeliveryStreamName"
+                )
                 if stream_name:
                     print(f"Get tags for firehose delivery stream: {stream_name}")
-                    list_tags_response = Dict(client.list_tags_for_delivery_stream(
-                        DeliveryStreamName=stream_name
-                    ))
+                    list_tags_response = Dict(
+                        client.list_tags_for_delivery_stream(
+                            DeliveryStreamName=stream_name
+                        )
+                    )
                     tag_list = list_tags_response.Tags
                     tags = cls.tag_list_to_dict(tag_list)
 

@@ -53,7 +53,9 @@ class LambdaHelper(GenericHelper):
                 function_name = cls.get_metric_dimension_value(metric, "FunctionName")
                 if function_name:
                     print(f"Get tags for lambda function: {function_name}")
-                    get_function_response = Dict(client.get_function(FunctionName=function_name))
+                    get_function_response = Dict(
+                        client.get_function(FunctionName=function_name)
+                    )
                     lambda_arn = get_function_response.Configuration.FunctionArn
                     get_tags_response = Dict(client.list_tags(Resource=lambda_arn))
                     tags = get_tags_response.Tags

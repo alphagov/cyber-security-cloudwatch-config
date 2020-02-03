@@ -8,31 +8,32 @@ from addict import Dict
 @pytest.fixture()
 def lambda_event():
     """Create a request event"""
-    event_data = Dict({
-        'requestContext': {
-            'elb': {
-                'targetGroupArn':
-                'arn:aws:elasticloadbalancing:eu:1234:targetgroup/test/1234'
-            }
-        },
-        'httpMethod': 'POST',
-        'path': '/',
-        'queryStringParameters': {},
-        'headers': {
-            'accept-encoding': 'identity',
-            'connection': 'close',
-            'content-length': '694',
-            'content-type': 'application/json',
-            'host': 'alert-controller.demo.cyber.digital',
-            'user-agent': 'Splunk/ABCD1234',
-            'x-amzn-trace-id': 'Root=1-1234',
-            'x-forwarded-for': '1.2.3.4',
-            'x-forwarded-port': '443',
-            'x-forwarded-proto': 'https'
-        },
-        'body': '{}',
-        'isBase64Encoded': False
-    })
+    event_data = Dict(
+        {
+            "requestContext": {
+                "elb": {
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu:1234:targetgroup/test/1234"
+                }
+            },
+            "httpMethod": "POST",
+            "path": "/",
+            "queryStringParameters": {},
+            "headers": {
+                "accept-encoding": "identity",
+                "connection": "close",
+                "content-length": "694",
+                "content-type": "application/json",
+                "host": "alert-controller.demo.cyber.digital",
+                "user-agent": "Splunk/ABCD1234",
+                "x-amzn-trace-id": "Root=1-1234",
+                "x-forwarded-for": "1.2.3.4",
+                "x-forwarded-port": "443",
+                "x-forwarded-proto": "https",
+            },
+            "body": "{}",
+            "isBase64Encoded": False,
+        }
+    )
 
     return event_data
 
@@ -40,136 +41,96 @@ def lambda_event():
 @pytest.fixture()
 def list_metric_response():
     """Create a request event"""
-    response = Dict({
-        "Metrics": [
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Throttles",
-                "Dimensions": [
-                    {
-                        "Name": "FunctionName",
-                        "Value": "csw-uat"
-                    },
-                    {
-                        "Name": "Resource",
-                        "Value": "csw-uat"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Invocations",
-                "Dimensions": [
-                    {
-                        "Name": "FunctionName",
-                        "Value": "csw-uat"
-                    },
-                    {
-                        "Name": "Resource",
-                        "Value": "csw-uat"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Errors",
-                "Dimensions": [
-                    {
-                        "Name": "FunctionName",
-                        "Value": "csw-uat"
-                    },
-                    {
-                        "Name": "Resource",
-                        "Value": "csw-uat"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Duration",
-                "Dimensions": [
-                    {
-                        "Name": "FunctionName",
-                        "Value": "csw-uat"
-                    },
-                    {
-                        "Name": "Resource",
-                        "Value": "csw-uat"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateNumberOfMessagesVisible",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-dan-audit-account-metric-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateNumberOfMessagesDelayed",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-uat-evaluated-metric-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateAgeOfOldestMessage",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-dan-audit-account-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateNumberOfMessagesNotVisible",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-uat-evaluated-metric-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "NumberOfMessagesSent",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-dan-evaluated-metric-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "NumberOfMessagesDeleted",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-dan-completed-audit-queue"
-                    }
-                ]
-            },
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "NumberOfEmptyReceives",
-                "Dimensions": [
-                    {
-                        "Name": "QueueName",
-                        "Value": "csw-uat-audit-account-queue"
-                    }
-                ]
-            }
-        ]
-    })
+    response = Dict(
+        {
+            "Metrics": [
+                {
+                    "Namespace": "AWS/Lambda",
+                    "MetricName": "Throttles",
+                    "Dimensions": [
+                        {"Name": "FunctionName", "Value": "csw-uat"},
+                        {"Name": "Resource", "Value": "csw-uat"},
+                    ],
+                },
+                {
+                    "Namespace": "AWS/Lambda",
+                    "MetricName": "Invocations",
+                    "Dimensions": [
+                        {"Name": "FunctionName", "Value": "csw-uat"},
+                        {"Name": "Resource", "Value": "csw-uat"},
+                    ],
+                },
+                {
+                    "Namespace": "AWS/Lambda",
+                    "MetricName": "Errors",
+                    "Dimensions": [
+                        {"Name": "FunctionName", "Value": "csw-uat"},
+                        {"Name": "Resource", "Value": "csw-uat"},
+                    ],
+                },
+                {
+                    "Namespace": "AWS/Lambda",
+                    "MetricName": "Duration",
+                    "Dimensions": [
+                        {"Name": "FunctionName", "Value": "csw-uat"},
+                        {"Name": "Resource", "Value": "csw-uat"},
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "ApproximateNumberOfMessagesVisible",
+                    "Dimensions": [
+                        {
+                            "Name": "QueueName",
+                            "Value": "csw-dan-audit-account-metric-queue",
+                        }
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "ApproximateNumberOfMessagesDelayed",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-uat-evaluated-metric-queue"}
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "ApproximateAgeOfOldestMessage",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-dan-audit-account-queue"}
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "ApproximateNumberOfMessagesNotVisible",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-uat-evaluated-metric-queue"}
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "NumberOfMessagesSent",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-dan-evaluated-metric-queue"}
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "NumberOfMessagesDeleted",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-dan-completed-audit-queue"}
+                    ],
+                },
+                {
+                    "Namespace": "AWS/SQS",
+                    "MetricName": "NumberOfEmptyReceives",
+                    "Dimensions": [
+                        {"Name": "QueueName", "Value": "csw-uat-audit-account-queue"}
+                    ],
+                },
+            ]
+        }
+    )
 
     return response
 
@@ -178,20 +139,16 @@ def list_metric_response():
 def dimension_metric():
     """Create dimension metric"""
 
-    metric = Dict({
-        "Namespace": "AWS/EC2",
-        "MetricName": "CPUUtilization",
-        "Dimensions": [
-            {
-                "Name": "Name",
-                "Value": "instance-name"
-            },
-            {
-                "Name": "InstanceId",
-                "Value": "i-0123456789abcdef0"
-            }
-        ]
-    })
+    metric = Dict(
+        {
+            "Namespace": "AWS/EC2",
+            "MetricName": "CPUUtilization",
+            "Dimensions": [
+                {"Name": "Name", "Value": "instance-name"},
+                {"Name": "InstanceId", "Value": "i-0123456789abcdef0"},
+            ],
+        }
+    )
 
     return metric
 
@@ -200,16 +157,13 @@ def dimension_metric():
 def lambda_metric():
     """Create lambda metric"""
 
-    metric = Dict({
-        "Namespace": "AWS/Lambda",
-        "MetricName": "Errors",
-        "Dimensions": [
-            {
-                "Name": "FunctionName",
-                "Value": "lambda-function"
-            }
-        ]
-    })
+    metric = Dict(
+        {
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Errors",
+            "Dimensions": [{"Name": "FunctionName", "Value": "lambda-function"}],
+        }
+    )
 
     return metric
 
@@ -236,12 +190,10 @@ def mock_get_function_response():
                 "SubnetIds": [
                     "subnet-01234567890abcdef",
                     "subnet-11234567890abcdef",
-                    "subnet-21234567890abcdef"
+                    "subnet-21234567890abcdef",
                 ],
-                "SecurityGroupIds": [
-                    "sg-01234567890abcdef"
-                ],
-                "VpcId": "vpc-01234567890abcdef"
+                "SecurityGroupIds": ["sg-01234567890abcdef"],
+                "VpcId": "vpc-01234567890abcdef",
             },
             "Environment": {
                 "Variables": {
@@ -250,17 +202,15 @@ def mock_get_function_response():
                     "DATABASE_URL": "mongodb://blah",
                     "TOPIC_ARN": "arn:aws:sns:eu-west-2:123456789012:topic",
                     "LOGLEVEL": "DEBUG",
-                    "VALID_TOKENS": "blah1,blah2"
+                    "VALID_TOKENS": "blah1,blah2",
                 }
             },
-            "TracingConfig": {
-                "Mode": "PassThrough"
-            },
-            "RevisionId": "12345678-1234-5678-9012-123456789012"
+            "TracingConfig": {"Mode": "PassThrough"},
+            "RevisionId": "12345678-1234-5678-9012-123456789012",
         },
         "Code": {
             "RepositoryType": "S3",
-            "Location": "https://awslambda-eu-west-2-tasks.s3.eu-west-2.amazonaws.com/snapshots/123456789012/lambda-function"
+            "Location": "https://awslambda-eu-west-2-tasks.s3.eu-west-2.amazonaws.com/snapshots/123456789012/lambda-function",
         },
         "Tags": {
             "SvcOwner": "Cyber",
@@ -269,8 +219,8 @@ def mock_get_function_response():
             "Service": "cyber-service",
             "SvcCodeURL": "https://github.com/alphagov/my-madeup-repo",
             "DeployedUsing": "Terraform",
-            "Name": "lambda-function"
-        }
+            "Name": "lambda-function",
+        },
     }
     return response
 
@@ -287,7 +237,7 @@ def mock_list_tags_response():
             "Service": "cyber-service",
             "SvcCodeURL": "https://github.com/alphagov/my-madeup-repo",
             "DeployedUsing": "Terraform",
-            "Name": "lambda-function"
+            "Name": "lambda-function",
         }
     }
     return response
@@ -298,11 +248,11 @@ def mock_sqs_send_message_response():
     """Create more for sqs send message"""
 
     response = {
-        'MD5OfMessageBody': '5a436cac350d96eb5c9ff594907f9397',
-        'MD5OfMessageAttributes': 'da09782a09540a4e759f7666815ab16e',
-        'MD5OfMessageSystemAttributes': '39ee2b4055f6b0173cc6bf9e701a59f4',
-        'MessageId': 'aa641d09283a0f86f9f0c80a81eeb048',
-        'SequenceNumber': '00001'
+        "MD5OfMessageBody": "5a436cac350d96eb5c9ff594907f9397",
+        "MD5OfMessageAttributes": "da09782a09540a4e759f7666815ab16e",
+        "MD5OfMessageSystemAttributes": "39ee2b4055f6b0173cc6bf9e701a59f4",
+        "MessageId": "aa641d09283a0f86f9f0c80a81eeb048",
+        "SequenceNumber": "00001",
     }
 
     return response
@@ -333,32 +283,34 @@ def health_monitor_sns_event():
             "ComparisonOperator": "LessThanThreshold",
             "Threshold": 5.0,
             "TreatMissingData": "- TreatMissingData:                    missing",
-            "EvaluateLowSampleCountPercentile": ""
-        }
+            "EvaluateLowSampleCountPercentile": "",
+        },
     }
 
-    event_data = Dict({
-        'Records': [
-            {
-                'EventSource': 'aws:sns',
-                'EventVersion': '1.0',
-                'EventSubscriptionArn': 'arn:aws:sns:eu-west-2:123456789012:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-749f20fafecc',
-                'Sns': {
-                    'Type': 'Notification',
-                    'MessageId': '12345678-1234-5678-9012-123456789012',
-                    'TopicArn': 'arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic',
-                    'Subject': 'ALARM: "example-cloudwatch-alarm" in EU (London)',
-                    'Message': json.dumps(alarm_data),
-                    'Timestamp': '2019-11-22T15:43:51.780Z',
-                    'SignatureVersion': '1',
-                    'Signature': 'oJj8Csqqzoa9Lh4LiV6O8/OVSMX6ahZ4WqcPfUuMRv2zN5NX2mBzIvGi7M+bAsc6Cs/HP7FJy9amMZBMuFfnelLG5k94Cu7NDbqMjhhoY/VMrf5QOw+5aPCl0wzKIopng+rwajGLAx2I2psbH3fgreZNYYVkNTXigPCOp9zM7WM6fzrxlA5vlOWKoFqeMKWkMYs+Te0y2FjsjsywBxc9iz/Nil7jYGNNdj5Gk3haWCuO8XCG3q+hc0MFkWWib0d858WOdAJKqqTBSrCpvieOdL+IzSCK4vbaneVr+pt39R9FN5gefDhqdQF3wBKMOSfdeBSc3v8Rn8ol4VDiptqZog==',
-                    'SigningCertUrl': 'https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-123456789012abcd123456789012abcd.pem',
-                    'UnsubscribeUrl': 'https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-12345678abcd',
-                    'MessageAttributes': {}
+    event_data = Dict(
+        {
+            "Records": [
+                {
+                    "EventSource": "aws:sns",
+                    "EventVersion": "1.0",
+                    "EventSubscriptionArn": "arn:aws:sns:eu-west-2:123456789012:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-749f20fafecc",
+                    "Sns": {
+                        "Type": "Notification",
+                        "MessageId": "12345678-1234-5678-9012-123456789012",
+                        "TopicArn": "arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic",
+                        "Subject": 'ALARM: "example-cloudwatch-alarm" in EU (London)',
+                        "Message": json.dumps(alarm_data),
+                        "Timestamp": "2019-11-22T15:43:51.780Z",
+                        "SignatureVersion": "1",
+                        "Signature": "oJj8Csqqzoa9Lh4LiV6O8/OVSMX6ahZ4WqcPfUuMRv2zN5NX2mBzIvGi7M+bAsc6Cs/HP7FJy9amMZBMuFfnelLG5k94Cu7NDbqMjhhoY/VMrf5QOw+5aPCl0wzKIopng+rwajGLAx2I2psbH3fgreZNYYVkNTXigPCOp9zM7WM6fzrxlA5vlOWKoFqeMKWkMYs+Te0y2FjsjsywBxc9iz/Nil7jYGNNdj5Gk3haWCuO8XCG3q+hc0MFkWWib0d858WOdAJKqqTBSrCpvieOdL+IzSCK4vbaneVr+pt39R9FN5gefDhqdQF3wBKMOSfdeBSc3v8Rn8ol4VDiptqZog==",
+                        "SigningCertUrl": "https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-123456789012abcd123456789012abcd.pem",
+                        "UnsubscribeUrl": "https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-12345678abcd",
+                        "MessageAttributes": {},
+                    },
                 }
-            }
-        ]
-    })
+            ]
+        }
+    )
 
     return event_data
 
@@ -372,10 +324,7 @@ def standard_health_alarm_event():
         "Environment": "prod",
         "EventType": "Alarm",
         "Healthy": True,
-        "Resource": {
-            "ID": None,
-            "Name": "cloudwatch_alarm_forwarder"
-        },
+        "Resource": {"ID": None, "Name": "cloudwatch_alarm_forwarder"},
         "Service": "Unknown",
         "Source": "AWS/CloudWatch",
         "SourceData": {
@@ -391,10 +340,7 @@ def standard_health_alarm_event():
             "Trigger": {
                 "ComparisonOperator": "GreaterThanOrEqualToThreshold",
                 "Dimensions": [
-                    {
-                        "name": "FunctionName",
-                        "value": "cloudwatch_alarm_forwarder"
-                    }
+                    {"name": "FunctionName", "value": "cloudwatch_alarm_forwarder"}
                 ],
                 "EvaluateLowSampleCountPercentile": "",
                 "EvaluationPeriods": 1,
@@ -405,9 +351,9 @@ def standard_health_alarm_event():
                 "StatisticType": "Statistic",
                 "Threshold": 0.0,
                 "TreatMissingData": "- TreatMissingData:                    notBreaching",
-                "Unit": None
-            }
-        }
+                "Unit": None,
+            },
+        },
     }
 
     return Dict(event)
@@ -425,14 +371,12 @@ def event_args():
         "service": "MyService",
         "healthy": "OK",
         "resource_name": "MyQueue",
-        "source_data": {
-            "field_1": "value_1"
-        },
+        "source_data": {"field_1": "value_1"},
         "metric_data": [
             {
                 "Maximum": 12.0,
                 "Timestamp": "2020-01-29 09:00:00+00:00",
-                "Unit": "Milliseconds"
+                "Unit": "Milliseconds",
             }
-        ]
+        ],
     }
