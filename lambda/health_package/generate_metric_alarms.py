@@ -272,6 +272,15 @@ if __name__ == "__main__":
         ),
         Dict(
             {
+                "Namespace": "AWS/Firehose",
+                "MetricName": "ExecuteProcessing.Success",
+                "Statistic": "Minimum",
+                "Multiplier": 1,
+                "Minimum": 0.99,  # alert on 1% failure
+            }
+        ),
+        Dict(
+            {
                 "Namespace": "AWS/Kinesis",
                 "MetricName": "GetRecords.IteratorAgeMilliseconds",
                 "Statistic": "Maximum",
