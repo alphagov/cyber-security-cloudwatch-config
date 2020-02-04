@@ -272,7 +272,7 @@ if __name__ == "__main__":
         ),
         Dict(
             {
-                "Namespace": "AWS/Kinesis",
+                "Namespace": "AWS/Firehose",
                 "MetricName": "ExecuteProcessing.Success",
                 "Statistic": "Minimum",
                 "Multiplier": 1,
