@@ -3,8 +3,13 @@ import os
 import datetime
 import logging
 
+# from typing import Dict as dDict
+from typing import Optional
+
 import boto3
+from mypy_boto3 import sts
 from addict import Dict
+
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
@@ -14,16 +19,16 @@ class GenericHelper:
     """ Standard helper functions for cloudwatch metrics """
 
     @classmethod
-    def get_caller_identity(cls):
+    def get_caller_identity(cls) -> Dict:
         """ Get a session for the IAM role to invoke the health lambda """
         session = boto3.session.Session()
         region = session.region_name
-        aws_sts = boto3.client("sts", region_name=region)
+        aws_sts: sts.STSClient = boto3.client("sts", region_name=region)
         caller = aws_sts.get_caller_identity()
         return Dict(caller)
 
     @classmethod
-    def get_namespace_service(cls, namespace):
+    def get_namespace_service(cls, namespace: str) -> Optional[str]:
         """
         Convert CloudWatch namespace to AWS service name
         """
@@ -33,9 +38,8 @@ class GenericHelper:
             "AWS/Firehose": "firehose",
             "AWS/Kinesis": "kinesis",
         }
-        client_name = clients.get(namespace, None)
 
-        return client_name
+        return clients.get(namespace, None)
 
     @classmethod
     def get_client_from_namespace(cls, namespace, region):
