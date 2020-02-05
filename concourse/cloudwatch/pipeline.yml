@@ -39,12 +39,6 @@ jobs:
                 make test
             dir: security-cloudwatch-config-git
 
-  - name: cloudwatch_zip
-    plan:
-      - get: security-cloudwatch-config-git
-        trigger: true
-        passed:
-          - cloudwatch_tests
       - task: zip
         config:
           <<: *cloudwatch_build
