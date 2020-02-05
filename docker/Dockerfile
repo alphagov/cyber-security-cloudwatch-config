@@ -16,8 +16,8 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_
         cp terraform /bin/
 
 # Install python deps
-COPY requirements-dev.txt .
-COPY requirements.txt .
+COPY lambda/health_package/requirements-dev.txt .
+COPY lambda/health_package/requirements.txt .
 RUN pip install --no-cache-dir -r requirements-dev.txt
 ENV PYTHONDONTWRITEBYTECODE=1
 COPY docker/sts-assume-role.sh /usr/local/bin/sts-assume-role.sh

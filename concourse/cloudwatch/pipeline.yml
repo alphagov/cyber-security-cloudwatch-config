@@ -23,7 +23,8 @@ resources:
   - name: cloudwatch_docker
     type: docker-image
     source:
-      repository: ((ecs_repo))
+      repository: gdscyber/concourse-worker-health
+      tag: '1.0'
 
 blocks:
   - &security-cloudwatch-config-git
@@ -43,7 +44,8 @@ blocks:
       image_resource:
         type: docker-image
         source:
-          repository: ((ecs_repo))
+          repository: gdscyber/concourse-worker-health
+          tag: '1.0'
 
       inputs:
         - name: security-cloudwatch-config-git
