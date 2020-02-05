@@ -4,6 +4,8 @@ RUN apt-get update && apt-get install -y zip wget awscli jq
 
 ENV TERRAFORMVERSION=0.12.16
 
+RUN aws configure set region eu-west-2 --profile default
+
 RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_linux_amd64.zip &&\
         wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_SHA256SUMS &&\
         wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_SHA256SUMS.sig &&\
@@ -15,11 +17,14 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_
         chmod 555 terraform &&\
         cp terraform /bin/
 
-# Install python deps
-COPY lambda/health_package/requirements-dev.txt .
-COPY lambda/health_package/requirements.txt .
-RUN pip install --no-cache-dir -r requirements-dev.txt
-ENV PYTHONDONTWRITEBYTECODE=1
 COPY docker/sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
 
-COPY . .
+RUN mkdir .target
+
+# Install python deps
+# COPY lambda/health_package/requirements-dev.txt .
+# COPY lambda/health_package/requirements.txt .
+# RUN pip install --no-cache-dir -r requirements-dev.txt
+# ENV PYTHONDONTWRITEBYTECODE=1
+
+# COPY . .

@@ -7,35 +7,10 @@ resources:
       uri: https://github.com/alphagov/cyber-security-cloudwatch-config
       branch: master
 
-  - name: security-cloudwatch-config-git_docker
-    icon: github-circle
-    type: git
-    source:
-      uri: https://github.com/alphagov/cyber-security-cloudwatch-config
-      branch: master
-      paths:
-        - docker/Dockerfile
-        - lambda/health_package/requirements.txt
-        - lambda/health_package/requirements-dev.txt
-        - lambda/health_package/Makefile
-        - lambda/health_package/tox.ini
-
-  - name: cloudwatch_docker
-    type: docker-image
-    source:
-      repository: gdscyber/concourse-worker-health
-      tag: '1.0'
-
 blocks:
   - &security-cloudwatch-config-git
     get: security-cloudwatch-config-git
     trigger: true
-
-  - &cloudwatch_docker
-    get: cloudwatch_docker
-    trigger: true
-    passed:
-      - cloudwatch_build_docker_image
 
   - config: &cloudwatch_build
 
@@ -44,27 +19,18 @@ blocks:
       image_resource:
         type: docker-image
         source:
-          repository: gdscyber/concourse-worker-health
-          tag: '1.0'
+            repository: gdscyber/concourse-worker-health
+            tag: '1.2.1'
 
       inputs:
         - name: security-cloudwatch-config-git
-
+        - name: .target
+      outputs:
+        - name: .target
 jobs:
-  - name: cloudwatch_build_docker_image
-    plan:
-      - get: security-cloudwatch-config-git_docker
-        trigger: true
-
-      - put: cloudwatch_docker
-        params:
-          build: security-cloudwatch-config-git_docker
-          tag_as_latest: true
-
   - name: cloudwatch_tests
     plan:
       - *security-cloudwatch-config-git
-      - *cloudwatch_docker
       - task: test
         config:
           <<: *cloudwatch_build
@@ -75,4 +41,19 @@ jobs:
               - |
                 cd lambda/health_package
                 make test
+            dir: security-cloudwatch-config-git
+
+  - name: cloudwatch_zip
+    plan:
+      - *security-cloudwatch-config-git
+      - task: zip
+        config:
+          <<: *cloudwatch_build
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd lambda/health_package
+                make zip
             dir: security-cloudwatch-config-git
