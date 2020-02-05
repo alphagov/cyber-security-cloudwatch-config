@@ -102,3 +102,7 @@ def test_send_to_health_monitor(mock_sqs_send_message_response):
     with stubber:
         response = send_to_health_monitor(event)
         assert response == mock_sqs_send_message_response
+
+
+def test_fail():
+    assert False
