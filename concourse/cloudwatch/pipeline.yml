@@ -5,13 +5,9 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/cyber-security-cloudwatch-config
-      branch: master
+      branch: concourse-pipeline
 
 blocks:
-  - &security-cloudwatch-config-git
-    get: security-cloudwatch-config-git
-    trigger: true
-
   - config: &cloudwatch_build
 
       platform: linux
@@ -24,13 +20,13 @@ blocks:
 
       inputs:
         - name: security-cloudwatch-config-git
-        - name: .target
-      outputs:
-        - name: .target
+
 jobs:
   - name: cloudwatch_tests
     plan:
-      - *security-cloudwatch-config-git
+      - get: security-cloudwatch-config-git
+        trigger: true
+
       - task: test
         config:
           <<: *cloudwatch_build
@@ -45,7 +41,10 @@ jobs:
 
   - name: cloudwatch_zip
     plan:
-      - *security-cloudwatch-config-git
+      - get: security-cloudwatch-config-git
+        trigger: true
+        passed:
+          - cloudwatch_tests
       - task: zip
         config:
           <<: *cloudwatch_build
