@@ -124,7 +124,7 @@ jobs:
             - name: cyber-security-cloudwatch-config-git
             - name: cyber-security-terraform-git
             - name: lambda_package
-            - name: alarms
+            - name: deployments
           run:
             path: /bin/bash
             args:
@@ -132,7 +132,7 @@ jobs:
               - |
                 cd ../lambda_package
                 ls *.zip
-                cd ../alarms
+                cd ../deployments
                 ls *.tfvars
                 cd ../cyber-security-terraform-git
                 ls
