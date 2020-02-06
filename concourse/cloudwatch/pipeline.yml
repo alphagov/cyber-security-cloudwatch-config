@@ -87,16 +87,11 @@ jobs:
             args:
               - -exc
               - |
-                env
-
-                cd ..
-                workdir=$(pwd)
-                ln -fs ${workdir}/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_account
-                cd cyber-security-cloudwatch-config-git
 
                 monitored_accounts=$(ls ../cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
 
                 for account_id in $monitored_accounts; do
+
                  echo "Test assume role"
                  target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
                  source sts-assume-role.sh $target_arn
@@ -106,6 +101,13 @@ jobs:
                   echo $AWS_ASSUMED_ACCOUNT_ID
                   echo $AWS_ASSUMED_ROLE_ARN
 
+                  # for some reason python can't create the files and directory structure it needs to output
+                  # the generated tfvars file so you have to create it manually
+                  mkdir -p terraform/per_account/deployments/${account_id}
+                  chmod -R 777 terraform/per_account/deployments
+                  touch terraform/per_account/deployments/${account_id}/alarms.tfvars
+                  chmod 777 terraform/per_account/deployments/${account_id}/alarms.tfvars
+
                   cd lambda/health_package
                   make run
                   cd ../..
@@ -114,6 +116,10 @@ jobs:
                  fi
                 done
 
+                pwd
+                ls terraform/per_account/deployments
+                cp -r terraform/per_account/deployments/* ../deployments
+                ls -l ../deployments
 
             dir: cyber-security-cloudwatch-config-git
 
@@ -133,7 +139,13 @@ jobs:
                 cd ../lambda_package
                 ls *.zip
                 cd ../deployments
-                ls *.tfvars
+                ls
                 cd ../cyber-security-terraform-git
                 ls
+
+                monitored_accounts=$(ls ../deployments)
+
+                for account_id in $monitored_accounts; do
+                  ls ../deployments/${account_id}
+                done
             dir: cyber-security-cloudwatch-config-git
