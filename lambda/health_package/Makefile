@@ -25,8 +25,8 @@ copy_dir:
 
 build: clean target_dir add_deps copy_dir
 
-run: build
-	cd .target; python generate_metric_alarms.py
+run: add_dev_deps
+	python generate_metric_alarms.py
 
 zip: build
 	cd .target; zip -X -9 ../health_package.zip -r .
