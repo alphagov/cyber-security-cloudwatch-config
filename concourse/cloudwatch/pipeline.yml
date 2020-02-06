@@ -1,11 +1,21 @@
 ---
 resources:
-  - name: security-cloudwatch-config-git
+  - name: cyber-security-cloudwatch-config-git
     icon: github-circle
     type: git
     source:
       uri: https://github.com/alphagov/cyber-security-cloudwatch-config
       branch: concourse-pipeline
+
+  - name: cyber-security-terraform-git
+    icon: github-circle
+    type: git
+    source:
+      uri: git@github.com:alphagov/cyber-security-terraform.git
+      branch: master
+      private_key: ((cyber-security-terraform-deploy-key))
+      paths:
+        - service/cloudwatch-config/*
 
 blocks:
   - config: &cloudwatch_build
@@ -16,15 +26,15 @@ blocks:
         type: docker-image
         source:
             repository: gdscyber/concourse-worker-health
-            tag: '1.2.1'
+            tag: '1.2.8'
 
       inputs:
-        - name: security-cloudwatch-config-git
+        - name: cyber-security-cloudwatch-config-git
 
 jobs:
-  - name: cloudwatch_tests
+  - name: cloudwatch_test
     plan:
-      - get: security-cloudwatch-config-git
+      - get: cyber-security-cloudwatch-config-git
         trigger: true
 
       - task: test
@@ -33,15 +43,25 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
               - |
                 cd lambda/health_package
                 make test
-            dir: security-cloudwatch-config-git
+                echo "Tests completed"
+            dir: cyber-security-cloudwatch-config-git
 
+  - name: cloudwatch_staging_deploy
+    plan:
+      - get: cyber-security-cloudwatch-config-git
+        trigger: true
+        passed:
+          - cloudwatch_test
+      - get: cyber-security-terraform-git
+        trigger: false
       - task: zip
         config:
           <<: *cloudwatch_build
+          outputs:
+          - name: lambda_package
           run:
             path: /bin/bash
             args:
@@ -49,4 +69,55 @@ jobs:
               - |
                 cd lambda/health_package
                 make zip
-            dir: security-cloudwatch-config-git
+                mv health_package.zip ../../../lambda_package
+                echo "Built zip file lambda distribution"
+                ls ../../..
+            dir: cyber-security-cloudwatch-config-git
+
+      - task: create_alarm_config
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                env
+                monitored_accounts=$(ls ../cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
+                for account_id in $monitored_accounts; do
+                 echo "Test assume role"
+                 target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                 source sts-assume-role.sh $target_arn
+                 source sts-get-caller-identity.sh
+
+                 if [[ $account_id == $AWS_ASSUMED_ACCOUNT_ID ]]; then
+                  echo $AWS_ASSUMED_ACCOUNT_ID
+                  echo $AWS_ASSUMED_ROLE_ARN
+                 else
+                  echo "FAILED TO ASSUME ${account_id}"
+                 fi
+                done
+
+
+            dir: cyber-security-cloudwatch-config-git
+
+      - task: deploy_terraform
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: lambda_package
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ../lambda_package
+                ls *.zip
+                cd ../cyber-security-terraform-git
+                ls
+            dir: cyber-security-cloudwatch-config-git

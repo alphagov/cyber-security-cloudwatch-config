@@ -18,8 +18,9 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_
         cp terraform /bin/
 
 COPY docker/sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
-
-RUN mkdir .target
+COPY docker/sts-get-caller-identity.sh /usr/local/bin/sts-get-caller-identity.sh
+RUN chmod a+x /usr/local/bin/sts-assume-role.sh
+RUN chmod a+x /usr/local/bin/sts-get-caller-identity.sh
 
 # Install python deps
 # COPY lambda/health_package/requirements-dev.txt .
