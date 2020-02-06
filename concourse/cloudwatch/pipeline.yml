@@ -102,13 +102,6 @@ jobs:
                   echo $AWS_ASSUMED_ACCOUNT_ID
                   echo $AWS_ASSUMED_ROLE_ARN
 
-                  # for some reason python can't create the files and directory structure it needs to output
-                  # the generated tfvars file so you have to create it manually
-                  mkdir -p terraform/per_account/deployments/${account_id}
-                  chmod -R 777 terraform/per_account/deployments
-                  touch terraform/per_account/deployments/${account_id}/alarms.tfvars
-                  chmod 777 terraform/per_account/deployments/${account_id}/alarms.tfvars
-
                   cd lambda/health_package
                   make run
                   cd ../..
