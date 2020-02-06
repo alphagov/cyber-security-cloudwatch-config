@@ -43,6 +43,7 @@ jobs:
           run:
             path: /bin/bash
             args:
+              - -exc
               - |
                 cd lambda/health_package
                 make test
