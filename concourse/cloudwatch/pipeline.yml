@@ -17,6 +17,32 @@ resources:
       paths:
         - service/cloudwatch-config/*
 
+  - name: health-notification
+    type: http-api
+    source:
+      uri: https://((health_host_test))/?alert_type=concourse$&alert_name=health
+      method: POST
+      headers:
+        Authorization: "Bearer ((health_token_test))"
+      json:
+        service: "{service}"
+        state: "{health}"
+        message: "{message}"
+        pipeline: "{BUILD_PIPELINE_NAME}"
+        job: "{BUILD_JOB_NAME}"
+        build_number: "{BUILD_NAME}"
+      service: "health"
+
+health_status_notify: &health_status_notify
+  put: health-notification
+
+resource_types:
+  - name: http-api
+    type: docker-image
+    source:
+      repository: aequitas/http-api-resource
+      tag: latest
+
 blocks:
   - config: &cloudwatch_build
 
@@ -36,6 +62,8 @@ jobs:
     plan:
       - get: cyber-security-cloudwatch-config-git
         trigger: true
+      - get: cyber-security-terraform-git
+        trigger: false
 
       - task: test
         config:
@@ -49,6 +77,16 @@ jobs:
                 make test
                 echo "Tests completed"
             dir: cyber-security-cloudwatch-config-git
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "Health package test passed"
+            health: healthy
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Health package test failed"
+            health: unhealthy
 
   - name: cloudwatch_staging_deploy
     plan:
@@ -58,6 +96,26 @@ jobs:
           - cloudwatch_test
       - get: cyber-security-terraform-git
         trigger: false
+
+      - task: terraform_deploy_keys
+        config:
+          <<: *cloudwatch_build
+          outputs:
+          - name: ssh
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cat > deploy_key <<'EOF'
+                ((cyber-security-terraform-deploy-key))
+                EOF
+                echo "Host github.com" > config
+                echo "  IdentityFile {workdir}/deploy_key" >> config
+                echo "  StrictHostKeyChecking no" >> config
+                chmod 400 deploy_key
+            dir: ssh
+
       - task: zip
         config:
           <<: *cloudwatch_build
@@ -74,6 +132,50 @@ jobs:
                 echo "Built zip file lambda distribution"
                 ls ../../..
             dir: cyber-security-cloudwatch-config-git
+
+      - task: terraform_account_validate
+        config:
+          <<: *cloudwatch_build
+          inputs:
+          - name: cyber-security-cloudwatch-config-git
+          - name: cyber-security-terraform-git
+          - name: ssh
+          - name: lambda_package
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ..
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                cat ssh/config
+                workdir=$(pwd)
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                cat /root/.ssh/config
+                test_run_account=$(ls cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments | head -1)
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_account
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_account/deployable
+
+                target_arn="arn:aws:iam::${test_run_account}:role/HealthConcourseWorkerRole"
+                source sts-assume-role.sh $target_arn
+                source sts-get-caller-identity.sh
+
+                terraform init -reconfigure -backend-config=../deployments/$test_run_account/backend.tfvars
+                terraform validate
+                echo "Terraform valid"
+            dir: cyber-security-cloudwatch-config-git
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "The account terraform has been validated"
+            health: healthy
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "The account terraform validation has failed"
+            health: unhealthy
 
       - task: create_alarm_config
         config:
