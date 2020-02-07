@@ -411,3 +411,100 @@ jobs:
           params:
             message: "Failed to validate health monitor terraform"
             health: unhealthy
+
+      - task: deploy_dashboard_terraform_to_non_prod
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: lambda_package
+            - name: ssh
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ..
+                workdir=$(pwd)
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_dashboard_environment/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_dashboard_environment
+
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_dashboard_environment/deployable
+                monitored_accounts=$(ls ../deployments)
+
+                for account_id in $monitored_accounts; do
+                  ls ../deployments/${account_id}
+                  env=$(grep DEF_ENVIRONMENT ../deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
+                  echo "${account_id} is a ${env} environment"
+                  if [[ $env != 'prod' ]]; then
+                    target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                    source sts-assume-role.sh $target_arn
+                    terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                    terraform apply -auto-approve -var-file=../deployments/${account_id}/apply.tfvars
+                  else
+                    echo "${account_id} is a production account - Not deploying at this stage"
+                  fi
+                done
+            dir: cyber-security-terraform-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to deploy non-production health monitoring lambdas"
+            health: unhealthy
+
+      - task: deploy_dashboard_terraform_to_prod
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: lambda_package
+            - name: ssh
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ..
+                workdir=$(pwd)
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_dashboard_environment/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_dashboard_environment
+
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_dashboard_environment/deployable
+                monitored_accounts=$(ls ../deployments)
+
+                for account_id in $monitored_accounts; do
+                  ls ../deployments/${account_id}
+                  env=$(grep DEF_ENVIRONMENT ../deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
+                  echo "${account_id} is a ${env} environment"
+                  if [[ $env == 'prod' ]]; then
+                    target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                    source sts-assume-role.sh $target_arn
+                    terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                    terraform apply -auto-approve -var-file=../deployments/${account_id}/apply.tfvars
+                  else
+                    echo "${account_id} is a production account - Not deploying at this stage"
+                  fi
+                done
+            dir: cyber-security-terraform-git
+
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "Successfully deployed production health monitoring lambdas"
+            health: healthy
+
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to deploy non-production health monitoring lambdas"
+            health: unhealthy
+
+
