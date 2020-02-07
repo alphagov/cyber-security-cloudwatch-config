@@ -232,16 +232,11 @@ jobs:
             args:
               - -exc
               - |
-                cd ../lambda_package
-                ls *.zip
-                cd ../deployments
-                ls
-                cd ../cyber-security-terraform-git
-                ls
-
                 monitored_accounts=$(ls ../deployments)
 
                 for account_id in $monitored_accounts; do
                   ls ../deployments/${account_id}
+                  env=$(grep DEF_ENVIRONMENT service/cloudwatch-config/per_account/deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
+                  echo "${account_id} is a ${env} environment"
                 done
-            dir: cyber-security-cloudwatch-config-git
+            dir: cyber-security-terraform-git
