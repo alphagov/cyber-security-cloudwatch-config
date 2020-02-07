@@ -77,18 +77,13 @@ jobs:
                 make test
                 echo "Tests completed"
             dir: cyber-security-cloudwatch-config-git
-        on_success:
-          <<: *health_status_notify
-          params:
-            message: "Health package test passed"
-            health: healthy
         on_failure:
           <<: *health_status_notify
           params:
             message: "Health package test failed"
             health: unhealthy
 
-  - name: cloudwatch_staging_deploy
+  - name: cloudwatch_deploy
     plan:
       - get: cyber-security-cloudwatch-config-git
         trigger: true
@@ -115,6 +110,11 @@ jobs:
                 echo "  StrictHostKeyChecking no" >> config
                 chmod 400 deploy_key
             dir: ssh
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to set SSH config"
+            health: unhealthy
 
       - task: zip
         config:
@@ -132,6 +132,11 @@ jobs:
                 echo "Built zip file lambda distribution"
                 ls ../../..
             dir: cyber-security-cloudwatch-config-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to build lambda zip file"
+            health: unhealthy
 
       - task: terraform_account_validate
         config:
@@ -148,33 +153,29 @@ jobs:
               - |
                 cd ..
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
-                cat ssh/config
                 workdir=$(pwd)
                 mkdir /root/.ssh
                 sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
-                cat /root/.ssh/config
-                test_run_account=$(ls cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments | head -1)
                 ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_account
+                monitored_accounts=$(ls cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
+
                 cd cyber-security-cloudwatch-config-git
                 cd terraform/per_account/deployable
 
-                target_arn="arn:aws:iam::${test_run_account}:role/HealthConcourseWorkerRole"
-                source sts-assume-role.sh $target_arn
-                source sts-get-caller-identity.sh
+                for account_id in $monitored_accounts; do
+                  target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                  source sts-assume-role.sh $target_arn
 
-                terraform init -reconfigure -backend-config=../deployments/$test_run_account/backend.tfvars
-                terraform validate
+                  terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                  terraform validate
+                done
+
                 echo "Terraform valid"
             dir: cyber-security-cloudwatch-config-git
-        on_success:
-          <<: *health_status_notify
-          params:
-            message: "The account terraform has been validated"
-            health: healthy
         on_failure:
           <<: *health_status_notify
           params:
-            message: "The account terraform validation has failed"
+            message: "Failed to validate account terraform"
             health: unhealthy
 
       - task: create_alarm_config
@@ -190,12 +191,11 @@ jobs:
             args:
               - -exc
               - |
-
                 monitored_accounts=$(ls ../cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
 
                 for account_id in $monitored_accounts; do
 
-                 echo "Test assume role"
+                 echo "Assume role"
                  target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
                  source sts-assume-role.sh $target_arn
                  source sts-get-caller-identity.sh
@@ -212,14 +212,16 @@ jobs:
                  fi
                 done
 
-                pwd
-                ls terraform/per_account/deployments
                 cp -r terraform/per_account/deployments/* ../deployments
-                ls -l ../deployments
 
             dir: cyber-security-cloudwatch-config-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to generate metric alarms"
+            health: unhealthy
 
-      - task: deploy_terraform
+      - task: deploy_account_terraform_to_non_prod
         config:
           <<: *cloudwatch_build
           inputs:
@@ -227,16 +229,185 @@ jobs:
             - name: cyber-security-terraform-git
             - name: lambda_package
             - name: deployments
+            - name: ssh
           run:
             path: /bin/bash
             args:
               - -exc
               - |
-                monitored_accounts=$(ls ../deployments)
+                cd ..
+                workdir=$(pwd)
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_account
+                monitored_accounts=$(ls deployments)
+
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_account/deployable
 
                 for account_id in $monitored_accounts; do
                   ls ../deployments/${account_id}
-                  env=$(grep DEF_ENVIRONMENT service/cloudwatch-config/per_account/deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
+                  env=$(grep DEF_ENVIRONMENT ../deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
                   echo "${account_id} is a ${env} environment"
+                  if [[ $env != 'prod' ]]; then
+                    target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                    source sts-assume-role.sh $target_arn
+                    terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                    terraform apply -auto-approve -var-file=../deployments/${account_id}/apply.tfvars -var-file=${workdir}/deployments/${account_id}/alarms.tfvars
+                  else
+                    echo "${account_id} is a production account - Not deploying at this stage"
+                  fi
                 done
             dir: cyber-security-terraform-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to deploy non-production cloudwatch alarms"
+            health: unhealthy
+
+      - task: deploy_account_terraform_to_prod
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: lambda_package
+            - name: deployments
+            - name: ssh
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ..
+                workdir=$(pwd)
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_account
+                monitored_accounts=$(ls deployments)
+
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_account/deployable
+
+                for account_id in $monitored_accounts; do
+                  ls ../deployments/${account_id}
+                  env=$(grep DEF_ENVIRONMENT ../deployments/${account_id}/apply.tfvars | tr '"' ' ' | awk {' print $3 '})
+                  echo "${account_id} is a ${env} environment"
+                  if [[ $env == 'prod' ]]; then
+                    target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                    source sts-assume-role.sh $target_arn
+                    terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                    terraform apply -auto-approve -var-file=../deployments/${account_id}/apply.tfvars -var-file=${workdir}/deployments/${account_id}/alarms.tfvars
+                  else
+                    echo "${account_id} is a production account - Not deploying at this stage"
+                  fi
+                done
+            dir: cyber-security-terraform-git
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "Deployed production cloudwatch alarms"
+            health: healthy
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to deploy production cloudwatch alarms"
+            health: unhealthy
+
+  - name: health_monitor_deploy
+    plan:
+      - get: cyber-security-cloudwatch-config-git
+        trigger: true
+        passed:
+          - cloudwatch_test
+          - cloudwatch_deploy
+      - get: cyber-security-terraform-git
+        trigger: false
+
+      - task: terraform_deploy_keys
+        config:
+          <<: *cloudwatch_build
+          outputs:
+            - name: ssh
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cat > deploy_key <<'EOF'
+                ((cyber-security-terraform-deploy-key))
+                EOF
+                echo "Host github.com" > config
+                echo "  IdentityFile {workdir}/deploy_key" >> config
+                echo "  StrictHostKeyChecking no" >> config
+                chmod 400 deploy_key
+            dir: ssh
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to set SSH config"
+            health: unhealthy
+
+      - task: zip
+        config:
+          <<: *cloudwatch_build
+          outputs:
+            - name: lambda_package
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd lambda/health_package
+                make zip
+                mv health_package.zip ../../../lambda_package
+                echo "Built zip file lambda distribution"
+                ls ../../..
+            dir: cyber-security-cloudwatch-config-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to build lambda zip file"
+            health: unhealthy
+
+      - task: terraform_account_validate
+        config:
+          <<: *cloudwatch_build
+          inputs:
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: ssh
+            - name: lambda_package
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                cd ..
+                cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
+                workdir=$(pwd)
+                mkdir /root/.ssh
+                sed 's+{workdir}+'"$workdir"'/ssh+g' ssh/config > /root/.ssh/config
+                ln -fs ${workdir}/cyber-security-terraform-git/service/cloudwatch-config/per_dashboard_environment/deployments ${workdir}/cyber-security-cloudwatch-config-git/terraform/per_dashboard_environment
+                environment_accounts=$(ls cyber-security-terraform-git/service/cloudwatch-config/per_dashboard_environment/deployments)
+
+                cd cyber-security-cloudwatch-config-git
+                cd terraform/per_dashboard_environment/deployable
+
+                for account_id in $environment_accounts; do
+                  target_arn="arn:aws:iam::${account_id}:role/HealthConcourseWorkerRole"
+                  source sts-assume-role.sh $target_arn
+
+                  terraform init -reconfigure -backend-config=../deployments/${account_id}/backend.tfvars
+                  terraform validate
+                done
+
+                echo "Terraform valid"
+            dir: cyber-security-cloudwatch-config-git
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Failed to validate health monitor terraform"
+            health: unhealthy
