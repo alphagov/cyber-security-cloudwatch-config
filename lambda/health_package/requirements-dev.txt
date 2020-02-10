@@ -3,7 +3,3 @@ pylint
 flake8
 pytest
 tox
-mock
-hypothesis
-pyfakefs
-python-Levenshtein

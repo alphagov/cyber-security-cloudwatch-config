@@ -123,3 +123,6 @@ setup.cfg
 .idea/
 
 deployments
+
+# MacOS
+.DS_Store

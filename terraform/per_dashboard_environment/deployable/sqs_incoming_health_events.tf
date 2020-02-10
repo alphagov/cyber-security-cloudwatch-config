@@ -10,11 +10,10 @@ data "aws_iam_policy_document" "incoming_health_events_resource_policy_data" {
 
     principals {
       type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${module.reference_accounts.staging}:role/cloudwatch_forwarder_role",
-        "arn:aws:iam::${module.reference_accounts.csls}:role/cloudwatch_forwarder_role",
-        "arn:aws:iam::${module.reference_accounts.demo}:role/cloudwatch_forwarder_role"
-      ]
+      identifiers = formatlist(
+        "arn:aws:iam::%s:role/cloudwatch_forwarder_role",
+        var.monitored_accounts
+      )
     }
 
     resources = list(aws_sqs_queue.incoming_health_events.arn)

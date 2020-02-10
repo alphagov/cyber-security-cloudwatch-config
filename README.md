@@ -49,7 +49,17 @@ terraform apply -var-file=../../lambda/generate_metric_alarms/output/[account]/a
 
 ## Concourse 
 
-There are some pipelines in the concourse folder. 
+There are some pipelines in the concourse folder.
+
+### cloudwatch
+Runs: 
+1. Generate metric alarms (to create alarms.tfvars for each account)
+2. Terraform (per_account) to deploy the cloudwatch alarms and 
+    forwarders. 
+3. Terraform (per_dashboard_environment) to deploy the health monitoring
+    infrastructure to notify splunk and slack of health events. 
+
+[README.md](concourse/cloudwatch/README.md) 
 
 ### concourse-heartbeat
 Check that our concourse workers are healthy. 
