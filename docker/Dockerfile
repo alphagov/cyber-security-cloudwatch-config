@@ -21,11 +21,3 @@ COPY docker/sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
 COPY docker/sts-get-caller-identity.sh /usr/local/bin/sts-get-caller-identity.sh
 RUN chmod a+x /usr/local/bin/sts-assume-role.sh
 RUN chmod a+x /usr/local/bin/sts-get-caller-identity.sh
-
-# Install python deps
-# COPY lambda/health_package/requirements-dev.txt .
-# COPY lambda/health_package/requirements.txt .
-# RUN pip install --no-cache-dir -r requirements-dev.txt
-# ENV PYTHONDONTWRITEBYTECODE=1
-
-# COPY . .
