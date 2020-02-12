@@ -15,6 +15,5 @@ health monitoring service.
 ## Deploy
 
 ```fly
-fly -t cd sp -p slack-webhook-checker \
-    -c slack-webhook-checker-pipeline.yml
+fly -t cd sp -p slack-webhook-checker -c slack-webhook-checker-pipeline.yml
 ```
