@@ -73,3 +73,16 @@ operational.
 We had an issue where we were posting to a webhook where 
 the channel name had been changed so it wasn't working. 
 [README.md](concourse/slack-webhook-checker/README.md)
+
+## Docker
+
+There are 2 Dockerfiles: 
+1. terraform-container - [README.md](docker/concourse-worker-health/README.md)
+    Installs a specified version of terraform and contains scripts
+    to perform an STS:AssumeRole operation to assume the role for 
+    a given pipeline. 
+
+2. http-api-container - [README.md](docker/http-api-resource/README.md)
+    Replaces the standard `aequitas/http-api-resource` container 
+    kernel with a more recent version to patch vulnerabilities.
+
