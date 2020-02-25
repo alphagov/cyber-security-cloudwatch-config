@@ -29,8 +29,8 @@ resource_types:
   - name: http-api
     type: docker-image
     source:
-      repository: aequitas/http-api-resource
-      tag: latest
+      repository: gdscyber/http-api-resource
+      tag: 1.0a
 
 resources:
   - name: once_per_day
