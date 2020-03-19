@@ -77,7 +77,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd lambda/health_package
                 make test
@@ -108,7 +108,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cat > deploy_key <<'EOF'
                 ((cyber-security-terraform-deploy-key))
@@ -132,7 +132,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd lambda/health_package
                 make zip
@@ -157,7 +157,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
@@ -197,7 +197,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 monitored_accounts=$(ls ../cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
 
@@ -241,7 +241,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 workdir=$(pwd)
@@ -286,7 +286,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 workdir=$(pwd)
@@ -342,7 +342,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cat > deploy_key <<'EOF'
                 ((cyber-security-terraform-deploy-key))
@@ -366,7 +366,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd lambda/health_package
                 make zip
@@ -391,7 +391,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
@@ -431,7 +431,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 workdir=$(pwd)
@@ -477,7 +477,7 @@ jobs:
           run:
             path: /bin/bash
             args:
-              - -exc
+              - -c
               - |
                 cd ..
                 workdir=$(pwd)
@@ -518,5 +518,3 @@ jobs:
           params:
             message: "Failed to deploy non-production health monitoring lambdas"
             health: unhealthy
-
-
