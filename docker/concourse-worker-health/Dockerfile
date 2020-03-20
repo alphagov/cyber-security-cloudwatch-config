@@ -2,7 +2,7 @@ FROM python:3
 WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y zip wget awscli jq
 
-ENV TERRAFORMVERSION=0.12.16
+ENV TERRAFORMVERSION=0.12.23
 
 RUN aws configure set region eu-west-2 --profile default
 
@@ -17,7 +17,7 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_
         chmod 555 terraform &&\
         cp terraform /bin/
 
-COPY docker/sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
-COPY docker/sts-get-caller-identity.sh /usr/local/bin/sts-get-caller-identity.sh
+COPY sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
+COPY sts-get-caller-identity.sh /usr/local/bin/sts-get-caller-identity.sh
 RUN chmod a+x /usr/local/bin/sts-assume-role.sh
 RUN chmod a+x /usr/local/bin/sts-get-caller-identity.sh
