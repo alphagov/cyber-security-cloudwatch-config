@@ -66,3 +66,9 @@ class LambdaHelper(GenericHelper):
         except botocore.exceptions.ClientError as err:
             print(str(err))
         return tags
+
+    @classmethod
+    def get_metric_threshold(cls, metric, rule):
+        threshold = super().get_metric_threshold(metric, rule)
+        # Calculate duration threshold here.
+        return threshold
