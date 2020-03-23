@@ -68,7 +68,33 @@ class LambdaHelper(GenericHelper):
         return tags
 
     @classmethod
-    def get_metric_threshold(cls, metric, rule):
+    def get_metric_threshold(cls, metric, rule, region=None):
         threshold = super().get_metric_threshold(metric, rule)
         # Calculate duration threshold here.
+
+        # Get the lambda timeout
+        namespace = metric.Namespace
+        try:
+            print(f"Getting boto client for {namespace} in {region}")
+            client = cls.get_client_from_namespace(namespace, region)
+            if client:
+                function_name = cls.get_metric_dimension_value(metric, "FunctionName")
+                if function_name:
+                    print(f"Get timeout for lambda function: {function_name}")
+                    lambda_timeout = get_function_response.Configuration.Timeout
+        except AttributeError as err:
+            print(json.dumps(metric, indent=2))
+            print(str(err))
+        except botocore.exceptions.ClientError as err:
+            print(str(err))
+
+        rule.Maximum = lambda_timeout * 0.9
+
+        if threshold > rule.Maximum:
+            LOG.info(
+                "Baseline threshold (%s) is greater than rule max (%s)",
+                threshold,
+                rule.Minimum,
+            )
+            threshold = rule.Maximum
         return threshold
