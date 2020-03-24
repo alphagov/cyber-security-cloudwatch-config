@@ -330,7 +330,8 @@ if __name__ == "__main__":
                 "Statistic": "Maximum",
                 "Multiplier": 1.1,
                 "Minimum": 3,
-                # Any lambda running longer than 1 minute probably needs breaking up
+                # Any lambda running for less than 3 secs should be fine
+                # The maximum is calculated based on the lambda's timeout.
             }
         ),
     ]
