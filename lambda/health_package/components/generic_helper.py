@@ -1,13 +1,10 @@
 """ Generic component helper functions """
-import os
 import datetime
-import logging
 
 import boto3
 from addict import Dict
 
-LOG = logging.getLogger()
-LOG.setLevel(logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG")))
+from logger import LOG
 
 
 class GenericHelper:
