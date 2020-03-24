@@ -75,6 +75,8 @@ class LambdaHelper(GenericHelper):
 
         # Get the lambda timeout
         namespace = metric.Namespace
+        # Assign a timeout outside of the try block
+        lambda_timeout = 60
         try:
             print(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
