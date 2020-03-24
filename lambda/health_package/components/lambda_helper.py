@@ -5,6 +5,7 @@ import botocore
 from addict import Dict
 
 from components.generic_helper import GenericHelper
+from logger import LOG
 
 
 class LambdaHelper(GenericHelper):
@@ -81,6 +82,9 @@ class LambdaHelper(GenericHelper):
                 function_name = cls.get_metric_dimension_value(metric, "FunctionName")
                 if function_name:
                     print(f"Get timeout for lambda function: {function_name}")
+                    get_function_response = Dict(
+                        client.get_function(FunctionName=function_name)
+                    )
                     lambda_timeout = get_function_response.Configuration.Timeout
         except AttributeError as err:
             print(json.dumps(metric, indent=2))
