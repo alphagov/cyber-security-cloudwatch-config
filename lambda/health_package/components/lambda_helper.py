@@ -94,7 +94,7 @@ class LambdaHelper(GenericHelper):
             LOG.info(
                 "Baseline threshold (%s) is greater than rule max (%s)",
                 threshold,
-                rule.Maximum,
+                rule.Minimum,
             )
             threshold = rule.Maximum
         return threshold
