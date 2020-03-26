@@ -1,23 +1,6 @@
-FROM python:3
+FROM gdscyber/cyber-security-concourse-base-image
 WORKDIR /usr/src/app
-RUN apt-get update && apt-get install -y zip wget awscli jq
 
-ENV TERRAFORMVERSION=0.12.23
-
-RUN aws configure set region eu-west-2 --profile default
-
-RUN wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_linux_amd64.zip &&\
-        wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_SHA256SUMS &&\
-        wget https://releases.hashicorp.com/terraform/${TERRAFORMVERSION}/terraform_${TERRAFORMVERSION}_SHA256SUMS.sig &&\
-        gpg --version &&\
-        gpg --keyserver hkps://keyserver.ubuntu.com --receive-keys 51852D87348FFC4C &&\
-        gpg -d terraform_${TERRAFORMVERSION}_SHA256SUMS.sig &&\
-        sha256sum --ignore-missing -c terraform_${TERRAFORMVERSION}_SHA256SUMS &&\
-        unzip terraform_${TERRAFORMVERSION}_linux_amd64.zip &&\
-        chmod 555 terraform &&\
-        cp terraform /bin/
-
-COPY sts-assume-role.sh /usr/local/bin/sts-assume-role.sh
 COPY sts-get-caller-identity.sh /usr/local/bin/sts-get-caller-identity.sh
 RUN chmod a+x /usr/local/bin/sts-assume-role.sh
 RUN chmod a+x /usr/local/bin/sts-get-caller-identity.sh

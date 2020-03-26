@@ -10,8 +10,7 @@ groups:
 slack_webhook_image_resource: &slack_webhook_image_image_resource
   type: docker-image
   source:
-    repository: gdscyber/csw-concourse-worker
-    tag: '1.3.2'
+    repository: gdscyber/cyber-security-concourse-base-image
 
 health_status_notify: &health_status_notify
   put: health-notification
@@ -129,4 +128,3 @@ jobs:
       params:
         message: "One or more webhooks failed see build log for details"
         health: unhealthy
-
