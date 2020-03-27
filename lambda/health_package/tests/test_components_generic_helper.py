@@ -57,3 +57,15 @@ def test_get_metric_statistics(lambda_metric, mock_get_metric_statistics):
         assert datapoint.Minimum == 123.0
         assert datapoint.Maximum == 123.0
         assert datapoint.Unit == "Seconds"
+
+
+@pytest.mark.usefixtures("lambda_metric")
+@pytest.mark.usefixtures("metric_rule")
+def test_get_metric_threshold(lambda_metric, metric_rule):
+    """Test get_metric_threshold classmethod"""
+    assert metric_rule.Namespace == "AWS/Lambda"
+    assert metric_rule.MetricName == "Duration"
+    assert metric_rule.Statistic == "Maximum"
+    assert metric_rule.Multiplier == 1.1
+    assert metric_rule.Minimum == 3
+    assert metric_rule.Maximum == 200

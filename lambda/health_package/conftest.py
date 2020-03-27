@@ -404,3 +404,19 @@ def mock_get_metric_statistics():
             ],
         }
     )
+
+
+@pytest.fixture()
+def metric_rule():
+    """Return test metric rule"""
+
+    return Dict(
+        {
+            "Namespace": "AWS/Lambda",
+            "MetricName": "Duration",
+            "Statistic": "Maximum",
+            "Multiplier": 1.1,
+            "Minimum": 3,
+            "Maximum": 200,
+        }
+    )
