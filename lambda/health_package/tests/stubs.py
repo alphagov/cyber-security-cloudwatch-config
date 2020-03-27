@@ -1,12 +1,42 @@
 """ Create mock boto3 clients for testing """
 import boto3
-from botocore.stub import Stubber
+from botocore.stub import Stubber, ANY
 
 
 def _keep_it_real():
     """ Keep the native """
     if not getattr(boto3, "real_client", None):
         boto3.real_client = boto3.client
+
+
+def mock_cloudwatch(mock_get_metric_statistics):
+    """Mock Cloudwatch metric stats"""
+    _keep_it_real()
+    region = "eu-west-2"
+    client = boto3.real_client("cloudwatch", region_name=region)
+
+    stubber = Stubber(client)
+
+    get_cloudwatch_params = {
+        "Namespace": "AWS/Lambda",
+        "MetricName": "Errors",
+        "Dimensions": [{"Name": "FunctionName", "Value": "lambda-function"}],
+        "StartTime": ANY,
+        "EndTime": ANY,
+        "Period": 2419200,
+        "Unit": "Seconds",
+        "Statistics": ["Maximum"],
+    }
+
+    stubber.add_response(
+        "get_metric_statistics", mock_get_metric_statistics, get_cloudwatch_params
+    )
+
+    stubber.activate()
+
+    # override boto.client to return the mock client
+    boto3.client = lambda service, region_name: client
+    return stubber
 
 
 def mock_sqs(queue_url, event, mock_sqs_send_message_response):

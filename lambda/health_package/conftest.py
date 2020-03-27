@@ -142,6 +142,7 @@ def dimension_metric():
     metric = Dict(
         {
             "Namespace": "AWS/EC2",
+            "Region": "eu-west-2",
             "MetricName": "CPUUtilization",
             "Dimensions": [
                 {"Name": "Name", "Value": "instance-name"},
@@ -160,6 +161,7 @@ def lambda_metric():
     metric = Dict(
         {
             "Namespace": "AWS/Lambda",
+            "Region": "eu-west-2",
             "MetricName": "Errors",
             "Dimensions": [{"Name": "FunctionName", "Value": "lambda-function"}],
         }
@@ -380,3 +382,25 @@ def event_args():
             }
         ],
     }
+
+
+@pytest.fixture()
+def mock_get_metric_statistics():
+    """Mock create metric statistics"""
+
+    return Dict(
+        {
+            "Label": "string",
+            "Datapoints": [
+                {
+                    "Timestamp": "2020-03-27T11:29:51.780Z",
+                    "SampleCount": 123.0,
+                    "Average": 123.0,
+                    "Sum": 123.0,
+                    "Minimum": 123.0,
+                    "Maximum": 123.0,
+                    "Unit": "Seconds",
+                }
+            ],
+        }
+    )
