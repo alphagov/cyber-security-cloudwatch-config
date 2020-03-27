@@ -28,11 +28,10 @@ slack_webhook_check_task: &slack_webhook_check_task
       echo "get ${ENVIRONMENT} environment for prefix and account id"
 
       echo "assuming aws concourse role..."
-      arn="arn:aws:iam::${ACCOUNT_ID}:role/${CD_ROLE}"
-      eval $(aws-assume-role $arn)
+      source /usr/local/bin/sts-assume-role.sh 'arn:aws:iam::779799343306:role/SlackWebhooksConcourseRole' 'eu-west-2'
 
       ssm_data=$(aws ssm get-parameters-by-path \
-      	--path=/slack/channels \
+      	--path=/slack/channels/ \
       	--recursive \
       	--with-decryption \
       	--region=eu-west-2
