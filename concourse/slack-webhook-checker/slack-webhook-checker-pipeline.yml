@@ -10,8 +10,7 @@ groups:
 slack_webhook_image_resource: &slack_webhook_image_image_resource
   type: docker-image
   source:
-    repository: gdscyber/csw-concourse-worker
-    tag: '1.3.2'
+    repository: gdscyber/cyber-security-concourse-base-image
 
 health_status_notify: &health_status_notify
   put: health-notification
@@ -29,11 +28,10 @@ slack_webhook_check_task: &slack_webhook_check_task
       echo "get ${ENVIRONMENT} environment for prefix and account id"
 
       echo "assuming aws concourse role..."
-      arn="arn:aws:iam::${ACCOUNT_ID}:role/${CD_ROLE}"
-      eval $(aws-assume-role $arn)
+      source /usr/local/bin/sts-assume-role.sh 'arn:aws:iam::779799343306:role/SlackWebhooksConcourseRole' 'eu-west-2'
 
       ssm_data=$(aws ssm get-parameters-by-path \
-      	--path=/slack/channels \
+      	--path=/slack/channels/ \
       	--recursive \
       	--with-decryption \
       	--region=eu-west-2
@@ -129,4 +127,3 @@ jobs:
       params:
         message: "One or more webhooks failed see build log for details"
         health: unhealthy
-
