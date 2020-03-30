@@ -2,6 +2,7 @@
 import pytest
 
 from components.generic_helper import GenericHelper
+import stubs
 
 
 @pytest.mark.usefixtures("list_metric_response")
@@ -38,3 +39,33 @@ def test_get_metric_resource_name(dimension_metric):
     helper = GenericHelper()
     dimension_value = helper.get_metric_resource_name(dimension_metric)
     assert instance_name == dimension_value
+
+
+@pytest.mark.usefixtures("lambda_metric")
+@pytest.mark.usefixtures("mock_get_metric_statistics")
+def test_get_metric_statistics(lambda_metric, mock_get_metric_statistics):
+    """ Test get_metric_statistics classmethod """
+    stubber = stubs.mock_cloudwatch(mock_get_metric_statistics)
+
+    with stubber:
+        helper = GenericHelper()
+        statistic = "Maximum"
+        lambda_values = helper.get_metric_statistics(lambda_metric, statistic)
+        print(str(lambda_values))
+        datapoint = lambda_values.Datapoints[0]
+        assert datapoint.Timestamp == "2020-03-27T11:29:51.780Z"
+        assert datapoint.Minimum == 123.0
+        assert datapoint.Maximum == 123.0
+        assert datapoint.Unit == "Seconds"
+
+
+@pytest.mark.usefixtures("lambda_metric")
+@pytest.mark.usefixtures("metric_rule")
+def test_get_metric_threshold(lambda_metric, metric_rule):
+    """ Test get_metric_threshold classmethod """
+    assert metric_rule.Namespace == "AWS/Lambda"
+    assert metric_rule.MetricName == "Duration"
+    assert metric_rule.Statistic == "Maximum"
+    assert metric_rule.Multiplier == 1.1
+    assert metric_rule.Minimum == 3
+    assert metric_rule.Maximum == 200
