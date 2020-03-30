@@ -43,7 +43,7 @@ def mock_sqs(queue_url, event, mock_sqs_send_message_response):
     """ Mock SQS send message  """
     _keep_it_real()
     region = "eu-west-2"
-    client = boto3.real_client("sqs")
+    client = boto3.real_client("sqs", region_name=region)
 
     stubber = Stubber(client)
 
