@@ -7,8 +7,7 @@ groups:
 heartbeat_image_resource: &heartbeat_image_resource
   type: docker-image
   source:
-    repository: ubuntu
-    tag: '18.04'
+    repository: gdscyber/cyber-security-concourse-base-image
 
 health_status_notify: &health_status_notify
   put: health-notification
@@ -19,7 +18,7 @@ heartbeat_pass_task: &heartbeat_pass_task
   run:
     path: sh
     args:
-    - -eu
+    - -e
     - -c
     - |
       set -x
