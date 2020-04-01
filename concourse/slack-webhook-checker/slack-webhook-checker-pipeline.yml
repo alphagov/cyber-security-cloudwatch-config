@@ -21,7 +21,7 @@ slack_webhook_check_task: &slack_webhook_check_task
   run:
     path: bash
     args:
-    - -eu
+    - -e
     - -c
     - |
       echo "Testing slack webhooks configured in SSM"
