@@ -18,7 +18,7 @@ heartbeat_pass_task: &heartbeat_pass_task
   run:
     path: sh
     args:
-    - -eu
+    - -e
     - -c
     - |
       set -x
