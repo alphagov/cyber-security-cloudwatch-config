@@ -3,14 +3,4 @@
 This container installs a specified version of terraform and some 
 helper script to enable assuming and IAM role. 
 
-NOTE: Replace version with the bumped version number
-```
-docker build --no-cache -t gdscyber/concourse-worker-health -t gdscyber/concourse-worker-health:1.0 .
-``` 
-
-Then to push to DockerHub:
-
-```
-docker push gdscyber/concourse-worker-health:1.0
-docker push gdscyber/concourse-worker-health:latest 
-```
+In order to make changes to the Docker image, simply push changes to the Dockerfile in this repository to master and the `cyber-security-concourse-base-image` concourse pipeline will be triggered, rebuilding the image and pushing it to DockerHub at `gdscyber/concourse-worker-health`.
