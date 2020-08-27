@@ -11,9 +11,6 @@ from logger import LOG
 class CloudwatchHelper(GenericHelper):
     """ Helper functions for Cloudwatch """
 
-    MONITORED_EVENT_RULE_NAMES = ["ah_test_event_rule"]
-    #MONITORED_LOG_GROUPS = ["csls_firehose_processing_failed", "csls_firehose_splunk_hec_failed"]
-
     @classmethod
     def metric_resource_exists(cls, metric, region=None):
         """
@@ -27,8 +24,8 @@ class CloudwatchHelper(GenericHelper):
             print(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
-                event_rule_name_metric = cls.get_metric_dimension_value(metric, "RuleName")
-                if event_rule_name_metric in CloudwatchHelper.MONITORED_EVENT_RULE_NAMES:
+                event_rule_name = cls.get_metric_dimension_value(metric, "RuleName")
+                if event_rule_name:
                     print(f"Get tags for event rule names: {event_rule_name}")
                     client.list_targets_by_rule(Rule=event_rule_name)
                 else:
@@ -50,12 +47,11 @@ class CloudwatchHelper(GenericHelper):
             print(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
-                #for event_rule_name in CloudwatchHelper.MONITORED_EVENT_RULE_NAMES:
-                event_rule_name_metric = cls.get_metric_dimension_value(metric, "RuleName")
-                if event_rule_name_metric:
-                    print(f"Get tags for event rule name: {event_rule_name_metric}")
+                event_rule_name = cls.get_metric_dimension_value(metric, "RuleName")
+                if event_rule_name:
+                    print(f"Get tags for event rule name: {event_rule_name}")
                     get_function_response = Dict(
-                        client.list_targets_by_rule(Rule=event_rule_name_metric)
+                        client.list_targets_by_rule(Rule=event_rule_name)
                         )
                     event_rule_name_arn = get_function_response.Targets.arn
                     get_tags_response = Dict(client.list_tags(Resource=event_rule_name_arn))
