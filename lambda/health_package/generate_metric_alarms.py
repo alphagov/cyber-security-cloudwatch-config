@@ -334,5 +334,15 @@ if __name__ == "__main__":
                 # The maximum is calculated based on the lambda's timeout.
             }
         ),
+        Dict(
+            {
+                "Namespace": "AWS/Events",
+                "MetricName": "TriggeredRules",
+                "Statistic": "Sum",
+                "Multiplier": 1,
+                "Minimum": 1,
+                "Maximum": 1,
+            }
+        ),
     ]
     main()

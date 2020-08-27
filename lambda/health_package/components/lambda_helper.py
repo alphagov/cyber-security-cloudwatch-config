@@ -1,4 +1,4 @@
-""" SQS component helper functions """
+""" Lambda component helper functions """
 import json
 
 import botocore

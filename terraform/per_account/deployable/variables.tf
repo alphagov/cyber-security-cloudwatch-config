@@ -5,7 +5,7 @@ variable "LOG_LEVEL" {
 
 variable "DEF_ENVIRONMENT" {
     type    = string
-    default = "Test"
+    default = "test"
 }
 
 variable "TARGET_LAMBDA" {

@@ -1,5 +1,6 @@
 """Query AWS for context about cloudwatch metric resources"""
 from components.generic_helper import GenericHelper
+from components.cloudwatch_helper import CloudwatchHelper
 from components.firehose_helper import FirehoseHelper
 from components.kinesis_helper import KinesisHelper
 from components.lambda_helper import LambdaHelper
@@ -18,6 +19,7 @@ def get_namespace_helper(namespace):
         "AWS/Lambda": LambdaHelper,
         "AWS/Firehose": FirehoseHelper,
         "AWS/Kinesis": KinesisHelper,
+        "AWS/Events": CloudwatchHelper
     }
     ComponentHelper = clients.get(namespace, GenericHelper)
 
