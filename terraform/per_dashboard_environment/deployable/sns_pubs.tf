@@ -5,6 +5,7 @@ variable "sns_topic_names" {
 }
 
 resource "aws_sns_topic" "euw1_sns_topics" {
+  #checkov:skip=CKV_AWS_26:Ensure all data stored in the SNS topic is encrypted
   count    = length(var.sns_topic_names)
   provider = aws.eu-west-1
   name     = var.sns_topic_names[count.index]
@@ -21,6 +22,7 @@ output "euw1_sns_arn_map" {
 }
 
 resource "aws_sns_topic" "euw2_sns_topics" {
+  #checkov:skip=CKV_AWS_26:Ensure all data stored in the SNS topic is encrypted
   count    = length(var.sns_topic_names)
   provider = aws.eu-west-2
   name     = var.sns_topic_names[count.index]

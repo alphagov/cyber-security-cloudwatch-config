@@ -1,4 +1,5 @@
 resource "aws_sqs_queue" "incoming_health_events" {
+  #checkov:skip=CKV_AWS_27:Ensure all data stored in the SQS queue is encrypted
   name                        = "incoming_health_events"
   visibility_timeout_seconds  = 60
 }

@@ -1,4 +1,5 @@
 resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
+  #checkov:skip=CKV_AWS_50:X-ray tracing is enabled for Lambda
   provider          = aws.eu-west-1
   filename          = local.zipfile
   source_code_hash  = filebase64sha256(local.zipfile)
@@ -46,6 +47,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_euw1" {
 }
 
 resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
+  #checkov:skip=CKV_AWS_50:X-ray tracing is enabled for Lambda
   provider          = aws.eu-west-2
   filename          = local.zipfile
   source_code_hash  = filebase64sha256(local.zipfile)

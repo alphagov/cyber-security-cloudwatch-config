@@ -2,6 +2,7 @@ locals {
   cloudwatch_alarm_sns_topic = "cloudwatch_forwarder"
 }
 resource "aws_sns_topic" "euw1_cloudwatch_alarm_sns_topic" {
+  #checkov:skip=CKV_AWS_26:Ensure all data stored in the SNS topic is encrypted
   provider  = aws.eu-west-1
   name      = local.cloudwatch_alarm_sns_topic
 }
@@ -12,6 +13,7 @@ output "euw1_sns_arn" {
 }
 
 resource "aws_sns_topic" "euw2_cloudwatch_alarm_sns_topic" {
+  #checkov:skip=CKV_AWS_26:Ensure all data stored in the SNS topic is encrypted
   provider  = aws.eu-west-2
   name      = local.cloudwatch_alarm_sns_topic
 }

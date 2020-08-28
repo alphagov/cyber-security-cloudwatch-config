@@ -1,4 +1,5 @@
 resource "aws_lambda_function" "health_monitor_update_dashboard_lambda" {
+  #checkov:skip=CKV_AWS_50:X-ray tracing is enabled for Lambda
   filename         = local.zipfile
   source_code_hash = filebase64sha256(local.zipfile)
   function_name    = "health_monitor_splunk_forwarder_lambda"
