@@ -15,5 +15,5 @@ jobs:
       - name: type checking using mypy
         uses: jpetrucciani/mypy-check@master
         with:
-          paths:
-            - 'lambda/**.py'
+          path:
+            - './lambda/**.py'
