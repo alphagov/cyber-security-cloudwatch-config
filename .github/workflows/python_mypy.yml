@@ -1,0 +1,18 @@
+---
+name: mypy type checking
+# Python static type checking using mypy
+
+on:
+  push:
+
+jobs:
+  python-type-checking:
+    name: Python Type Checking
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: type checking using mypy
+        uses: jpetrucciani/mypy-check@master
+        with:
+          path: './lambda'

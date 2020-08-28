@@ -1,0 +1,33 @@
+---
+name: Terraform Validation
+# Terraform validation and static code analysis using Checkov
+
+on:
+  push:
+
+jobs:
+  terraform-validation:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Validate and Diff Terraform config
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.12.26
+      - name: Terraform init
+        run: cd terraform; terraform init -backend=false
+      - name: Terraform fmt
+        run: cd terraform; terraform fmt -check -diff
+      - name: Terraform validate
+        run: cd terraform; terraform validate
+  terraform-static-analysis:
+    name: Checkov static analysis of Terraform config
+    runs-on: ubuntu-latest
+    container: bridgecrew/checkov
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Static analysis of Terraform config using Checkov
+        run: checkov -d terraform
