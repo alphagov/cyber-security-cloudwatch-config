@@ -51,12 +51,12 @@ def toggle_alarm_state(alarm_name, region="eu-west-2"):
         # Set alarm state from Alarm to OK
         print(f"Alarm for {str(alarm_name)} is currently set to {state}")
         set_alarm_state("OK", str(alarm_name), region)
-        print(f"Setting state from ALARM -> OK")
+        print("Setting state from ALARM -> OK")
     elif state == "OK":
         # Set alarm state from OK to ALARM
         print(f"Alarm for {alarm_name} is currently set to {state}")
         set_alarm_state("ALARM", str(alarm_name), region)
-        print(f"Setting state from OK -> ALARM")
+        print("Setting state from OK -> ALARM")
     else:
         # INSUFFICENT_DATA state
         print(f"Alarm state for {alarm_name} is set to {state}")

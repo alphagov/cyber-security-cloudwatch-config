@@ -1,7 +1,7 @@
 """
 Entrypoint for processing a cloudwatch alarm event from SNS
 """
-import json
+# import json
 import boto3
 
 from logger import LOG
@@ -47,6 +47,6 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     )
 
     # <class 'health_event.HealthEvent'> cannot be serialised as JSON
-    #LOG.debug("Standardised event: %s", json.dumps(event))
+    # LOG.debug("Standardised event: %s", json.dumps(event))
     LOG.debug("Standardised event: %s", event.to_json())
     return event
