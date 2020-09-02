@@ -1,5 +1,5 @@
 ---
-name: Run tests
+name: Python tests
 
 on:
   push:
@@ -15,5 +15,5 @@ jobs:
           architecture: x64
       - name: Install dependencies and run tests
         run: |
-          cd lambda/health_package
+          cd ./lambda/health_package
           make test
