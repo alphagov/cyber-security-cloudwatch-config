@@ -12,7 +12,7 @@ def lambda_event():
         {
             "requestContext": {
                 "elb": {
-                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu:1234:targetgroup/test/1234"
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu:1234:targetgroup/test/1234"  # noqa: E501
                 }
             },
             "httpMethod": "POST",
@@ -212,7 +212,7 @@ def mock_get_function_response():
         },
         "Code": {
             "RepositoryType": "S3",
-            "Location": "https://awslambda-eu-west-2-tasks.s3.eu-west-2.amazonaws.com/snapshots/123456789012/lambda-function",
+            "Location": "https://awslambda-eu-west-2-tasks.s3.eu-west-2.amazonaws.com/snapshots/123456789012/lambda-function",  # noqa: E501
         },
         "Tags": {
             "SvcOwner": "Cyber",
@@ -269,7 +269,7 @@ def health_monitor_sns_event():
         "AlarmDescription": "testing state change from OK -> ALARM",
         "AWSAccountId": "123456789012",
         "NewStateValue": "ALARM",
-        "NewStateReason": "Threshold Crossed: 1 out of the last 1 datapoints [1.0 (22/11/19 15:38:00)] was less than the threshold (5.0) (minimum 1 datapoint for OK -> ALARM transition).",
+        "NewStateReason": "Threshold Crossed: 1 out of the last 1 datapoints [1.0 (22/11/19 15:38:00)] was less than the threshold (5.0) (minimum 1 datapoint for OK -> ALARM transition).",  # noqa: E501
         "StateChangeTime": "2019-11-22T15:43:51.730+0000",
         "Region": "EU (London)",
         "OldStateValue": "OK",
@@ -295,18 +295,18 @@ def health_monitor_sns_event():
                 {
                     "EventSource": "aws:sns",
                     "EventVersion": "1.0",
-                    "EventSubscriptionArn": "arn:aws:sns:eu-west-2:123456789012:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-749f20fafecc",
+                    "EventSubscriptionArn": "arn:aws:sns:eu-west-2:123456789012:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-749f20fafecc",  # noqa: E501
                     "Sns": {
                         "Type": "Notification",
                         "MessageId": "12345678-1234-5678-9012-123456789012",
-                        "TopicArn": "arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic",
+                        "TopicArn": "arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic",  # noqa: E501
                         "Subject": 'ALARM: "example-cloudwatch-alarm" in EU (London)',
                         "Message": json.dumps(alarm_data),
                         "Timestamp": "2019-11-22T15:43:51.780Z",
                         "SignatureVersion": "1",
-                        "Signature": "oJj8Csqqzoa9Lh4LiV6O8/OVSMX6ahZ4WqcPfUuMRv2zN5NX2mBzIvGi7M+bAsc6Cs/HP7FJy9amMZBMuFfnelLG5k94Cu7NDbqMjhhoY/VMrf5QOw+5aPCl0wzKIopng+rwajGLAx2I2psbH3fgreZNYYVkNTXigPCOp9zM7WM6fzrxlA5vlOWKoFqeMKWkMYs+Te0y2FjsjsywBxc9iz/Nil7jYGNNdj5Gk3haWCuO8XCG3q+hc0MFkWWib0d858WOdAJKqqTBSrCpvieOdL+IzSCK4vbaneVr+pt39R9FN5gefDhqdQF3wBKMOSfdeBSc3v8Rn8ol4VDiptqZog==",
-                        "SigningCertUrl": "https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-123456789012abcd123456789012abcd.pem",
-                        "UnsubscribeUrl": "https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-12345678abcd",
+                        "Signature": "oJj8Csqqzoa9Lh4LiV6O8/OVSMX6ahZ4WqcPfUuMRv2zN5NX2mBzIvGi7M+bAsc6Cs/HP7FJy9amMZBMuFfnelLG5k94Cu7NDbqMjhhoY/VMrf5QOw+5aPCl0wzKIopng+rwajGLAx2I2psbH3fgreZNYYVkNTXigPCOp9zM7WM6fzrxlA5vlOWKoFqeMKWkMYs+Te0y2FjsjsywBxc9iz/Nil7jYGNNdj5Gk3haWCuO8XCG3q+hc0MFkWWib0d858WOdAJKqqTBSrCpvieOdL+IzSCK4vbaneVr+pt39R9FN5gefDhqdQF3wBKMOSfdeBSc3v8Rn8ol4VDiptqZog==",  # noqa: E501
+                        "SigningCertUrl": "https://sns.eu-west-2.amazonaws.com/SimpleNotificationService-123456789012abcd123456789012abcd.pem",  # noqa: E501
+                        "UnsubscribeUrl": "https://sns.eu-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-2:103495720024:health-monitoring-test-topic:3908eac2-28e6-4621-b3fe-12345678abcd",  # noqa: E501
                         "MessageAttributes": {},
                     },
                 }
@@ -333,7 +333,7 @@ def standard_health_alarm_event():
             "AWSAccountId": "885513274347",
             "AlarmDescription": "Tracks number of errors from lambda functions.",
             "AlarmName": "cloudwatch_alarm_forwarder_alarm",
-            "NewStateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+            "NewStateReason": "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",  # noqa: E501
             "NewStateValue": "OK",
             "OldStateValue": "ALARM",
             "Region": "EU (London)",
