@@ -2,6 +2,7 @@
 import pytest
 
 from ..components.generic_helper import GenericHelper
+from ..logger import LOG
 from . import stubs
 
 
@@ -51,7 +52,7 @@ def test_get_metric_statistics(lambda_metric, mock_get_metric_statistics):
         helper = GenericHelper()
         statistic = "Maximum"
         lambda_values = helper.get_metric_statistics(lambda_metric, statistic)
-        print(str(lambda_values))
+        LOG.debug(str(lambda_values))
         datapoint = lambda_values.Datapoints[0]
         assert datapoint.Timestamp == "2020-03-27T11:29:51.780Z"
         assert datapoint.Minimum == 123.0

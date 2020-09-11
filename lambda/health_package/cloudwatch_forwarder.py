@@ -73,7 +73,7 @@ def send_to_health_monitor(event):
 
 def get_message_body(message):
     """ Return json decoded message body from either SNS or SQS event model """
-    print(str(message))
+    LOG.debug(str(message))
     try:
         message_text = message["body"]
         # catch addict default behaviour for missing keys
@@ -88,7 +88,7 @@ def get_message_body(message):
     except (TypeError, json.JSONDecodeError):
         message_body = message_text
 
-    print(str(message_body))
+    LOG.debug(str(message_body))
     return message_body
 
 
@@ -97,7 +97,7 @@ def parse_messages(event):
     Parse the escaped message body from each of the SQS messages in event.Records
     """
     messages = [get_message_body(record) for record in event["Records"]]
-    print(str(messages))
+    LOG.debug(str(messages))
     return messages
 
 

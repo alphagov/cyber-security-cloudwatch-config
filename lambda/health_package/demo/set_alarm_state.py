@@ -2,6 +2,8 @@
 import boto3
 import fire
 
+from ..logger import LOG
+
 
 def get_alarm(alarm_name, region):
     """ Get alarm by name """
@@ -46,20 +48,20 @@ def toggle_alarm_state(alarm_name, region="eu-west-2"):
     state = get_alarm_state(alarm_name, region)
 
     if state is None:
-        print(f"Alarm state for {alarm_name} not found")
+        LOG.errro(f"Alarm state for {alarm_name} not found")
     elif state == "ALARM":
         # Set alarm state from Alarm to OK
-        print(f"Alarm for {str(alarm_name)} is currently set to {state}")
+        LOG.info(f"Alarm for {str(alarm_name)} is currently set to {state}")
         set_alarm_state("OK", str(alarm_name), region)
-        print("Setting state from ALARM -> OK")
+        LOG.info("Setting state from ALARM -> OK")
     elif state == "OK":
         # Set alarm state from OK to ALARM
-        print(f"Alarm for {alarm_name} is currently set to {state}")
+        LOG.info(f"Alarm for {alarm_name} is currently set to {state}")
         set_alarm_state("ALARM", str(alarm_name), region)
-        print("Setting state from OK -> ALARM")
+        LOG.info("Setting state from OK -> ALARM")
     else:
         # INSUFFICENT_DATA state
-        print(f"Alarm state for {alarm_name} is set to {state}")
+        LOG.warn(f"Alarm state for {alarm_name} is set to {state}")
 
 
 if __name__ == "__main__":

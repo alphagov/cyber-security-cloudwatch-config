@@ -2,6 +2,8 @@
 import boto3
 import fire
 
+from ..logger import LOG
+
 REGIONS = ["eu-west-1", "eu-west-2"]
 
 
@@ -50,13 +52,13 @@ def reset_all_alarm_states(state):
                 alarm_name = alarm["AlarmName"]
                 is_health_alarm = is_health_monitor_alarm(alarm)
                 if is_health_alarm:
-                    print(f"Setting {alarm_name} to {state} in {region}")
+                    LOG.info(f"Setting {alarm_name} to {state} in {region}")
                     set_alarm_state(state, alarm_name, region)
                 else:
-                    print(f"Not setting state: {alarm_name} is not ours")
+                    LOG.warn("Not setting state: {alarm_name} is not ours")
 
     else:
-        print(
+        LOG.error(
             f"State={state} is not valid. Valid values are: " + ", ".join(valid_states)
         )
 

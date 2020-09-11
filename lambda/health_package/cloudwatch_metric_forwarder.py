@@ -60,7 +60,6 @@ def get_cloudwatch_alarms():
 
 def get_cloudwatch_metric_statistics(alarm):
     """ Get the current metric statistics for the metric identified by an alarm """
-    # print(str(alarm))
     namespace = alarm.get("Namespace")
     metric_name = alarm.get("MetricName")
     statistic = alarm.get("Statistic")

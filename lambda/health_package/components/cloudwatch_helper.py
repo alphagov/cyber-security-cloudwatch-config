@@ -21,21 +21,21 @@ class CloudwatchHelper(GenericHelper):
         namespace = metric.Namespace
         resource_exists = True
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 event_rule_name = cls.get_metric_dimension_value(metric, "RuleName")
                 if event_rule_name:
-                    print(f"Get tags for event rule names: {event_rule_name}")
+                    LOG.info(f"Get tags for event rule names: {event_rule_name}")
                     client.list_targets_by_rule(Rule=event_rule_name)
                 else:
                     resource_exists = False
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.error(str(err))
             resource_exists = False
         return resource_exists
 
@@ -44,12 +44,12 @@ class CloudwatchHelper(GenericHelper):
         namespace = metric.Namespace
         tags = {}
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 event_rule_name = cls.get_metric_dimension_value(metric, "RuleName")
                 if event_rule_name:
-                    print(f"Get tags for event rule name: {event_rule_name}")
+                    LOG.info(f"Get tags for event rule name: {event_rule_name}")
                     get_function_response = Dict(
                         client.list_targets_by_rule(Rule=event_rule_name)
                     )
@@ -60,10 +60,10 @@ class CloudwatchHelper(GenericHelper):
                     tags = get_tags_response.Tags
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.ERROR(json.dumps(metric, indent=2))
+            LOG.ERROR(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.ERROR(str(err))
         return tags
 
     # @classmethod

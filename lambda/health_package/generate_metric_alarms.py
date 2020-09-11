@@ -89,7 +89,7 @@ def get_region_metrics():
 
     for region in regions:
         type_metrics = defaultdict(list)
-        print(f"Reading metrics for {region}")
+        LOG.info(f"Reading metrics for {region}")
         client = boto3.client("cloudwatch", region_name=region)
         has_next_page = True
         next_page_token = None
@@ -141,21 +141,21 @@ def get_metric_alarms(metrics):
         helper = enrich.get_namespace_helper(namespace)
         service = helper.get_namespace_service(namespace)
 
-        # print(str(metric_rule))
+        LOG.trace(str(metric_rule))
         for region in metrics:
             if region not in alarms:
                 alarms[region] = defaultdict(list)
             if service not in alarms[region]:
                 alarms[region][service] = defaultdict(list)
 
-            print(f"Analysing metrics for {region}\n")
+            LOG.info(f"Analysing metrics for {region}\n")
             region_metrics = metrics[region]
             namespace_metrics = region_metrics[namespace]
-            print(
+            LOG.info(
                 f"Found {len(namespace_metrics)} metrics for {namespace} in {region}\n"
             )
             for metric in namespace_metrics:
-                print(f"Checking rules for {metric.MetricName}")
+                LOG.info(f"Checking rules for {metric.MetricName}")
                 if (
                     metric.MetricName == metric_rule.MetricName
                     and helper.metric_resource_exists(metric, region=region)

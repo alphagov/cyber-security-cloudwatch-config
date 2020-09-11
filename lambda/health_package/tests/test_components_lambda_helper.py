@@ -2,6 +2,7 @@
 import pytest
 
 from ..components.lambda_helper import LambdaHelper
+from ..logger import LOG
 from . import stubs
 
 
@@ -34,7 +35,7 @@ def test_get_tags_for_metric_resource(
     with stubber:
         helper = LambdaHelper()
         tags = helper.get_tags_for_metric_resource(lambda_metric)
-        print(str(tags))
+        LOG.debug(str(tags))
         assert tags.Environment == "test"
         assert tags.SvcCodeURL == "https://github.com/alphagov/my-madeup-repo"
         assert tags.Name == "lambda-function"

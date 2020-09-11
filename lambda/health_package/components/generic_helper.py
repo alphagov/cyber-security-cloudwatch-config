@@ -127,7 +127,7 @@ class GenericHelper:
         """
         statistic_value = 0
         metric_stats = cls.get_metric_statistics(metric, rule.Statistic)
-        print(str(metric_stats))
+        LOG.trace(str(metric_stats))
 
         for datapoint in metric_stats.Datapoints:
             statistic_value = datapoint[rule.Statistic]

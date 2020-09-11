@@ -170,4 +170,4 @@ def send_to_sns(topic_arn, sns_message):
 
 
 if __name__ == "__main__":
-    print("No run task defined yet")
+    LOG.error("No run task defined yet")

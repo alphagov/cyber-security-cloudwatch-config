@@ -5,6 +5,7 @@ import botocore
 from addict import Dict
 
 from ..components.generic_helper import GenericHelper
+from ..logger import LOG
 
 
 class FirehoseHelper(GenericHelper):
@@ -20,7 +21,7 @@ class FirehoseHelper(GenericHelper):
         namespace = metric.Namespace
         resource_exists = True
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
 
             if client:
@@ -33,10 +34,10 @@ class FirehoseHelper(GenericHelper):
                     resource_exists = False
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.error(str(err))
             resource_exists = False
         return resource_exists
 
@@ -49,14 +50,14 @@ class FirehoseHelper(GenericHelper):
         namespace = metric.Namespace
         tags = {}
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 stream_name = cls.get_metric_dimension_value(
                     metric, "DeliveryStreamName"
                 )
                 if stream_name:
-                    print(f"Get tags for firehose delivery stream: {stream_name}")
+                    LOG.info(f"Get tags for firehose delivery stream: {stream_name}")
                     list_tags_response = Dict(
                         client.list_tags_for_delivery_stream(
                             DeliveryStreamName=stream_name
@@ -66,8 +67,8 @@ class FirehoseHelper(GenericHelper):
                     tags = cls.tag_list_to_dict(tag_list)
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.error(str(err))
         return tags

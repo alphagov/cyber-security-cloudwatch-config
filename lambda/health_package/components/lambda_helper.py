@@ -21,21 +21,21 @@ class LambdaHelper(GenericHelper):
         namespace = metric.Namespace
         resource_exists = True
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 function_name = cls.get_metric_dimension_value(metric, "FunctionName")
                 if function_name:
-                    print(f"Get tags for lambda function: {function_name}")
+                    LOG.info(f"Get tags for lambda function: {function_name}")
                     client.get_function(FunctionName=function_name)
                 else:
                     resource_exists = False
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.ERROR(json.dumps(metric, indent=2))
+            LOG.ERROR(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.ERROR(str(err))
             resource_exists = False
         return resource_exists
 
@@ -48,12 +48,12 @@ class LambdaHelper(GenericHelper):
         namespace = metric.Namespace
         tags = {}
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 function_name = cls.get_metric_dimension_value(metric, "FunctionName")
                 if function_name:
-                    print(f"Get tags for lambda function: {function_name}")
+                    LOG.info(f"Get tags for lambda function: {function_name}")
                     get_function_response = Dict(
                         client.get_function(FunctionName=function_name)
                     )
@@ -62,10 +62,10 @@ class LambdaHelper(GenericHelper):
                     tags = get_tags_response.Tags
 
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.ERROR(json.dumps(metric, indent=2))
+            LOG.ERROR(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.ERROR(str(err))
         return tags
 
     @classmethod
@@ -78,21 +78,21 @@ class LambdaHelper(GenericHelper):
         # Assign a timeout outside of the try block
         lambda_timeout = 60
         try:
-            print(f"Getting boto client for {namespace} in {region}")
+            LOG.info(f"Getting boto client for {namespace} in {region}")
             client = cls.get_client_from_namespace(namespace, region)
             if client:
                 function_name = cls.get_metric_dimension_value(metric, "FunctionName")
                 if function_name:
-                    print(f"Get timeout for lambda function: {function_name}")
+                    LOG.info(f"Get timeout for lambda function: {function_name}")
                     get_function_response = Dict(
                         client.get_function(FunctionName=function_name)
                     )
                     lambda_timeout = get_function_response.Configuration.Timeout
         except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
+            LOG.ERROR(json.dumps(metric, indent=2))
+            LOG.ERROR(str(err))
         except botocore.exceptions.ClientError as err:
-            print(str(err))
+            LOG.ERROR(str(err))
 
         rule.Maximum = lambda_timeout * 0.9
 

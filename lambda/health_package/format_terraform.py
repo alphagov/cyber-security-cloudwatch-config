@@ -1,4 +1,5 @@
 """Utility functions to generate output in the form of a tfvars file"""
+from .logger import LOG
 
 
 def get_tf_map(source, indent_size, indent_level=0):
@@ -48,5 +49,5 @@ def get_tf_item(source, indent_size, indent_level=0):
     elif source is None:
         formatted += '""'
     else:
-        print(str(type(source)))
+        LOG.warn(str(type(source)))
     return formatted
