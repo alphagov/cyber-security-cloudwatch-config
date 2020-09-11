@@ -3,21 +3,21 @@ import os
 
 import pytest
 
-from cloudwatch_forwarder import (
+from ..cloudwatch_forwarder import (
     get_environment,
     get_environment_account_id,
     get_health_target_queue_url,
-    send_to_health_monitor,
     parse_messages,
+    send_to_health_monitor,
 )
-from health_event import HealthEvent
-import stubs
+from ..health_event import HealthEvent
+from . import stubs
 
 
 @pytest.mark.usefixtures("health_monitor_sns_event")
 def test_parse_messages(health_monitor_sns_event):
-    """ Test that the parse sns message correctly
-    retrieves the right content from the test event """
+    """Test that the parse sns message correctly
+    retrieves the right content from the test event"""
     messages = parse_messages(health_monitor_sns_event)
     assert "AlarmName" in messages[0]
 

@@ -52,9 +52,11 @@ class CloudwatchHelper(GenericHelper):
                     print(f"Get tags for event rule name: {event_rule_name}")
                     get_function_response = Dict(
                         client.list_targets_by_rule(Rule=event_rule_name)
-                        )
+                    )
                     event_rule_name_arn = get_function_response.Targets.arn
-                    get_tags_response = Dict(client.list_tags(Resource=event_rule_name_arn))
+                    get_tags_response = Dict(
+                        client.list_tags(Resource=event_rule_name_arn)
+                    )
                     tags = get_tags_response.Tags
 
         except AttributeError as err:

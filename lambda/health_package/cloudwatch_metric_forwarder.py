@@ -89,8 +89,8 @@ def get_cloudwatch_metric_statistics(alarm):
 
 
 def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
-    """ Transform data from native CloudWatch
-        into a shared data model independent of the data source
+    """Transform data from native CloudWatch
+    into a shared data model independent of the data source
     """
     session = boto3.session.Session()
     region = session.region_name
