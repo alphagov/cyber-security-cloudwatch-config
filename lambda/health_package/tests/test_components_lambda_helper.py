@@ -1,8 +1,8 @@
 """ Test LambdaHelper class"""
 import pytest
 
-from components.lambda_helper import LambdaHelper
-import stubs
+from ..components.lambda_helper import LambdaHelper
+from . import stubs
 
 
 @pytest.mark.usefixtures("lambda_metric")

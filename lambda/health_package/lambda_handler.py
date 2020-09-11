@@ -1,10 +1,10 @@
 """Handler."""
-from generate_metric_alarms import process_generate_metric_alarms_event
-from health_monitor_lambda import process_health_event
 from cloudwatch_alarm_forwarder import process_cloudwatch_alarm_event
 from cloudwatch_metric_forwarder import process_cloudwatch_metric_event
-from splunk_forwarder import process_update_dashboard_event
+from generate_metric_alarms import process_generate_metric_alarms_event
+from health_monitor_lambda import process_health_event
 from logger import LOG
+from splunk_forwarder import process_update_dashboard_event
 
 
 def generate_metric_alarms_handler(event, context):

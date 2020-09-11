@@ -1,7 +1,7 @@
 """Test."""
 import pytest
 
-from generate_metric_alarms import process_generate_metric_alarms_event
+from ..generate_metric_alarms import process_generate_metric_alarms_event
 
 
 @pytest.mark.usefixtures("lambda_event")

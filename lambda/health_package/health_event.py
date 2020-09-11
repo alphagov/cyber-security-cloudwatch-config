@@ -1,6 +1,6 @@
 """ Data model for health event data """
-import os
 import json
+import os
 
 
 class HealthEvent:

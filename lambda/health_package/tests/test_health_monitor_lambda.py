@@ -1,7 +1,7 @@
 """ Unit tests for health monitor lambda """
 import pytest
 
-from health_monitor_lambda import get_slack_channel, get_slack_post
+from ..health_monitor_lambda import get_slack_channel, get_slack_post
 
 
 def test_get_slack_channel():

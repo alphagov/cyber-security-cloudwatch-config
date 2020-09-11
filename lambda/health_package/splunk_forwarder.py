@@ -1,8 +1,9 @@
 """ Lambda to send the Health Monitor alarm data to Splunk Cloud HEC """
 
 import json
-import requests
+
 import boto3
+import requests
 
 from logger import LOG
 

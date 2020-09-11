@@ -4,8 +4,8 @@ import json
 import botocore
 from addict import Dict
 
-from components.generic_helper import GenericHelper
-from logger import LOG
+from ..logger import LOG
+from .generic_helper import GenericHelper
 
 
 class SqsHelper(GenericHelper):

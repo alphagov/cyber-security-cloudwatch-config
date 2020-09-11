@@ -4,7 +4,7 @@ import json
 import botocore
 from addict import Dict
 
-from components.generic_helper import GenericHelper
+from ..components.generic_helper import GenericHelper
 
 
 class FirehoseHelper(GenericHelper):

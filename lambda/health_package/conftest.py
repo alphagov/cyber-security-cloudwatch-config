@@ -1,7 +1,7 @@
 """fixtures for tests"""
 import json
-import pytest
 
+import pytest
 from addict import Dict
 
 

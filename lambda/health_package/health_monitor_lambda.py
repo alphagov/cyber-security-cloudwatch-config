@@ -4,11 +4,11 @@ import os
 from collections import defaultdict
 
 import boto3
-from botocore.exceptions import ClientError
 from addict import Dict
+from botocore.exceptions import ClientError
 
-from logger import LOG
-from cloudwatch_forwarder import parse_messages
+from .cloudwatch_forwarder import parse_messages
+from .logger import LOG
 
 
 def flatten_alarm_data_structure(message):

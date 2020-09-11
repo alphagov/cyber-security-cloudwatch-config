@@ -1,9 +1,10 @@
 """Test HealthEvent class """
 import json
 from datetime import datetime
+
 import pytest
 
-from health_event import HealthEvent
+from ..health_event import HealthEvent
 
 
 @pytest.mark.usefixtures("event_args")

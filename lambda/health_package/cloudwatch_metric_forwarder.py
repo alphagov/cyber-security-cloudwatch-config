@@ -2,17 +2,16 @@
 Entrypoint for scheduled cloudwatch metrics forwarding
 """
 import json
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
 
-from addict import Dict
 import boto3
+from addict import Dict
 
-from logger import LOG
 import enrich
 from cloudwatch_forwarder import send_to_health_monitor
 from health_event import HealthEvent
-
+from logger import LOG
 
 # This is the frequency of shipping metrics to Splunk
 # If this value is changed you should also change

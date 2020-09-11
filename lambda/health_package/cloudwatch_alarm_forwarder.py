@@ -1,13 +1,12 @@
 """
 Entrypoint for processing a cloudwatch alarm event from SNS
 """
-# import json
 import boto3
 
-from logger import LOG
 import enrich
 from cloudwatch_forwarder import parse_sns_message, send_to_health_monitor
 from health_event import HealthEvent
+from logger import LOG
 
 
 def process_cloudwatch_alarm_event(event):
