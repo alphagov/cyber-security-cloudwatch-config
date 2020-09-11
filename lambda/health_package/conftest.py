@@ -177,7 +177,7 @@ def mock_get_function_response():
     response = {
         "Configuration": {
             "FunctionName": "lambda-function",
-            "FunctionArn": "arn:aws:lambda:eu-west-2:123456789012:function:lambda-function",
+            "FunctionArn": "arn:aws:lambda:eu-west-2:123456789012:function:lambda-function",  # noqa: E501
             "Runtime": "python3.7",
             "Role": "arn:aws:iam::103495720024:role/role_name",
             "Handler": "module.function",
@@ -352,7 +352,7 @@ def standard_health_alarm_event():
                 "Statistic": "MAXIMUM",
                 "StatisticType": "Statistic",
                 "Threshold": 0.0,
-                "TreatMissingData": "- TreatMissingData:                    notBreaching",
+                "TreatMissingData": "- TreatMissingData:                    notBreaching",  # noqa: E501
                 "Unit": None,
             },
         },
