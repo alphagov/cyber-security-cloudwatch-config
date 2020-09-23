@@ -4,8 +4,7 @@ import datetime
 import boto3
 from addict import Dict
 
-from ..logger import LOG
-
+from logger import LOG
 
 class GenericHelper:
     """ Standard helper functions for cloudwatch metrics """
@@ -127,7 +126,7 @@ class GenericHelper:
         """
         statistic_value = 0
         metric_stats = cls.get_metric_statistics(metric, rule.Statistic)
-        LOG.trace(str(metric_stats))
+        LOG.debug(str(metric_stats))
 
         for datapoint in metric_stats.Datapoints:
             statistic_value = datapoint[rule.Statistic]

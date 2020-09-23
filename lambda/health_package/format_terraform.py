@@ -1,5 +1,5 @@
 """Utility functions to generate output in the form of a tfvars file"""
-from .logger import LOG
+from logger import LOG
 
 
 def get_tf_map(source, indent_size, indent_level=0):

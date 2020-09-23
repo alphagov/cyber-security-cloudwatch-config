@@ -7,8 +7,8 @@ import boto3
 from addict import Dict
 from botocore.exceptions import ClientError
 
-from .cloudwatch_forwarder import parse_messages
-from .logger import LOG
+from cloudwatch_forwarder import parse_messages
+from logger import LOG
 
 
 def flatten_alarm_data_structure(message):

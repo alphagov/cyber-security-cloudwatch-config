@@ -4,8 +4,8 @@ import json
 import botocore
 from addict import Dict
 
-from ..logger import LOG
-from .generic_helper import GenericHelper
+from logger import LOG
+from components.generic_helper import GenericHelper
 
 
 class KinesisHelper(GenericHelper):
@@ -31,10 +31,10 @@ class KinesisHelper(GenericHelper):
                     resource_exists = False
 
         except AttributeError as err:
-            LOG.ERROR(json.dumps(metric, indent=2))
-            LOG.ERROR(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            LOG.ERROR(str(err))
+            LOG.error(str(err))
             resource_exists = False
         return resource_exists
 
@@ -60,8 +60,8 @@ class KinesisHelper(GenericHelper):
                     tags = cls.tag_list_to_dict(tag_list)
 
         except AttributeError as err:
-            LOG.ERROR(json.dumps(metric, indent=2))
-            LOG.ERROR(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            LOG.ERROR(str(err))
+            LOG.error(str(err))
         return tags

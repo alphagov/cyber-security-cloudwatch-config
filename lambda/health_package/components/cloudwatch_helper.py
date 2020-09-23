@@ -4,9 +4,8 @@ import json
 import botocore
 from addict import Dict
 
-from ..components.generic_helper import GenericHelper
-from ..logger import LOG
-
+from components.generic_helper import GenericHelper
+from logger import LOG
 
 class CloudwatchHelper(GenericHelper):
     """ Helper functions for Cloudwatch """
@@ -60,8 +59,8 @@ class CloudwatchHelper(GenericHelper):
                     tags = get_tags_response.Tags
 
         except AttributeError as err:
-            LOG.ERROR(json.dumps(metric, indent=2))
-            LOG.ERROR(str(err))
+            LOG.error(json.dumps(metric, indent=2))
+            LOG.error(str(err))
         except botocore.exceptions.ClientError as err:
-            LOG.ERROR(str(err))
+            LOG.error(str(err))
         return tags

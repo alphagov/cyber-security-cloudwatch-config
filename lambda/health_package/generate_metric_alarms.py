@@ -7,9 +7,10 @@ import boto3
 from addict import Dict
 from botocore.exceptions import ClientError
 
-from . import enrich, format_terraform
-from .local_exceptions import ServerError
-from .logger import LOG
+import enrich
+import format_terraform
+from local_exceptions import ServerError
+from logger import LOG
 
 
 def process_generate_metric_alarms_event(event):
@@ -141,7 +142,7 @@ def get_metric_alarms(metrics):
         helper = enrich.get_namespace_helper(namespace)
         service = helper.get_namespace_service(namespace)
 
-        LOG.trace(str(metric_rule))
+        LOG.debug(str(metric_rule))
         for region in metrics:
             if region not in alarms:
                 alarms[region] = defaultdict(list)
