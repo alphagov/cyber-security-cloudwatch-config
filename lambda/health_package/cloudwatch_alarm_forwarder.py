@@ -46,5 +46,5 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
         source_data=source_message,
     )
 
-    LOG.debug("Standardised event: %s", json.dumps(event))
+    LOG.debug("Standardised event: %s", json.dumps(event, default=str))
     return event
