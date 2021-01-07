@@ -94,7 +94,8 @@ class LambdaHelper(GenericHelper):
         except botocore.exceptions.ClientError as err:
             print(str(err))
 
-        rule.Maximum = lambda_timeout * 0.9
+        # 90% of max timeout seconds in milliseconds
+        rule.Maximum = lambda_timeout * 1000 * 0.9
 
         if threshold > rule.Maximum:
             LOG.info(
