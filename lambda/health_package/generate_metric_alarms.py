@@ -329,9 +329,10 @@ if __name__ == "__main__":
                 "MetricName": "Duration",
                 "Statistic": "Maximum",
                 "Multiplier": 1.1,
-                "Minimum": 3,
+                "Minimum": 3000,
                 # Any lambda running for less than 3 secs should be fine
                 # The maximum is calculated based on the lambda's timeout.
+                # This is measured in milliseconds (I think that has changed)
             }
         ),
     ]
