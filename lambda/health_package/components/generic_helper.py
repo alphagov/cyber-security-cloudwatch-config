@@ -114,7 +114,6 @@ class GenericHelper:
             StartTime=days_ago,
             EndTime=now,
             Period=period,
-            Unit="Seconds",
             Statistics=[statistic],
         )
         return Dict(stats_response)
