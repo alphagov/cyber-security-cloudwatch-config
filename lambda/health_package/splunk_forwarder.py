@@ -22,8 +22,11 @@ def process_update_dashboard_event(lambda_invoke_event):
             payload_to_send = build_splunk_payload(health_monitoring_message)
             send_health_monitoring_data_to_splunk(payload_to_send)
 
-    except (ValueError, KeyError):
-        LOG.error("Failed to build Splunk payload for health monitoring data")
+    except (ValueError, KeyError, JSONDecodeError) as error:
+        LOG.error(
+            "Failed to build Splunk payload for health monitoring data: %s",
+            error
+        )
 
 
 def get_splunk_hec_token(ssm_param, region):
@@ -49,7 +52,7 @@ def get_environment(health_event):
     """
     try:
         event_env = health_event.get("Environment", "prod")
-    except (KeyError, TypeError):
+    except (TypeError):
         event_env = "prod"
 
     env = "prod" if event_env in ("prod", "production", "live") else "test"
