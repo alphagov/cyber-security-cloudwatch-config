@@ -106,7 +106,21 @@ class GenericHelper:
         x_days = 28
         now = datetime.datetime.now()
         days_ago = now - datetime.timedelta(days=x_days)
-        period = 60 * 60 * 24 * x_days
+        # This should return a single datapoint for the entire period
+        # Setting the period to the exact time lapse sometimes returns
+        # multiple data points. 
+        #
+        # Aggregating across multiple datapoints is possible but needs 
+        # to be sensitive to the stat type so an aggregate of maximums
+        # would need to take the max and an aggregate of minimums would 
+        # need to take the min etc. 
+        #
+        # For older data (> 15 days ago) 
+        # the period must be a multiple of 300 (5 mins) 
+        #
+        # This calculates the total time lapse (in seconds) and adds 
+        # 5 minutes to ensure only one data point can be returned
+        period = (60 * 60 * 24 * x_days) + 300
         stats_response = client.get_metric_statistics(
             Namespace=metric.Namespace,
             MetricName=metric.MetricName,
