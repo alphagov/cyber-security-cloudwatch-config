@@ -24,7 +24,6 @@ def mock_cloudwatch(mock_get_metric_statistics):
         "StartTime": ANY,
         "EndTime": ANY,
         "Period": 2419200,
-        "Unit": "Seconds",
         "Statistics": ["Maximum"],
     }
 

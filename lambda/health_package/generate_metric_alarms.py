@@ -159,7 +159,7 @@ def get_metric_alarms(metrics):
                 print(f"Checking rules for {metric.MetricName}")
                 if (
                     metric.MetricName == metric_rule.MetricName
-                    and helper.metric_resource_exists(metric, region=region)
+                    and helper.metric_resource_exists(metric)
                 ):
                     # get metric-statistics and calculate health threshold
                     metric.Threshold = helper.get_metric_threshold(metric, metric_rule)

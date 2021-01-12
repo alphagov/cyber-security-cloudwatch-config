@@ -11,12 +11,13 @@ class FirehoseHelper(GenericHelper):
     """ Helper functions for Firehose """
 
     @classmethod
-    def metric_resource_exists(cls, metric, region=None):
+    def metric_resource_exists(cls, metric):
         """
         Check the resource exists before defining an alarm
         aws cloudwatch list-metrics returns metrics for resources that
         no longer exists
         """
+        region = metric.Region
         namespace = metric.Namespace
         resource_exists = True
         try:
@@ -41,11 +42,12 @@ class FirehoseHelper(GenericHelper):
         return resource_exists
 
     @classmethod
-    def get_tags_for_metric_resource(cls, metric, region=None):
+    def get_tags_for_metric_resource(cls, metric):
         """
         Get QueueUrl from queue name and then get the tags if present
         There is some duplication of the above function it would be nice to remove
         """
+        region = metric.Region
         namespace = metric.Namespace
         tags = {}
         try:
