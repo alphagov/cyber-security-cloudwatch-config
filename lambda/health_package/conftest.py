@@ -399,7 +399,6 @@ def mock_get_metric_statistics():
                     "Sum": 123.0,
                     "Minimum": 123.0,
                     "Maximum": 123.0,
-                    "Unit": "Seconds",
                 }
             ],
         }

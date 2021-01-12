@@ -56,7 +56,6 @@ def test_get_metric_statistics(lambda_metric, mock_get_metric_statistics):
         assert datapoint.Timestamp == "2020-03-27T11:29:51.780Z"
         assert datapoint.Minimum == 123.0
         assert datapoint.Maximum == 123.0
-        assert datapoint.Unit == "Seconds"
 
 
 @pytest.mark.usefixtures("lambda_metric")
