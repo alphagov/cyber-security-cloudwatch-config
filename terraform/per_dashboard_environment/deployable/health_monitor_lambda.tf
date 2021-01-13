@@ -6,6 +6,7 @@ resource "aws_lambda_function" "health_monitor_lambda" {
   handler          = "lambda_handler.health_monitor_handler"
   timeout          = 60
   runtime          = "python3.7"
+  tags             = merge(module.tags.tags, map("Name", "health_monitor_lambda"))
 
   environment {
     variables = {

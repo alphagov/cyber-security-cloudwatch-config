@@ -1,6 +1,7 @@
 resource "aws_sqs_queue" "incoming_health_events" {
   name                        = "incoming_health_events"
   visibility_timeout_seconds  = 60
+  tags     = merge(module.tags.tags, map("Name", "incoming_health_events"))
 }
 
 data "aws_iam_policy_document" "incoming_health_events_resource_policy_data" {

@@ -6,6 +6,7 @@ resource "aws_lambda_function" "health_monitor_update_dashboard_lambda" {
   handler          = "lambda_handler.splunk_forwarder_event_handler"
   timeout          = 60
   runtime          = "python3.7"
+  tags     = merge(module.tags.tags, map("Name", "health_monitor_splunk_forwarder_lambda"))
 }
 
 resource "aws_lambda_permission" "allow_invocation_from_sns" {
