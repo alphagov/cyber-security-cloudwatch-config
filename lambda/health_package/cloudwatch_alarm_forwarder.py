@@ -30,6 +30,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
 
     resource_name = helper.get_metric_resource_name(metric)
     resource_id = helper.get_metric_resource_id(metric)
+    account_id = session.client("sts").get_caller_identity().get("Account")
 
     event.populate(
         source="AWS/CloudWatch",
@@ -41,6 +42,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
         resource_name=resource_name,
         resource_id=resource_id,
         source_data=source_message,
+        aws_account_id=account_id
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))
