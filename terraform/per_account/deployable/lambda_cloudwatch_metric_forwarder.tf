@@ -7,6 +7,7 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
   handler           = "lambda_handler.cloudwatch_metric_event_handler"
   runtime           = "python3.7"
   timeout           = 300
+  tags              = merge(module.tags.tags, map("Name", "cloudwatch_metric_forwarder_euw1_${data.aws_caller_identity.current.account_id}"))
 
   environment {
     variables = {
@@ -27,6 +28,7 @@ resource "aws_cloudwatch_event_rule" "every_hour_euw1" {
   name                = "every-hour"
   description         = "Fires every hour"
   schedule_expression = local.metric_cron
+  tags                = merge(module.tags.tags, map("Name", "every_hour_health_monitoring_euw1_${data.aws_caller_identity.current.account_id}"))
 }
 
 resource "aws_cloudwatch_event_target" "run_every_hour_euw1" {
@@ -54,6 +56,7 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
   handler           = "lambda_handler.cloudwatch_metric_event_handler"
   runtime           = "python3.7"
   timeout           = 300
+  tags              = merge(module.tags.tags, map("Name", "cloudwatch_metric_forwarder_euw2_${data.aws_caller_identity.current.account_id}"))
 
   environment {
     variables = {
@@ -74,6 +77,7 @@ resource "aws_cloudwatch_event_rule" "every_hour_euw2" {
   name                = "every-hour"
   description         = "Fires every hour"
   schedule_expression = local.metric_cron
+  tags                = merge(module.tags.tags, map("Name", "every_hour_health_monitoring_euw2_${data.aws_caller_identity.current.account_id}"))
 }
 
 resource "aws_cloudwatch_event_target" "run_every_hour_euw2" {

@@ -29,6 +29,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_lambda_errors" {
   alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   treat_missing_data  = "notBreaching"
+  tags                = merge(module.tags.tags, map("Name", "${var.eu-west-1__lambda__Errors[count.index].ResourceName}_Errors_alarm_${data.aws_caller_identity.current.account_id}"))
 }
 
 resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_lambda_errors" {
@@ -50,4 +51,5 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_lambda_errors" {
   alarm_actions       = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   treat_missing_data  = "notBreaching"
+  tags                = merge(module.tags.tags, map("Name", "${var.eu-west-2__lambda__Errors[count.index].ResourceName}_Errors_alarm_${data.aws_caller_identity.current.account_id}"))
 }

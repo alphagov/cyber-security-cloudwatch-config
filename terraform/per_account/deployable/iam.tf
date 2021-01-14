@@ -16,6 +16,7 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_assume_role" {
 resource "aws_iam_role" "cloudwatch_forwarder_role" {
   name               = "cloudwatch_forwarder_role"
   assume_role_policy = data.aws_iam_policy_document.cloudwatch_forwarder_assume_role.json
+  tags                = merge(module.tags.tags, map("Name", "cloudwatch_forwarder_role_${data.aws_caller_identity.current.account_id}"))
 }
 
 # Publish events to SNS topic

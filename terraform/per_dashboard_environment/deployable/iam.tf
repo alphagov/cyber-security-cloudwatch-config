@@ -13,11 +13,13 @@ data "aws_iam_policy_document" "health_monitor_assume_role" {
 resource "aws_iam_role" "health_monitor_role" {
   name               = "health_monitor_role"
   assume_role_policy = data.aws_iam_policy_document.health_monitor_assume_role.json
+  tags               = merge(module.tags.tags, map("Name", "health_monitor_role"))
 }
 
 resource "aws_iam_role" "health_monitor_update_dashboard_role" {
   name               = "health_monitor_update_dashboard_role"
   assume_role_policy = data.aws_iam_policy_document.health_monitor_assume_role.json
+  tags               = merge(module.tags.tags, map("Name", "health_monitor_update_dashboard_role"))
 }
 
 # Publish events to SNS topic

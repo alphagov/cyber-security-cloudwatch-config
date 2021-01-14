@@ -8,6 +8,7 @@ resource "aws_sns_topic" "euw1_sns_topics" {
   count    = length(var.sns_topic_names)
   provider = aws.eu-west-1
   name     = var.sns_topic_names[count.index]
+  tags     = merge(module.tags.tags, map("Name", "${var.sns_topic_names[count.index]}"))
 }
 
 output "euw1_sns_arns" {
@@ -24,6 +25,7 @@ resource "aws_sns_topic" "euw2_sns_topics" {
   count    = length(var.sns_topic_names)
   provider = aws.eu-west-2
   name     = var.sns_topic_names[count.index]
+  tags     = merge(module.tags.tags, map("Name", "${var.sns_topic_names[count.index]}"))
 }
 
 output "euw2_sns_arns" {
