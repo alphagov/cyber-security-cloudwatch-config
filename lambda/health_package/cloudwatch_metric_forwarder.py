@@ -100,7 +100,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     metric.update(alarm.Dimensions)
     helper = enrich.get_namespace_helper(metric.Namespace)
     LOG.debug("Using %s helper", helper.__class__.__name__)
-    tags = helper.get_tags_for_metric_resource(metric, region=region)
+    tags = helper.get_tags_for_metric_resource(metric)
     alarm.Tags = tags
     LOG.debug("Tags: %s", json.dumps(tags))
 
