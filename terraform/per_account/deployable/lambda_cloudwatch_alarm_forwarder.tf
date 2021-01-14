@@ -7,6 +7,7 @@ resource "aws_lambda_function" "cloudwatch_alarm_forwarder_euw1_lambda" {
   handler           = "lambda_handler.cloudwatch_alarm_event_handler"
   runtime           = "python3.7"
   timeout           = 30
+  tags              = merge(module.tags.tags, map("Name", "cloudwatch_alarm_forwarder_euw1_${data.aws_caller_identity.current.account_id}"))
 
   environment {
     variables = {
@@ -47,6 +48,7 @@ resource "aws_lambda_function" "cloudwatch_alarm_forwarder_euw2_lambda" {
   handler           = "lambda_handler.cloudwatch_alarm_event_handler"
   runtime           = "python3.7"
   timeout           = 30
+  tags              = merge(module.tags.tags, map("Name", "cloudwatch_alarm_forwarder_euw2_${data.aws_caller_identity.current.account_id}"))
 
   environment {
     variables = {

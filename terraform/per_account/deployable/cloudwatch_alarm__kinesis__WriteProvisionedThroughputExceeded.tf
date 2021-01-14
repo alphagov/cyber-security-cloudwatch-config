@@ -28,6 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_kinesis_write_provision_
   }
   alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
+  tags                = merge(module.tags.tags, map("Name", "${var.eu-west-1__kinesis__WriteProvisionedThroughputExceeded[count.index].ResourceName}_WriteProvisionedThroughputExceeded_alarm_${data.aws_caller_identity.current.account_id}"))
 }
 
 resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_kinesis_write_provision_throughput_exceeded" {
@@ -48,4 +49,5 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_kinesis_write_provision_
   }
   alarm_actions       = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
+  tags                = merge(module.tags.tags, map("Name", "${var.eu-west-2__kinesis__WriteProvisionedThroughputExceeded[count.index].ResourceName}_WriteProvisionedThroughputExceeded_alarm_${data.aws_caller_identity.current.account_id}"))
 }
