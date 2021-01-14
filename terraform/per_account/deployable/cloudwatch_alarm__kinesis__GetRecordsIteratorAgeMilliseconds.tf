@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_kinesis_get_records_iter
   evaluation_periods  = 2
   threshold           = var.eu-west-1__kinesis__GetRecordsIteratorAgeMilliseconds[count.index].Threshold
   alarm_description   = "Tracks the read position across all shards and consumers in the stream. If an iterator's age passes 50% of the retention period (by default, 24 hours, configurable up to 7 days), there is risk for data loss due to record expiration."
-  metric_name         = "GetRecordsIteratorAgeMilliseconds"
+  metric_name         = "GetRecords.IteratorAgeMilliseconds"
   namespace           = "AWS/Kinesis"
   period              = 300
   statistic           = "Maximum"
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_kinesis_get_records_iter
   evaluation_periods  = 2
   threshold           = var.eu-west-2__kinesis__GetRecordsIteratorAgeMilliseconds[count.index].Threshold
   alarm_description   = "Tracks the read position across all shards and consumers in the stream. If an iterator's age passes 50% of the retention period (by default, 24 hours, configurable up to 7 days), there is risk for data loss due to record expiration."
-  metric_name         = "GetRecordsIteratorAgeMilliseconds"
+  metric_name         = "GetRecords.IteratorAgeMilliseconds"
   namespace           = "AWS/Kinesis"
   period              = 300
   statistic           = "Maximum"
