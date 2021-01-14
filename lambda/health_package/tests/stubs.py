@@ -23,7 +23,7 @@ def mock_cloudwatch(mock_get_metric_statistics):
         "Dimensions": [{"Name": "FunctionName", "Value": "lambda-function"}],
         "StartTime": ANY,
         "EndTime": ANY,
-        "Period": 2419200,
+        "Period": (60 * 60 * 24 * 28) + 300,  # 28 days + 5 mins (see generic_helper.py)
         "Statistics": ["Maximum"],
     }
 
