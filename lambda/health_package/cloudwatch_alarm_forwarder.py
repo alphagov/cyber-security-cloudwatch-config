@@ -27,7 +27,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     region = session.region_name
     metric = source_message.Trigger
     helper = enrich.get_namespace_helper(metric.Namespace)
-    source_message.Tags = helper.get_tags_for_metric_resource(metric, region=region)
+    source_message.Tags = helper.get_tags_for_metric_resource(metric)
 
     event = HealthEvent()
 
