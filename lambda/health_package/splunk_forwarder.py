@@ -22,7 +22,7 @@ def process_update_dashboard_event(lambda_invoke_event):
             payload_to_send = build_splunk_payload(health_monitoring_message)
             send_health_monitoring_data_to_splunk(payload_to_send)
 
-    except (ValueError, KeyError, JSONDecodeError) as error:
+    except (ValueError, KeyError, json.JSONDecodeError) as error:
         LOG.error(
             "Failed to build Splunk payload for health monitoring data: %s",
             error
