@@ -132,7 +132,7 @@ def get_slack_post(message):
 def notify_pagerduty_sns(pagerduty_sns_message):
     """ Send message to PagerDuty SNS """
     pagerduty_sns_arn = os.environ["PAGERDUTY_SNS_ARN"]
-    response = send_to_sns(pagerduty_sns_arn, json.dumps(pagerduty_sns_message))
+    response = send_to_sns(pagerduty_sns_arn, pagerduty_sns_message)
     return response
 
 
@@ -147,7 +147,7 @@ def notify_slack_sns(slack_sns_message):
 def notify_dashboard_sns(dashboard_sns_message):
     """ Send message to Dashboard SNS """
     dashboard_sns_arn = os.environ["DASHBOARD_SNS_ARN"]
-    response = send_to_sns(dashboard_sns_arn, json.dumps(dashboard_sns_message))
+    response = send_to_sns(dashboard_sns_arn, dashboard_sns_message)
     return response
 
 
