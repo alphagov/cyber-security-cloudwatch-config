@@ -93,8 +93,6 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     """ Transform data from native CloudWatch
         into a shared data model independent of the data source
     """
-    session = boto3.session.Session()
-    region = session.region_name
     metric = Dict()
     metric.update(alarm)
     metric.update(alarm.Dimensions)
@@ -120,7 +118,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
         resource_id=resource_id,
         source_data=alarm,
         metric_data=metric_data,
-        notify_slack=False
+        notify_slack=False,
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))

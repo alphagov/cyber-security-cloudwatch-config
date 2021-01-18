@@ -13,6 +13,7 @@ AWS_REGION = "eu-west-2"
 def process_update_dashboard_event(lambda_invoke_event):
     """ Receive and process Health Monitoring message """
     try:
+        LOG.debug(lambda_invoke_event)
         health_events = [
             json.loads(event["Sns"]["Message"])
             for event in lambda_invoke_event["Records"]
@@ -24,8 +25,7 @@ def process_update_dashboard_event(lambda_invoke_event):
 
     except (ValueError, KeyError, json.JSONDecodeError) as error:
         LOG.error(
-            "Failed to build Splunk payload for health monitoring data: %s",
-            error
+            "Failed to build Splunk payload for health monitoring data: %s", error
         )
 
 
@@ -67,7 +67,7 @@ def build_splunk_payload(health_monitoring_payload):
         "index": f"cyber_services_{env}",
         "source": "health_monitoring_event",
         "sourcetype": "_json",
-        "event": health_monitoring_payload
+        "event": health_monitoring_payload,
     }
 
     payload_to_send = json.dumps(payload_dictionary)

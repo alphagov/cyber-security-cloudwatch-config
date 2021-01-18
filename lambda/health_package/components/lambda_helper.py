@@ -18,7 +18,7 @@ class LambdaHelper(GenericHelper):
         aws cloudwatch list-metrics returns metrics for resources that
         no longer exists
         """
-        region = metric.Region
+        region = cls.get_metric_region(metric)
         namespace = metric.Namespace
         resource_exists = True
         try:
@@ -46,7 +46,7 @@ class LambdaHelper(GenericHelper):
         Get QueueUrl from queue name and then get the tags if present
         There is some duplication of the above function it would be nice to remove
         """
-        region = metric.Region
+        region = cls.get_metric_region(metric)
         namespace = metric.Namespace
         tags = {}
         try:
@@ -72,7 +72,7 @@ class LambdaHelper(GenericHelper):
 
     @classmethod
     def get_metric_threshold(cls, metric, rule):
-        region = metric.Region
+        region = cls.get_metric_region(metric)
         threshold = super().get_metric_threshold(metric, rule)
         # Calculate duration threshold here.
 
