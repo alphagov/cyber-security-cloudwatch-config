@@ -2,7 +2,6 @@
 Entrypoint for processing a cloudwatch alarm event from SNS
 """
 import json
-import boto3
 
 from logger import LOG
 import enrich
@@ -23,8 +22,6 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     """ Transform data from native CloudWatch
         into a shared data model independent of the data source
     """
-    session = boto3.session.Session()
-    region = session.region_name
     metric = source_message.Trigger
     helper = enrich.get_namespace_helper(metric.Namespace)
     source_message.Tags = helper.get_tags_for_metric_resource(metric)

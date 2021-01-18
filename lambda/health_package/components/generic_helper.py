@@ -76,6 +76,27 @@ class GenericHelper:
         return dim_val
 
     @classmethod
+    def get_metric_region(cls, metric):
+        """
+        Use metric.Region if set or default to session region
+
+        When generating alarm config we iterate across multiple
+        regions so need to set the region which matches the given
+        metric.
+
+        When collecting data the forwarder lambdas run in the
+        region where the metric/alarm config lives.
+        """
+        if hasattr(metric, "Region"):
+            region = metric.Region
+            LOG.debug(f"Metric region: {region}")
+        else:
+            session = boto3.session.Session()
+            region = session.region_name
+            LOG.debug(f"Using session region: {region}")
+        return region
+
+    @classmethod
     def get_metric_resource_name(cls, metric):
         """Query dimensions for field matching *Name*"""
         return cls.get_dimension_value_matching_substring(metric.Dimensions, "Name")
@@ -101,7 +122,9 @@ class GenericHelper:
         # Value=csw-prod-audit-account-queue
         # --region=eu-west-1
 
-        client = boto3.client("cloudwatch", metric.Region)
+        region = cls.get_metric_region(metric)
+
+        client = boto3.client("cloudwatch", region)
 
         x_days = 28
         now = datetime.datetime.now()

@@ -18,7 +18,7 @@ class SqsHelper(GenericHelper):
         aws cloudwatch list-metrics returns metrics for resources that
         no longer exists
         """
-        region = metric.Region
+        region = cls.get_metric_region(metric)
         namespace = metric.Namespace
         resource_exists = True
         try:
@@ -46,7 +46,7 @@ class SqsHelper(GenericHelper):
         Get QueueUrl from queue name and then get the tags if present
         There is some duplication of the above function it would be nice to remove
         """
-        region = metric.Region
+        region = cls.get_metric_region(metric)
         namespace = metric.Namespace
         tags = {}
         try:
