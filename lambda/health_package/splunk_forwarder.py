@@ -15,7 +15,7 @@ def process_update_dashboard_event(lambda_invoke_event):
     try:
         LOG.debug(lambda_invoke_event)
         health_events = [
-            json.loads(json.loads(event["Sns"]["Message"]))
+            json.loads(event["Sns"]["Message"])
             for event in lambda_invoke_event["Records"]
         ]
         for health_monitoring_message in health_events:
