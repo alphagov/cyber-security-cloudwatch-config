@@ -87,8 +87,8 @@ class GenericHelper:
         When collecting data the forwarder lambdas run in the
         region where the metric/alarm config lives.
         """
-        if hasattr(metric, "Region"):
-            region = metric.Region
+        region = metric.get("Region")
+        if region:
             LOG.debug(f"Metric region: {region}")
         else:
             session = boto3.session.Session()
