@@ -3,6 +3,8 @@ Entrypoint for processing a cloudwatch alarm event from SNS
 """
 import json
 
+import boto3
+
 from logger import LOG
 import enrich
 from cloudwatch_forwarder import parse_sns_message, send_to_health_monitor
@@ -30,6 +32,8 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
 
     resource_name = helper.get_metric_resource_name(metric)
     resource_id = helper.get_metric_resource_id(metric)
+    session = boto3.session.Session()
+    region = session.region_name
     account_id = session.client("sts").get_caller_identity().get("Account")
 
     event.populate(

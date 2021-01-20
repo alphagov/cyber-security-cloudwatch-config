@@ -106,6 +106,8 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
 
     resource_name = helper.get_metric_resource_name(metric)
     resource_id = helper.get_metric_resource_id(metric)
+    session = boto3.session.Session()
+    region = session.region_name
     account_id = session.client("sts").get_caller_identity().get("Account")
 
     event.populate(
