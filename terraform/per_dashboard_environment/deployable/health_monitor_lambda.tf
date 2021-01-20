@@ -11,7 +11,7 @@ resource "aws_lambda_function" "health_monitor_lambda" {
   environment {
     variables = {
       DEF_ENVIRONMENT   = var.DEF_ENVIRONMENT
-      LOGLEVEL          = "DEBUG"
+      LOG_LEVEL         = var.LOG_LEVEL
       PAGERDUTY_SNS_ARN = local.pagerduty_sns_arn
       SLACK_SNS_ARN     = local.slack_sns_arn
       DASHBOARD_SNS_ARN = local.dashboard_sns_arn

@@ -11,7 +11,7 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL          = ""
+      LOG_LEVEL         = var.LOG_LEVEL
       PROD_ACCOUNT      = module.reference_accounts.production
       TEST_ACCOUNT      = module.reference_accounts.staging
       TARGET_ROLE       = var.TARGET_ROLE
@@ -60,7 +60,7 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
 
   environment {
     variables = {
-      LOGLEVEL          = ""
+      LOG_LEVEL         = var.LOG_LEVEL
       PROD_ACCOUNT      = module.reference_accounts.production
       TEST_ACCOUNT      = module.reference_accounts.staging
       TARGET_ROLE       = var.TARGET_ROLE

@@ -7,3 +7,8 @@ variable "monitored_accounts" {
     type    = list
     default = []
 }
+
+variable "LOG_LEVEL" {
+  type    = string
+  default = "DEBUG"
+}
