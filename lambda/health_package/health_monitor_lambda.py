@@ -106,7 +106,9 @@ def format_slack_message(message):
         content.header = (
             f"{content.component_type}: {content.resource} is {content.state}"
         )
-        content.message = message.get("Message", None)
+        content.message = message.get("Message")
+        content.aws_account_id = message.get("AwsAccountId")
+        content.aws_region = message.get("AwsRegion")
 
     except (ValueError, KeyError) as err:
         LOG.debug("Failed to read health event: %s", str(err))
