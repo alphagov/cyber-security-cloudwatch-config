@@ -19,6 +19,7 @@ class HealthEvent:
         self.source_data = {}
         self.metric_data = None
         self.aws_account_id = None
+        self.aws_region = None
 
     def populate(
         self,
@@ -34,6 +35,7 @@ class HealthEvent:
         source_data=None,
         metric_data=None,
         aws_account_id=None,
+        aws_region=None,
     ):
         """" set all event properties as optional keywords"""
         args = locals()  # gets a dictionary of all local parameters

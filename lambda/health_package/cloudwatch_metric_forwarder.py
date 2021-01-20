@@ -120,7 +120,8 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
         source_data=alarm,
         metric_data=metric_data,
         notify_slack=False,
-        aws_account_id=account_id
+        aws_account_id=account_id,
+        aws_region=region
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))
