@@ -203,7 +203,7 @@ def mock_get_function_response():
                     "DATABASE_NAME": "databasename",
                     "DATABASE_URL": "mongodb://blah",
                     "TOPIC_ARN": "arn:aws:sns:eu-west-2:123456789012:topic",
-                    "LOGLEVEL": "DEBUG",
+                    "LOG_LEVEL": "DEBUG",
                     "VALID_TOKENS": "blah1,blah2",
                 }
             },
