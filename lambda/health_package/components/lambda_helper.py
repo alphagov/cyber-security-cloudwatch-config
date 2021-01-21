@@ -90,7 +90,6 @@ class LambdaHelper(GenericHelper):
                     get_function_response = Dict(
                         client.get_function(FunctionName=function_name)
                     )
-                    print(str(get_function_response))
                     lambda_timeout = get_function_response.Configuration.Timeout
         except AttributeError as err:
             print(json.dumps(metric, indent=2))
