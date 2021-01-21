@@ -162,33 +162,26 @@ class GenericHelper:
         """
         statistic_value = 0
         metric_stats = cls.get_metric_statistics(metric, rule.Statistic)
-        print(str(metric_stats))
 
         for datapoint in metric_stats.Datapoints:
             statistic_value = datapoint[rule.Statistic]
 
         threshold = statistic_value * rule.Multiplier
-        LOG.info(
-            "Baseline threshold: %s * %s = %s",
-            statistic_value,
-            rule.Multiplier,
-            threshold,
+        print(f"Calculated threshold is {threshold}")
+        print(
+            f"Baseline threshold: {statistic_value} * {rule.Multiplier} = {threshold}"
         )
         # The min/max overrides do not have to be set
         # If they are set they override the calculated
         # threshold value
         if "Minimum" in rule and threshold < rule.Minimum:
-            LOG.info(
-                "Baseline threshold (%s) is less than rule min (%s)",
-                threshold,
-                rule.Minimum,
+            print(
+                f"Baseline threshold {threshold} is less than rule min {rule.Minimum}"
             )
             threshold = rule.Minimum
         elif "Maximum" in rule and threshold > rule.Maximum:
-            LOG.info(
-                "Baseline threshold (%s) is greater than rule max (%s)",
-                threshold,
-                rule.Minimum,
+            print(
+                f"Baseline threshold {threshold} is less than rule max {rule.Maximum}"
             )
             threshold = rule.Maximum
 

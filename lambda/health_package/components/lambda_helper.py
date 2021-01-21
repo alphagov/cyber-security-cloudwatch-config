@@ -72,40 +72,36 @@ class LambdaHelper(GenericHelper):
 
     @classmethod
     def get_metric_threshold(cls, metric, rule):
-        region = cls.get_metric_region(metric)
+        if metric.MetricName == "Duration":
+            region = cls.get_metric_region(metric)
+            # Calculate duration threshold here.
+
+            # Get the lambda timeout
+            namespace = metric.Namespace
+            # Assign a timeout outside of the try block
+            lambda_timeout = 60
+            try:
+                print(f"Getting boto client for {namespace} in {region}")
+                client = cls.get_client_from_namespace(namespace, region)
+                if client:
+                    function_name = cls.get_metric_dimension_value(metric, "FunctionName")
+                    if function_name:
+                        print(f"Get timeout for lambda function: {function_name}")
+                        get_function_response = Dict(
+                            client.get_function(FunctionName=function_name)
+                        )
+                        lambda_timeout = get_function_response.Configuration.Timeout
+            except AttributeError as err:
+                print(json.dumps(metric, indent=2))
+                print(str(err))
+            except botocore.exceptions.ClientError as err:
+                print(str(err))
+
+            print(f"Set lambda timeout to: {lambda_timeout}")
+            # 90% of max timeout seconds in milliseconds
+            rule.Maximum = lambda_timeout * 1000 * 0.9
+            print(f"Maximum threshold set to {rule.Maximum}")
+
         threshold = super().get_metric_threshold(metric, rule)
-        # Calculate duration threshold here.
 
-        # Get the lambda timeout
-        namespace = metric.Namespace
-        # Assign a timeout outside of the try block
-        lambda_timeout = 60
-        try:
-            print(f"Getting boto client for {namespace} in {region}")
-            client = cls.get_client_from_namespace(namespace, region)
-            if client:
-                function_name = cls.get_metric_dimension_value(metric, "FunctionName")
-                if function_name:
-                    print(f"Get timeout for lambda function: {function_name}")
-                    get_function_response = Dict(
-                        client.get_function(FunctionName=function_name)
-                    )
-                    lambda_timeout = get_function_response.Configuration.Timeout
-        except AttributeError as err:
-            print(json.dumps(metric, indent=2))
-            print(str(err))
-        except botocore.exceptions.ClientError as err:
-            print(str(err))
-
-        print(f"Set lambda timeout to: {lambda_timeout}")
-        # 90% of max timeout seconds in milliseconds
-        rule.Maximum = lambda_timeout * 1000 * 0.9
-
-        if threshold > rule.Maximum:
-            LOG.info(
-                "Baseline threshold (%s) is greater than rule max (%s)",
-                threshold,
-                rule.Minimum,
-            )
-            threshold = rule.Maximum
         return threshold

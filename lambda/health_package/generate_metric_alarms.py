@@ -163,6 +163,7 @@ def get_metric_alarms(metrics):
                 ):
                     # get metric-statistics and calculate health threshold
                     metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
+                    print(f"Threshold is: {metric.Threshold}")
 
                     # annotate with service
                     metric.Service = service
@@ -214,6 +215,7 @@ def main():
                     alarms[region][service][metric], 2
                 )
                 alarm_file.write(f"{group} = {group_alarm_data}")
+                print(f"{group} = {group_alarm_data}")
 
 
 if __name__ == "__main__":
