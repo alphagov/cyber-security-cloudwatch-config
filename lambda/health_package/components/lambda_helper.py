@@ -83,7 +83,10 @@ class LambdaHelper(GenericHelper):
                 print(f"Getting boto client for {namespace} in {region}")
                 client = cls.get_client_from_namespace(namespace, region)
                 if client:
-                    function_name = cls.get_metric_dimension_value(metric, "FunctionName")
+                    function_name = cls.get_metric_dimension_value(
+                        metric,
+                        "FunctionName"
+                    )
                     if function_name:
                         print(f"Get timeout for lambda function: {function_name}")
                         get_function_response = Dict(
