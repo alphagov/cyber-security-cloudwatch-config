@@ -5,7 +5,6 @@ import botocore
 from addict import Dict
 
 from components.generic_helper import GenericHelper
-from logger import LOG
 
 
 class LambdaHelper(GenericHelper):
