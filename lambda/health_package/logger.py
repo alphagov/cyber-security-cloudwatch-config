@@ -1,6 +1,6 @@
 """ Define a shared logger instance """
-import os
 import logging
+import os
 
 logging.getLogger("boto3").setLevel(logging.WARNING)
 logging.getLogger("botocore").setLevel(logging.WARNING)

@@ -5,10 +5,10 @@ import json
 
 import boto3
 
-from logger import LOG
 import enrich
 from cloudwatch_forwarder import parse_sns_message, send_to_health_monitor
 from health_event import HealthEvent
+from logger import LOG
 
 
 def process_cloudwatch_alarm_event(event):
@@ -21,8 +21,8 @@ def process_cloudwatch_alarm_event(event):
 
 
 def cloudwatch_alarm_to_standard_health_data_model(source_message):
-    """ Transform data from native CloudWatch
-        into a shared data model independent of the data source
+    """Transform data from native CloudWatch
+    into a shared data model independent of the data source
     """
     metric = source_message.Trigger
     helper = enrich.get_namespace_helper(metric.Namespace)
@@ -47,7 +47,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
         resource_id=resource_id,
         source_data=source_message,
         aws_account_id=account_id,
-        aws_region=region
+        aws_region=region,
     )
 
     LOG.debug("Standardised event: %s", json.dumps(event, default=str))

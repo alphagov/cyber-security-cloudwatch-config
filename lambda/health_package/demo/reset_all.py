@@ -2,7 +2,6 @@
 import boto3
 import fire
 
-
 REGIONS = ["eu-west-1", "eu-west-2"]
 
 

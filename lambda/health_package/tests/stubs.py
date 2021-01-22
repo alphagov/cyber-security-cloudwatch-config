@@ -1,6 +1,6 @@
 """ Create mock boto3 clients for testing """
 import boto3
-from botocore.stub import Stubber, ANY
+from botocore.stub import ANY, Stubber
 
 
 def _keep_it_real():

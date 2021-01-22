@@ -3,13 +3,13 @@ import json
 import os
 from collections import defaultdict
 
-from addict import Dict
 import boto3
+from addict import Dict
 from botocore.exceptions import ClientError
 
-from local_exceptions import ServerError
 import enrich
 import format_terraform
+from local_exceptions import ServerError
 from logger import LOG
 
 
