@@ -1,6 +1,6 @@
 """ Data model for health event data """
-import os
 import json
+import os
 
 
 class HealthEvent:
@@ -70,8 +70,8 @@ class HealthEvent:
             self.source = source
 
     def set_component_type(self, component_type):
-        """ Set the component type
-            component_type = [ "AWS/SQS", "Concourse", "UptimeRobot"... ]
+        """Set the component type
+        component_type = [ "AWS/SQS", "Concourse", "UptimeRobot"... ]
         """
         if component_type is not None:
             self.component_type = component_type
@@ -82,9 +82,9 @@ class HealthEvent:
             self.event_type = event_type
 
     def set_notify_target(self, target, notify):
-        """ Set the notification prefs
-            target = [ Slack | PagerDuty | Splunk ]
-            notify = bool
+        """Set the notification prefs
+        target = [ Slack | PagerDuty | Splunk ]
+        notify = bool
         """
         target_attribute = "notify_" + target.lower()
         if hasattr(self, target_attribute):
@@ -101,16 +101,16 @@ class HealthEvent:
             self.service = service
 
     def set_healthy(self, healthy):
-        """ Set the current health status of the resource
-            healthy = bool
+        """Set the current health status of the resource
+        healthy = bool
         """
         if healthy is not None:
             self.healthy = healthy
 
     def set_resource(self, resource_name=None, resource_id=None):
-        """ Set the resource name and/or id
-            Different resources in AWS have
-            either no name or no id.
+        """Set the resource name and/or id
+        Different resources in AWS have
+        either no name or no id.
         """
         self.resource = {"Name": resource_name, "ID": resource_id}
 
@@ -125,9 +125,9 @@ class HealthEvent:
             self.metric_data = metric_data
 
     def to_json(self):
-        """ Convert to dict
-            Change case from python snake_case to UpperCamelCase
-            and convert to JSON
+        """Convert to dict
+        Change case from python snake_case to UpperCamelCase
+        and convert to JSON
         """
         event_dict = vars(self)
         camel_dict = {}

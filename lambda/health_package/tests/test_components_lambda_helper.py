@@ -1,8 +1,8 @@
 """ Test LambdaHelper class"""
 import pytest
+import stubs
 
 from components.lambda_helper import LambdaHelper
-import stubs
 
 
 @pytest.mark.usefixtures("lambda_metric")
@@ -26,8 +26,8 @@ def test_metric_resource_exists(
 def test_get_tags_for_metric_resource(
     lambda_metric, mock_get_function_response, mock_list_tags_response
 ):
-    """ Check that we can resolve the metric resource
-        and from that get the tags linked to that resource
+    """Check that we can resolve the metric resource
+    and from that get the tags linked to that resource
     """
     stubber = stubs.mock_lambda(mock_get_function_response, mock_list_tags_response)
 

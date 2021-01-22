@@ -1,7 +1,7 @@
 """ Process an alarm from CloudWatch """
-import os
-import json
 import base64
+import json
+import os
 
 import boto3
 from addict import Dict

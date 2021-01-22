@@ -1,8 +1,9 @@
 """ Lambda to send the Health Monitor alarm data to Splunk Cloud HEC """
 
 import json
-import requests
+
 import boto3
+import requests
 
 from logger import LOG
 
@@ -46,7 +47,7 @@ def get_splunk_hec_token(ssm_param, region):
 
 
 def get_environment(health_event):
-    """ Get the environment setting from the source event
+    """Get the environment setting from the source event
 
     Normalise to prod|test to match index names
     """

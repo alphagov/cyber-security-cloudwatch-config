@@ -84,8 +84,7 @@ class LambdaHelper(GenericHelper):
                 client = cls.get_client_from_namespace(namespace, region)
                 if client:
                     function_name = cls.get_metric_dimension_value(
-                        metric,
-                        "FunctionName"
+                        metric, "FunctionName"
                     )
                     if function_name:
                         print(f"Get timeout for lambda function: {function_name}")

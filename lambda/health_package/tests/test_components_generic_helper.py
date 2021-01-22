@@ -1,8 +1,8 @@
 """ Test GenericHelper class """
 import pytest
+import stubs
 
 from components.generic_helper import GenericHelper
-import stubs
 
 
 @pytest.mark.usefixtures("list_metric_response")

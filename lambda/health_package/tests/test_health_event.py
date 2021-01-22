@@ -1,6 +1,7 @@
 """Test HealthEvent class """
 import json
 from datetime import datetime
+
 import pytest
 
 from health_event import HealthEvent
