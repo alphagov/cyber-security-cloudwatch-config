@@ -35,6 +35,12 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     session = boto3.session.Session()
     region = session.region_name
     account_id = session.client("sts").get_caller_identity().get("Account")
+    new_state_healthy = source_message.NewStateValue == "OK"
+    old_state_insufficient = source_message.OldStateValue == "INSUFFICIENT_DATA"
+    # Suppress sending to Slack when going from INSUFFICIENT_DATA to OK
+    # When new alarms are created or updated and go back to healthy
+    # we don't really need to see that in Slack
+    notify_slack = not (new_state_healthy and old_state_insufficient)
 
     event.populate(
         source="AWS/CloudWatch",
@@ -42,7 +48,8 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
         event_type="Alarm",
         environment=source_message.Tags.get("Environment", "Test").lower(),
         service=source_message.Tags.get("Service", "Unknown"),
-        healthy=source_message.NewStateValue == "OK",
+        healthy=new_state_healthy,
+        notify_slack=notify_slack,
         resource_name=resource_name,
         resource_id=resource_id,
         source_data=source_message,
