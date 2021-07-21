@@ -1,4 +1,4 @@
-""" SQS component helper functions """
+""" Codepipeline component helper functions """
 import json
 
 import botocore
