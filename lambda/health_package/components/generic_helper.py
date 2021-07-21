@@ -29,6 +29,7 @@ class GenericHelper:
             "AWS/Lambda": "lambda",
             "AWS/Firehose": "firehose",
             "AWS/Kinesis": "kinesis",
+            "aws.codepipeline": "codepipeline",
         }
         client_name = clients.get(namespace, None)
 
