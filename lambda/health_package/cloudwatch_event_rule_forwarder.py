@@ -25,6 +25,7 @@ def format_namespace(name):
     if len(name_array) == 2:
         namespace = "/".join([name_array[0].upper(), name_array[1].title()])
         return namespace
+    return name
 
 
 def extract_key_from_tags(tags_list, key, default):
