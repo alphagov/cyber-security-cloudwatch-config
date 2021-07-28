@@ -20,6 +20,13 @@ def process_cloudwatch_event_rule(event):
     return response.StatusCode == 200
 
 
+def format_namespace(name):
+    name_array = string1.split(".")
+    if len(name_array) == 2:
+        namespace = "/".join([name_array[0].upper(), name_array[1].title()])
+        return namespace
+
+
 def extract_key_from_tags(tags_list, key, default):
     for tag_dict in tags_list:
         if tag_dict["key"] == key:
@@ -32,7 +39,7 @@ def cloudwatch_event_rule_to_standard_health_data_model(source_message):
     into a shared data model independent of the data source
     """
     LOG.info("source_message: %s", str(source_message))
-    source_message.Namespace = source_message.source
+    source_message.Namespace = format_namespace(source_message.source)
     helper = enrich.get_namespace_helper(source_message.Namespace)
     source_message.Tags = helper.get_tags_for_metric_resource(source_message)
 

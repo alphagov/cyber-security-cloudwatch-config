@@ -19,7 +19,7 @@ def get_namespace_helper(namespace):
         "AWS/Lambda": LambdaHelper,
         "AWS/Firehose": FirehoseHelper,
         "AWS/Kinesis": KinesisHelper,
-        "aws.codepipeline": CodePipelineHelper,
+        "AWS/Codepipeline": CodePipelineHelper,
     }
     ComponentHelper = clients.get(namespace, GenericHelper)
 
