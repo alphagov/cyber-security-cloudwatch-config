@@ -20,14 +20,6 @@ def process_cloudwatch_event_rule(event):
     return response.StatusCode == 200
 
 
-def format_namespace(name):
-    name_array = string1.split(".")
-    if len(name_array) == 2:
-        namespace = "/".join([name_array[0].upper(), name_array[1].title()])
-        return namespace
-    return name
-
-
 def extract_key_from_tags(tags_list, key, default):
     for tag_dict in tags_list:
         if tag_dict["key"] == key:
@@ -40,8 +32,7 @@ def cloudwatch_event_rule_to_standard_health_data_model(source_message):
     into a shared data model independent of the data source
     """
     LOG.info("source_message: %s", str(source_message))
-    source_message.Namespace = format_namespace(source_message.source)
-    helper = enrich.get_namespace_helper(source_message.Namespace)
+    helper = enrich.get_namespace_helper(source_message.source)
     source_message.Tags = helper.get_tags_for_metric_resource(source_message)
 
     event = HealthEvent()
@@ -62,7 +53,7 @@ def cloudwatch_event_rule_to_standard_health_data_model(source_message):
     notify_slack = not (new_state_healthy and old_state_insufficient)
 
     event.populate(
-        source="AWS/Codepipeline",
+        source=source_message.source,
         component_type=source_message.source,
         event_type="Alarm",
         environment=environment,

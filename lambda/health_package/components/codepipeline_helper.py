@@ -24,7 +24,9 @@ class CodePipelineHelper(GenericHelper):
             if client:
                 print(f"Get tags for code pipeline: {namespace}")
                 codepipeline_arn = metric.resources[0]
-                get_tags_response = Dict(client.list_tags_for_resource(resourceArn=codepipeline_arn))
+                get_tags_response = Dict(
+                    client.list_tags_for_resource(resourceArn=codepipeline_arn)
+                )
                 tags = get_tags_response.tags
 
         except AttributeError as err:
@@ -33,4 +35,3 @@ class CodePipelineHelper(GenericHelper):
         except botocore.exceptions.ClientError as err:
             print(str(err))
         return tags
-

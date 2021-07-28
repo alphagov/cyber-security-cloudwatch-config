@@ -110,7 +110,7 @@ def cloudwatch_metric_to_standard_health_data_model(alarm, metric_data=None):
     account_id = session.client("sts").get_caller_identity().get("Account")
 
     event.populate(
-        source="AWS/CloudWatch",
+        source="aws.cloudwatch",
         component_type=alarm.Namespace,
         event_type="Metric",
         environment=tags.get("Environment", "Test").lower(),

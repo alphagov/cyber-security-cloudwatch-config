@@ -43,7 +43,7 @@ def cloudwatch_alarm_to_standard_health_data_model(source_message):
     notify_slack = not (new_state_healthy and old_state_insufficient)
 
     event.populate(
-        source="AWS/CloudWatch",
+        source="aws.cloudwatch",
         component_type=source_message.Trigger.Namespace,
         event_type="Alarm",
         environment=source_message.Tags.get("Environment", "Test").lower(),

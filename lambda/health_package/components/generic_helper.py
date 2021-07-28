@@ -20,18 +20,23 @@ class GenericHelper:
         return Dict(caller)
 
     @classmethod
+    def format_namespace(cls, namespace):
+        return namespace.lower().replace("/", ".")
+
+    @classmethod
     def get_namespace_service(cls, namespace):
         """
         Convert CloudWatch namespace to AWS service name
         """
+        formatted_namespace = cls.format_namespace(namespace)
         clients = {
-            "AWS/SQS": "sqs",
-            "AWS/Lambda": "lambda",
-            "AWS/Firehose": "firehose",
-            "AWS/Kinesis": "kinesis",
-            "AWS/Codepipeline": "codepipeline",
+            "aws.sqs": "sqs",
+            "aws.lambda": "lambda",
+            "aws.firehose": "firehose",
+            "aws.kinesis": "kinesis",
+            "aws.codepipeline": "codepipeline",
         }
-        client_name = clients.get(namespace, None)
+        client_name = clients.get(formatted_namespace, None)
 
         return client_name
 
