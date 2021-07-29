@@ -137,7 +137,8 @@ def get_metric_alarms(metrics):
     alarms = Dict()
 
     # implement standard monitoring rules based on namespace
-    for metric_rule in METRIC_RULES:
+    for metric in METRIC_RULES:
+        metric_rule = Dict(metric)
         namespace = metric_rule.Namespace
         helper = enrich.get_namespace_helper(namespace)
         service = helper.get_namespace_service(namespace)
@@ -242,100 +243,6 @@ if __name__ == "__main__":
     # for 1 datapoints within 5 minutes
     # firehose__DeliveryToS3DataFreshness > 500
     # for 1 datapoints within 5 minutes
-    METRIC_RULES = [
-        Dict(
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateAgeOfOldestMessage",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 2,
-                "Maximum": 300,  # this is an initial guess to be tuned later
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/SQS",
-                "MetricName": "ApproximateNumberOfMessagesVisible",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 500,
-                "Maximum": 5000,  # this is an initial guess to be tuned later
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Kinesis",
-                "MetricName": "PutRecord.Success",
-                "Statistic": "Minimum",
-                "Multiplier": 1,
-                "Minimum": 0.99,  # alert on 1% failure
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Firehose",
-                "MetricName": "ExecuteProcessing.Success",
-                "Statistic": "Minimum",
-                "Multiplier": 1,
-                "Minimum": 0.99,  # alert on 1% failure
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Kinesis",
-                "MetricName": "GetRecords.IteratorAgeMilliseconds",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 300,
-                "Maximum": 43200000,  # 12 hours
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Firehose",
-                "MetricName": "ThrottledGetShardIterator",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 2,
-                "Maximum": 10,
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Firehose",
-                "MetricName": "KinesisMillisBehindLatest",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 3000,
-                # Not interested in less than 3 seconds delay
-                "Maximum": 60000,
-                # We'd want to know if there was a minute delay in kinesis
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Errors",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 10,
-                # We probably don't want to know the first few times a lambda errors
-                "Maximum": 200,
-                # We definitely want to know if it errors frequently
-            }
-        ),
-        Dict(
-            {
-                "Namespace": "AWS/Lambda",
-                "MetricName": "Duration",
-                "Statistic": "Maximum",
-                "Multiplier": 1.1,
-                "Minimum": 3000,
-                # Any lambda running for less than 3 secs should be fine
-                # The maximum is calculated based on the lambda's timeout.
-                # This is measured in milliseconds (I think that has changed)
-            }
-        ),
-    ]
-    main()
+    with open("metric-settings.json", "r") as metrics_file:
+        METRIC_RULES = json.load(metrics_file)
+        main()
