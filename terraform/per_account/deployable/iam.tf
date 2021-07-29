@@ -83,6 +83,18 @@ data "aws_iam_policy_document" "cloudwatch_forwarder_policy_document" {
       "arn:aws:sqs:${var.TARGET_REGION}:${module.reference_accounts.staging}:${var.TARGET_SQS_QUEUE}"
     ]
   }
+
+   statement {
+    effect = "Allow"
+
+    actions = [
+      "codepipeline:ListTagsForResource"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "cloudwatch_forwarder_policy" {
