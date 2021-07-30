@@ -84,6 +84,11 @@ jobs:
               - -c
               - |
                 cd lambda/health_package
+                # Not sure why this venv is necessary
+                # For some reason without it pip install fails
+                pip install virtualenv
+                virtualenv ~/venv
+                . ~/venv/bin/activate
                 make test
             dir: cyber-security-cloudwatch-config-git
         on_failure:
