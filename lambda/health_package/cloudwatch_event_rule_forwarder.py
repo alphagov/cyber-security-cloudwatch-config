@@ -33,6 +33,7 @@ def cloudwatch_event_rule_to_standard_health_data_model(source_message):
     """
     LOG.info("source_message: %s", str(source_message))
     helper = enrich.get_namespace_helper(source_message.source)
+    source_message.Namespace = source_message.source
     source_message.Tags = helper.get_tags_for_metric_resource(source_message)
 
     event = HealthEvent()
