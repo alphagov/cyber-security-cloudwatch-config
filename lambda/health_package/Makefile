@@ -21,6 +21,7 @@ add_dev_deps:
 
 copy_dir:
 	cp *.py .target/
+	cp *.json .target/
 	cp components/*.py .target/components/
 
 build: clean target_dir add_deps copy_dir
