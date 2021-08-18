@@ -1,9 +1,9 @@
 ---
 groups:
-- name: slack-webhooks-check
-  jobs:
-  - slack-webhooks-test
-  # Add prod task when role deployed
+  - name: slack-webhooks-check
+    jobs:
+      - slack-webhooks-test
+      # Add prod task when role deployed
 
 # Using this for the assume_role function.
 # Replace this with something else in time.
@@ -23,59 +23,60 @@ slack_webhook_check_task: &slack_webhook_check_task
   run:
     path: bash
     args:
-    - -e
-    - -c
-    - |
-      echo "Testing slack webhooks configured in SSM"
-      echo "get ${ENVIRONMENT} environment for prefix and account id"
+      - -c
+      - |
+        set -x
+        set -e
+        echo "Testing slack webhooks configured in SSM"
+        echo "get ${ENVIRONMENT} environment for prefix and account id"
 
-      echo "assuming aws concourse role..."
-      source /usr/local/bin/sts-assume-role.sh 'arn:aws:iam::779799343306:role/SlackWebhooksConcourseRole' 'eu-west-2'
+        echo "assuming aws concourse role..."
+        source /usr/local/bin/sts-assume-role.sh 'arn:aws:iam::779799343306:role/SlackWebhooksConcourseRole' 'eu-west-2'
 
-      ssm_data=$(aws ssm get-parameters-by-path \
-      	--path=/slack/channels/ \
-      	--recursive \
-      	--with-decryption \
-      	--region=eu-west-2
-      )
+        ssm_data=$(aws ssm get-parameters-by-path \
+          --path=/slack/channels/ \
+          --recursive \
+          --with-decryption \
+          --region=eu-west-2
+        )
 
-      parameters=($(echo $ssm_data | jq .Parameters[].Name | xargs))
-      hooks=($(echo $ssm_data | jq .Parameters[].Value | xargs))
+        parameters=($(echo $ssm_data | jq .Parameters[].Name | xargs))
+        hooks=($(echo $ssm_data | jq .Parameters[].Value | xargs))
 
-      working=()
-      broken=()
+        working=()
+        broken=()
 
-      for i in ${!parameters[@]}; do
-      	echo "Index: ${i}"
-      	param=${parameters[$i]}
-      	hook=${hooks[$i]}
-      	channel="${param/\/slack\/channels\//#}"
-      	echo "Channel: ${channel}"
-      	echo "HookURL: ${hook}"
+        for i in ${!parameters[@]}; do
+          echo "Index: ${i}"
+          param=${parameters[$i]}
+          hook=${hooks[$i]}
+          channel="${param/\/slack\/channels\//#}"
+          echo "Channel: ${channel}"
+          echo "HookURL: ${hook}"
 
-        echo "Testing hook for channel ${channel}"
-        message="*This is a drill*\\nPlease ignore this message"
-        json="{\"channel\": \"$channel\", \"username\": \"Slack Webhook Testing\", \"icon_emoji\": \":drill:\", \"text\": \"$message\"}"
-        status_code=$(curl -s -o /dev/null -w '%{http_code}' -d "payload=$json" $hook)
-        echo "Status code: ${status_code}"
+          echo "Testing hook for channel ${channel}"
+          message="*This is a drill*\\nPlease ignore this message"
+          json="{\"channel\": \"$channel\", \"username\": \"Slack Webhook Testing\", \"icon_emoji\": \":drill:\", \"text\": \"$message\"}"
+          status_code=$(curl -s -o /dev/null -w '%{http_code}' -d "payload=$json" $hook)
+          echo "Status code: ${status_code}"
 
-        if [[ $status_code -eq 200 ]]; then
-          working=("${working[@]}" "${channel}")
-        else
-          broken=("${broken[@]}" "${channel}")
+          if [[ $status_code -eq 200 ]]; then
+            working=("${working[@]}" "${channel}")
+          else
+            broken=("${broken[@]}" "${channel}")
+          fi
+
+          i=$((i+1))
+        done
+
+        echo "Working: ${working[@]}"
+        echo "Broken: ${broken[@]}"
+        # Return a non-zero exit status if any webhooks fail
+        # Should exit(0) if all channels return 200
+        # number_broken=${#broken[@]}
+        if [[ ${#broken[@]} -gt 0 ]]; then
+          exit 1
         fi
-
-      	i=$((i+1))
-      done
-
-      echo "Working: ${working[@]}"
-      echo "Broken: ${broken[@]}"
-      # Return a non-zero exit status if any webhooks fail
-      # Should exit(0) if all channels return 200
-      # number_broken=${#broken[@]}
-      if [[ ${#broken[@]} -gt 0 ]]; then
-        exit 1
-      fi
 
 resource_types:
   - name: http-api
@@ -108,26 +109,26 @@ resources:
       service: "Slack"
 
 jobs:
-- name: slack-webhooks-test
-  plan:
-  - get: once_per_day
-    trigger: true
-  - task: test-webhooks
-    config:
-      <<: *slack_webhook_check_task
-      params:
-        ENVIRONMENT: "Test"
-        ACCOUNT_ID: "103495720024"
-        CD_ROLE: "health_monitor_concourse_role"
+  - name: slack-webhooks-test
+    plan:
+      - get: once_per_day
+        trigger: true
+      - task: test-webhooks
+        config:
+          <<: *slack_webhook_check_task
+          params:
+            ENVIRONMENT: "Test"
+            ACCOUNT_ID: "103495720024"
+            CD_ROLE: "health_monitor_concourse_role"
 
-    on_success:
-      <<: *health_status_notify
-      params:
-        message: "All webhooks responded with success"
-        health: healthy
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "All webhooks responded with success"
+            health: healthy
 
-    on_failure:
-      <<: *health_status_notify
-      params:
-        message: "One or more webhooks failed see build log for details"
-        health: unhealthy
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "One or more webhooks failed see build log for details"
+            health: unhealthy

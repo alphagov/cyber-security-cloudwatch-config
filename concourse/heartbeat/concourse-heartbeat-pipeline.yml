@@ -1,8 +1,8 @@
 ---
 groups:
-- name: concourse-heartbeat
-  jobs:
-  - concourse-heartbeat-pass
+  - name: concourse-heartbeat
+    jobs:
+      - concourse-heartbeat-pass
 
 heartbeat_image_resource: &heartbeat_image_resource
   type: docker-image
@@ -10,7 +10,6 @@ heartbeat_image_resource: &heartbeat_image_resource
     repository: gdscyber/cyber-security-concourse-base-image
     username: ((docker_hub_username))
     password: ((docker_hub_password))
-    
 
 health_status_notify: &health_status_notify
   put: health-notification
@@ -21,11 +20,11 @@ heartbeat_pass_task: &heartbeat_pass_task
   run:
     path: sh
     args:
-    - -e
-    - -c
-    - |
-      set -x
-      echo "Testing concourse reporting: success"
+      - -c
+      - |
+        set -x
+        set -e
+        echo "Testing concourse reporting: success"
 
 resource_types:
   - name: http-api
@@ -59,22 +58,22 @@ resources:
 
 
 jobs:
-- name: concourse-heartbeat-pass
-  plan:
-  - get: once_per_day
-    trigger: true
-  - task: heartbeat
-    config:
-      <<: *heartbeat_pass_task
+  - name: concourse-heartbeat-pass
+    plan:
+      - get: once_per_day
+        trigger: true
+      - task: heartbeat
+        config:
+          <<: *heartbeat_pass_task
 
-    on_success:
-      <<: *health_status_notify
-      params:
-        message: "Pipeline completed successfully"
-        health: healthy
+        on_success:
+          <<: *health_status_notify
+          params:
+            message: "Pipeline completed successfully"
+            health: healthy
 
-    on_failure:
-      <<: *health_status_notify
-      params:
-        message: "Pipeline failed"
-        health: unhealthy
+        on_failure:
+          <<: *health_status_notify
+          params:
+            message: "Pipeline failed"
+            health: unhealthy

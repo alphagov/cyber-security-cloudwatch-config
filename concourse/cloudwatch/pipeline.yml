@@ -59,18 +59,39 @@ blocks:
       image_resource:
         type: docker-image
         source:
-            repository: gdscyber/concourse-worker-health
-            tag: 'latest'
-            username: ((docker_hub_username))
-            password: ((docker_hub_password))
+          repository: gdscyber/concourse-worker-health
+          tag: 'latest'
+          username: ((docker_hub_username))
+          password: ((docker_hub_password))
 
       inputs:
         - name: cyber-security-cloudwatch-config-git
 
 jobs:
+  - name: update-pipeline
+    serial: true
+    plan:
+      - get: cyber-security-cloudwatch-config-git
+        trigger: true
+
+      - set_pipeline: cyber-security-cloudwatch-health
+        file: csls-pipeline-git/concourse/cloudwatch/pipeline.yml
+
+      - set_pipeline: heartbeat
+        file: csls-pipeline-git/concourse/heartbeat/concourse-heartbeat-pipeline.yml
+
+      - set_pipeline: slack-webhook-checker
+        file: csls-pipeline-git/concourse/slack-webhook-checker/slack-webhook-checker-pipeline.yml
+    on_failure:
+      <<: *health_status_notify
+      params:
+        message: Pipeline update failed
+        health: unhealthy
+
   - name: cloudwatch_test
     plan:
       - get: cyber-security-cloudwatch-config-git
+        passed: [update-pipeline]
         trigger: true
       - get: cyber-security-terraform-git
         trigger: false
@@ -83,6 +104,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd lambda/health_package
                 # Not sure why this venv is necessary
                 # For some reason without it pip install fails
@@ -112,12 +135,14 @@ jobs:
         config:
           <<: *cloudwatch_build
           outputs:
-          - name: ssh
+            - name: ssh
           run:
             path: /bin/bash
             args:
               - -c
               - |
+                set -x
+                set -e
                 cat > deploy_key <<'EOF'
                 ((cyber-security-terraform-deploy-key))
                 EOF
@@ -136,12 +161,14 @@ jobs:
         config:
           <<: *cloudwatch_build
           outputs:
-          - name: lambda_package
+            - name: lambda_package
           run:
             path: /bin/bash
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd lambda/health_package
                 make zip
                 mv health_package.zip ../../../lambda_package
@@ -158,15 +185,17 @@ jobs:
         config:
           <<: *cloudwatch_build
           inputs:
-          - name: cyber-security-cloudwatch-config-git
-          - name: cyber-security-terraform-git
-          - name: ssh
-          - name: lambda_package
+            - name: cyber-security-cloudwatch-config-git
+            - name: cyber-security-terraform-git
+            - name: ssh
+            - name: lambda_package
           run:
             path: /bin/bash
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
                 workdir=$(pwd)
@@ -207,6 +236,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 monitored_accounts=$(ls ../cyber-security-terraform-git/service/cloudwatch-config/per_account/deployments)
 
                 for account_id in $monitored_accounts; do
@@ -251,6 +282,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 workdir=$(pwd)
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
@@ -297,6 +330,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 workdir=$(pwd)
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
@@ -354,6 +389,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cat > deploy_key <<'EOF'
                 ((cyber-security-terraform-deploy-key))
                 EOF
@@ -378,6 +415,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd lambda/health_package
                 make zip
                 mv health_package.zip ../../../lambda_package
@@ -403,6 +442,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
                 workdir=$(pwd)
@@ -443,6 +484,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 workdir=$(pwd)
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
@@ -489,6 +532,8 @@ jobs:
             args:
               - -c
               - |
+                set -x
+                set -e
                 cd ..
                 workdir=$(pwd)
                 cp lambda_package/health_package.zip cyber-security-cloudwatch-config-git/lambda/health_package
