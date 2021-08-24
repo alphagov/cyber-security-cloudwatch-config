@@ -75,13 +75,13 @@ jobs:
         trigger: true
 
       - set_pipeline: cyber-security-cloudwatch-health
-        file: csls-pipeline-git/concourse/cloudwatch/pipeline.yml
+        file: cyber-security-cloudwatch-config-git/concourse/cloudwatch/pipeline.yml
 
       - set_pipeline: heartbeat
-        file: csls-pipeline-git/concourse/heartbeat/concourse-heartbeat-pipeline.yml
+        file: cyber-security-cloudwatch-health/concourse/heartbeat/concourse-heartbeat-pipeline.yml
 
       - set_pipeline: slack-webhook-checker
-        file: csls-pipeline-git/concourse/slack-webhook-checker/slack-webhook-checker-pipeline.yml
+        file: cyber-security-cloudwatch-health/concourse/slack-webhook-checker/slack-webhook-checker-pipeline.yml
     on_failure:
       <<: *health_status_notify
       params:
