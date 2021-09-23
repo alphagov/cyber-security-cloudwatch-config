@@ -30,7 +30,8 @@
     "Period": 300,
     "Multiplier": 1.1,
     "Minimum": 2,
-    "Maximum": 10
+    "Maximum": 10,
+    "Description": "Number of incidents of throttling"
   },
   {
     "Namespace": "AWS/Firehose",

@@ -165,6 +165,7 @@ def get_metric_alarms(metrics):
                     if (
                         metric.MetricName == metric_rule.MetricName
                         and helper.metric_resource_exists(metric)
+
                     ):
                         # get metric-statistics and calculate health threshold
                         metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
@@ -173,6 +174,13 @@ def get_metric_alarms(metrics):
                         # annotate with service
                         metric.Service = service
 
+                        # copy reference properties from rule
+                        metric.Description = metric_rule.Description
+                        metric.Statistic = metric_rule.Statistic
+                        metric.ComparisonOperator = metric_rule.ComparisonOperator
+                        metric.Period = metric_rule.Period
+                        metric.EvaluationPeriods = metric_rule.EvaluationPeriods
+                        
                         # annotate with resource name and id derived from metric Dimensions
                         metric.ResourceName = helper.get_metric_resource_name(metric)
                         metric.ResourceId = helper.get_metric_resource_id(metric)
