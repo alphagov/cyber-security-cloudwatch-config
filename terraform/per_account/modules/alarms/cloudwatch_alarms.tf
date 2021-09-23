@@ -15,9 +15,13 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_alarms" {
   namespace           = var.eu-west-1_alarms[count.index].Namespace
   period              = var.eu-west-1_alarms[count.index].Period
   statistic           = var.eu-west-1_alarms[count.index].Statistic
-  dimensions = {
-    DeliveryStreamName = var.eu-west-1_alarms[count.index].ResourceName
-  }
+  dimensions = jsondecode(
+    format(
+      "{\"%s\": \"%s\"}",
+      var.eu-west-1_alarms[count.index].DimensionName,
+      var.eu-west-1_alarms[count.index].DimensionValue
+    )
+  )
   alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
   tags                = merge(
@@ -47,9 +51,13 @@ resource "aws_cloudwatch_metric_alarm" "euw2_cloudwatch_alarms" {
   namespace           = var.eu-west-2_alarms[count.index].Namespace
   period              = var.eu-west-2_alarms[count.index].Period
   statistic           = var.eu-west-2_alarms[count.index].Statistic
-  dimensions = {
-    DeliveryStreamName = var.eu-west-2_alarms[count.index].ResourceName
-  }
+  dimensions = jsondecode(
+    format(
+      "{\"%s\": \"%s\"}",
+      var.eu-west-2_alarms[count.index].DimensionName,
+      var.eu-west-2_alarms[count.index].DimensionValue
+    )
+  )
   alarm_actions       = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   ok_actions          = ["${local.euw2_sns_cloudwatch_forwarder_topic}"]
   tags                = merge(
