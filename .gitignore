@@ -122,7 +122,7 @@ setup.cfg
 # PyCharm
 .idea/
 
-deployments
+deployments/**/*.tfvars
 
 # MacOS
 .DS_Store
