@@ -12,7 +12,6 @@ import format_terraform
 from local_exceptions import ServerError
 from logger import LOG
 
-
 MONITORED_REGIONS = ["eu-west-1", "eu-west-2", "us-east-1"]
 
 
@@ -182,7 +181,8 @@ def get_metric_alarms(metrics):
                         metric.Period = metric_rule.Period
                         metric.EvaluationPeriods = metric_rule.EvaluationPeriods
 
-                        # annotate with resource name and id derived from metric Dimensions
+                        # annotate with resource name and id
+                        # derived from metric Dimensions
                         metric.ResourceName = helper.get_metric_resource_name(metric)
                         metric.ResourceId = helper.get_metric_resource_id(metric)
 
@@ -204,7 +204,7 @@ def get_metric_alarms(metrics):
                     unmonitored_resources.extend(unmonitored_region_resources)
 
     if len(unmonitored_resources) > 0:
-        print(f"Resources deployed into UNMONITORED REGIONS")
+        print("Resources deployed into UNMONITORED REGIONS")
         print(json.dumps(unmonitored_resources, indent=2))
     return alarms
 
