@@ -165,10 +165,11 @@ def get_metric_alarms(metrics):
                     if (
                         metric.MetricName == metric_rule.MetricName
                         and helper.metric_resource_exists(metric)
-
                     ):
                         # get metric-statistics and calculate health threshold
-                        metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
+                        metric.Threshold = helper.get_metric_threshold(
+                            metric, metric_rule
+                        )
                         print(f"Threshold is: {metric.Threshold}")
 
                         # annotate with service
@@ -197,18 +198,13 @@ def get_metric_alarms(metrics):
                 # Log any metrics with Dimensions in unmonitored regions
                 # Metrics without dimensions aren't attached to a resource
                 unmonitored_region_resources = [
-                    metric
-                    for metric
-                    in namespace_metrics
-                    if len(metric.Dimensions) > 0
+                    metric for metric in namespace_metrics if len(metric.Dimensions) > 0
                 ]
                 if len(unmonitored_region_resources) > 0:
                     unmonitored_resources.extend(unmonitored_region_resources)
 
     if len(unmonitored_resources) > 0:
-        print(
-            f"Resources deployed into UNMONITORED REGIONS"
-        )
+        print(f"Resources deployed into UNMONITORED REGIONS")
         print(json.dumps(unmonitored_resources, indent=2))
     return alarms
 
@@ -239,9 +235,7 @@ def main():
     # generate in tfvars format
     alarm_file = open(f"{file_path}/alarms.tfvars", "w")
     for region in alarms:
-        region_alarms = format_terraform.get_tf_list(
-            alarms[region], 2
-        )
+        region_alarms = format_terraform.get_tf_list(alarms[region], 2)
         alarm_file.write(f"{region}_alarms = {region_alarms}")
         print(f"{region}_alarms = {region_alarms}")
 
