@@ -13,6 +13,9 @@ from local_exceptions import ServerError
 from logger import LOG
 
 
+MONITORED_REGIONS = ["eu-west-1", "eu-west-2", "us-east-1"]
+
+
 def process_generate_metric_alarms_event(event):
     """Handles a new event request
     Placeholder copied from alert_controller implementation
@@ -135,6 +138,7 @@ def get_metric_alarms(metrics):
     Iterate over metrics and return alarm config
     """
     alarms = Dict()
+    unmonitored_resources = []
 
     # implement standard monitoring rules based on namespace
     for metric in METRIC_RULES:
@@ -145,38 +149,59 @@ def get_metric_alarms(metrics):
 
         # print(str(metric_rule))
         for region in metrics:
-            if region not in alarms:
-                alarms[region] = defaultdict(list)
-            if service not in alarms[region]:
-                alarms[region][service] = defaultdict(list)
-
             print(f"Analysing metrics for {region}\n")
             region_metrics = metrics[region]
             namespace_metrics = region_metrics[namespace]
             print(
                 f"Found {len(namespace_metrics)} metrics for {namespace} in {region}\n"
             )
-            for metric in namespace_metrics:
-                print(f"Checking rules for {metric.MetricName}")
-                if (
-                    metric.MetricName == metric_rule.MetricName
-                    and helper.metric_resource_exists(metric)
-                ):
-                    # get metric-statistics and calculate health threshold
-                    metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
-                    print(f"Threshold is: {metric.Threshold}")
 
-                    # annotate with service
-                    metric.Service = service
+            if region in MONITORED_REGIONS:
+                if region not in alarms:
+                    alarms[region] = []
 
-                    # annotate with resource name and id derived from metric Dimensions
-                    metric.ResourceName = helper.get_metric_resource_name(metric)
-                    metric.ResourceId = helper.get_metric_resource_id(metric)
+                for metric in namespace_metrics:
+                    print(f"Checking rules for {metric.MetricName}")
+                    if (
+                        metric.MetricName == metric_rule.MetricName
+                        and helper.metric_resource_exists(metric)
+                    ):
+                        # get metric-statistics and calculate health threshold
+                        metric.Threshold = helper.get_metric_threshold(metric, metric_rule)
+                        print(f"Threshold is: {metric.Threshold}")
 
-                    alarm = metric.copy()
-                    del alarm.Dimensions
-                    alarms[region][service][metric.MetricName].append(alarm)
+                        # annotate with service
+                        metric.Service = service
 
+                        # annotate with resource name and id derived from metric Dimensions
+                        metric.ResourceName = helper.get_metric_resource_name(metric)
+                        metric.ResourceId = helper.get_metric_resource_id(metric)
+
+                        alarm = metric.copy()
+                        # print(json.dumps(alarm.Dimensions, indent=2))
+                        # exit()
+                        dimension = alarm.Dimensions[0]
+                        alarm[f"DimensionName"] = dimension["Name"]
+                        alarm[f"DimensionValue"] = dimension["Value"]
+                        del alarm.Dimensions
+                        alarms[region].append(alarm)
+            else:
+                # Log any metrics with Dimensions in unmonitored regions
+                # Metrics without dimensions aren't attached to a resource
+                unmonitored_region_resources = [
+                    metric
+                    for metric
+                    in namespace_metrics
+                    if len(metric.Dimensions) > 0
+                ]
+                if len(unmonitored_region_resources) > 0:
+                    unmonitored_resources.extend(unmonitored_region_resources)
+
+    if len(unmonitored_resources) > 0:
+        print(
+            f"Resources deployed into UNMONITORED REGIONS"
+        )
+        print(json.dumps(unmonitored_resources, indent=2))
     return alarms
 
 
@@ -206,43 +231,15 @@ def main():
     # generate in tfvars format
     alarm_file = open(f"{file_path}/alarms.tfvars", "w")
     for region in alarms:
-        for service in alarms[region]:
-            for metric in alarms[region][service]:
-                metric_var_name = metric.replace(".", "")
-                group = f"{region}__{service}__{metric_var_name}"
-                # group_alarm_data =
-                #    json.dumps(alarms[region][service][metric], indent=2)
-                group_alarm_data = format_terraform.get_tf_list(
-                    alarms[region][service][metric], 2
-                )
-                alarm_file.write(f"{group} = {group_alarm_data}")
-                print(f"{group} = {group_alarm_data}")
+        region_alarms = format_terraform.get_tf_list(
+            alarms[region], 2
+        )
+        alarm_file.write(f"{region}_alarms = {region_alarms}")
+        print(f"{region}_alarms = {region_alarms}")
 
 
 if __name__ == "__main__":
 
-    MONITORED_REGIONS = ["eu-west-1", "eu-west-2", "us-east-1"]
-
-    # Match boto3 casing for consistency
-    # Suggested thresholds
-    # sqs__NumberOfMessagesSent < 10
-    # for 1 datapoints within 5 minutes
-    # sqs__ApproximateAgeOfOldestMessage > 4
-    # for 1 datapoints within 5 minutes
-    # kinesis__PutRecordSuccess < 1
-    # for 1 datapoints within 5 minutes
-    # kinesis__GetRecordsIteratorAgeMilliseconds >= 43200000
-    # for 1 datapoints within 1 hour
-    # kinesis__GetRecordsSuccess < 1
-    # for 1 datapoints within 15 minutes
-    # firehose__ExecuteProcessingSuccess < 1
-    # for 1 datapoints within 5 minutes
-    # firehose__ExecuteProcessingDuration > 60
-    # for 1 datapoints within 5 minutes
-    # firehose__ThrottledGetShardIterator > 1
-    # for 1 datapoints within 5 minutes
-    # firehose__DeliveryToS3DataFreshness > 500
-    # for 1 datapoints within 5 minutes
     with open("metric-settings.json", "r") as metrics_file:
         METRIC_RULES = json.load(metrics_file)
         main()

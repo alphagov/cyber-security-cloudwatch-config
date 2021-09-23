@@ -27,3 +27,18 @@ variable "TARGET_REGION" {
   type    = string
   default = "eu-west-2"
 }
+
+variable "eu-west-1_alarms" {
+  type    = list(map(string))
+  default = []
+}
+
+variable "eu-west-2_alarms" {
+  type    = list(map(string))
+  default = []
+}
+
+variable "us-east-1_alarms" {
+  type    = list(map(string))
+  default = []
+}
