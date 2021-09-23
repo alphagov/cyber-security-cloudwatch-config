@@ -180,7 +180,7 @@ def get_metric_alarms(metrics):
                         metric.ComparisonOperator = metric_rule.ComparisonOperator
                         metric.Period = metric_rule.Period
                         metric.EvaluationPeriods = metric_rule.EvaluationPeriods
-                        
+
                         # annotate with resource name and id derived from metric Dimensions
                         metric.ResourceName = helper.get_metric_resource_name(metric)
                         metric.ResourceId = helper.get_metric_resource_id(metric)
@@ -189,8 +189,8 @@ def get_metric_alarms(metrics):
                         # print(json.dumps(alarm.Dimensions, indent=2))
                         # exit()
                         dimension = alarm.Dimensions[0]
-                        alarm[f"DimensionName"] = dimension["Name"]
-                        alarm[f"DimensionValue"] = dimension["Value"]
+                        alarm.DimensionName = dimension["Name"]
+                        alarm.DimensionValue = dimension["Value"]
                         del alarm.Dimensions
                         alarms[region].append(alarm)
             else:
