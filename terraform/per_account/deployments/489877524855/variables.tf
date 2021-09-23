@@ -28,6 +28,18 @@ variable "TARGET_REGION" {
   default     = "eu-west-2"
 }
 
+variable "lambda_zip" {
+  description = "Path to the zipped lambda package"
+  type        = string
+  default     = "../../../../lambda/health_package/health_package.zip"
+}
+
+variable "metrics_cron" {
+  description = "Frequency to run metric forwarder lambda - on the hour"
+  type        = string
+  default     = "cron(0 * ? * * *)"
+}
+
 variable "eu-west-1_alarms" {
   type    = list(map(string))
   default = []

@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
   provider          = aws.eu-west-1
-  filename          = local.zipfile
-  source_code_hash  = filebase64sha256(local.zipfile)
+  filename          = var.lambda_zip
+  source_code_hash  = filebase64sha256(var.lambda_zip)
   function_name     = "cloudwatch_metric_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_metric_event_handler"
@@ -23,17 +23,17 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw1_lambda" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_hour_euw1" {
+resource "aws_cloudwatch_event_rule" "cron_euw1" {
   provider            = aws.eu-west-1
-  name                = "every-hour"
+  name                = "metrics_cron_euw1"
   description         = "Fires every hour"
-  schedule_expression = local.metric_cron
-  tags                = merge(module.tags.tags, map("Name", "every_hour_health_monitoring_euw1_${data.aws_caller_identity.current.account_id}"))
+  schedule_expression = var.metrics_cron
+  tags                = merge(module.tags.tags, map("Name", "cron_health_monitoring_euw1_${data.aws_caller_identity.current.account_id}"))
 }
 
-resource "aws_cloudwatch_event_target" "run_every_hour_euw1" {
+resource "aws_cloudwatch_event_target" "cron_euw1" {
   provider    = aws.eu-west-1
-  rule        = aws_cloudwatch_event_rule.every_hour_euw1.name
+  rule        = aws_cloudwatch_event_rule.cron_euw1.name
   target_id   = aws_lambda_function.cloudwatch_metric_forwarder_euw1_lambda.function_name
   arn         = aws_lambda_function.cloudwatch_metric_forwarder_euw1_lambda.arn
 }
@@ -44,13 +44,13 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_euw1" {
   action          = "lambda:InvokeFunction"
   function_name   = aws_lambda_function.cloudwatch_metric_forwarder_euw1_lambda.function_name
   principal       = "events.amazonaws.com"
-  source_arn      = aws_cloudwatch_event_rule.every_hour_euw1.arn
+  source_arn      = aws_cloudwatch_event_rule.cron_euw1.arn
 }
 
 resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
   provider          = aws.eu-west-2
-  filename          = local.zipfile
-  source_code_hash  = filebase64sha256(local.zipfile)
+  filename          = var.lambda_zip
+  source_code_hash  = filebase64sha256(var.lambda_zip)
   function_name     = "cloudwatch_metric_forwarder"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_metric_event_handler"
@@ -72,17 +72,17 @@ resource "aws_lambda_function" "cloudwatch_metric_forwarder_euw2_lambda" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_hour_euw2" {
+resource "aws_cloudwatch_event_rule" "cron_euw2" {
   provider            = aws.eu-west-2
-  name                = "every-hour"
+  name                = "metrics_cron_euw2"
   description         = "Fires every hour"
-  schedule_expression = local.metric_cron
+  schedule_expression = var.metrics_cron
   tags                = merge(module.tags.tags, map("Name", "every_hour_health_monitoring_euw2_${data.aws_caller_identity.current.account_id}"))
 }
 
-resource "aws_cloudwatch_event_target" "run_every_hour_euw2" {
+resource "aws_cloudwatch_event_target" "cron_euw2" {
   provider    = aws.eu-west-2
-  rule        = aws_cloudwatch_event_rule.every_hour_euw2.name
+  rule        = aws_cloudwatch_event_rule.cron_euw2.name
   target_id   = aws_lambda_function.cloudwatch_metric_forwarder_euw2_lambda.function_name
   arn         = aws_lambda_function.cloudwatch_metric_forwarder_euw2_lambda.arn
 }
@@ -93,5 +93,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_euw2" {
   action          = "lambda:InvokeFunction"
   function_name   = aws_lambda_function.cloudwatch_metric_forwarder_euw2_lambda.function_name
   principal       = "events.amazonaws.com"
-  source_arn      = aws_cloudwatch_event_rule.every_hour_euw2.arn
+  source_arn      = aws_cloudwatch_event_rule.cron_euw2.arn
 }

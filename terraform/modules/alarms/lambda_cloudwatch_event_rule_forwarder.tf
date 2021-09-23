@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "cloudwatch_event_rule_forwarder_euw1_lambda" {
   provider          = aws.eu-west-1
-  filename          = local.zipfile
-  source_code_hash  = filebase64sha256(local.zipfile)
+  filename          = var.lambda_zip
+  source_code_hash  = filebase64sha256(var.lambda_zip)
   function_name     = "cloudwatch_event_rule_forwarder_euw1"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_event_rule_handler"
@@ -42,8 +42,8 @@ resource "aws_sns_topic_subscription" "health_monitor_events_euw1_sns_subscripti
 
 resource "aws_lambda_function" "cloudwatch_event_rule_forwarder_euw2_lambda" {
   provider          = aws.eu-west-2
-  filename          = local.zipfile
-  source_code_hash  = filebase64sha256(local.zipfile)
+  filename          = var.lambda_zip
+  source_code_hash  = filebase64sha256(var.lambda_zip)
   function_name     = "cloudwatch_event_rule_forwarder_euw2"
   role              = aws_iam_role.cloudwatch_forwarder_role.arn
   handler           = "lambda_handler.cloudwatch_event_rule_handler"
