@@ -1,13 +1,13 @@
 variable "LOG_LEVEL" {
   description = "Python log level passed to lambda environments"
   type        = string
-  default     = "DEBUG"
+  default     = "INFO"
 }
 
 variable "DEF_ENVIRONMENT" {
   description = "What is the status of the deployed service"
   type        = string
-  default     = "test"
+  default     = "prod"
 }
 
 
