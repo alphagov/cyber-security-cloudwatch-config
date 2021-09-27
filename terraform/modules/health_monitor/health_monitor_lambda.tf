@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "health_monitor_lambda" {
-  filename         = local.zipfile
-  source_code_hash = filebase64sha256(local.zipfile)
+  filename         = var.lambda_zip
+  source_code_hash = filebase64sha256(var.lambda_zip)
   function_name    = "health_monitor_lambda"
   role             = aws_iam_role.health_monitor_role.arn
   handler          = "lambda_handler.health_monitor_handler"

@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "health_monitor_update_dashboard_lambda" {
-  filename         = local.zipfile
-  source_code_hash = filebase64sha256(local.zipfile)
+  filename         = var.lambda_zip
+  source_code_hash = filebase64sha256(var.lambda_zip)
   function_name    = "health_monitor_splunk_forwarder_lambda"
   role             = aws_iam_role.health_monitor_update_dashboard_role.arn
   handler          = "lambda_handler.splunk_forwarder_event_handler"
