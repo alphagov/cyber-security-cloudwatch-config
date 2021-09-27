@@ -1,13 +1,13 @@
 variable "service_name" {
   description = "The name of the pipeline"
   type        = string
-  default     = "alert-processor"
+  default     = "cloudwatch-config"
 }
 
 variable "repository_name" {
   description = "The name of the github source repository"
   type        = string
-  default     = "alphagov/cyber-security-alert-processor"
+  default     = "alphagov/cyber-security-cloudwatch-config"
 }
 
 variable "environment" {
@@ -62,5 +62,5 @@ variable "aws_account_id_production" {
 variable "github_branch_name" {
   description = "The Github branch to trigger the pipeline from"
   type        = string
-  default     = "master"
+  default     = "ce-287-refactor-terraform"
 }

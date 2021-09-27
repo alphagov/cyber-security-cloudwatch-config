@@ -4,7 +4,7 @@ locals {
     Environment   = var.environment
     SvcOwner      = "Cyber"
     DeployedUsing = "Terraform_v12"
-    SvcCodeURL    = "https://github.com/alphagov/cyber-security-concourse-base-image"
+    SvcCodeURL    = "https://github.com/alphagov/cyber-security-cloudwatch-config"
   }
 
   docker_hub_creds    = jsondecode(data.aws_secretsmanager_secret_version.dockerhub_creds.secret_string)

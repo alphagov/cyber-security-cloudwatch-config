@@ -1,4 +1,4 @@
-resource "aws_codepipeline" "alert_processor" {
+resource "aws_codepipeline" "cloudwatch_config" {
   name     = var.service_name
   role_arn = data.aws_iam_role.pipeline_role.arn
   tags     = merge(local.tags, { Name = var.service_name })
@@ -20,7 +20,7 @@ resource "aws_codepipeline" "alert_processor" {
       output_artifacts = ["git_alert_processor"]
       configuration = {
         ConnectionArn    = "arn:aws:codestar-connections:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:connection/${var.codestar_connection_id}"
-        FullRepositoryId = "alphagov/cyber-security-alert-processor"
+        FullRepositoryId = "alphagov/cyber-security-cloudwatch-config"
         BranchName       = var.github_branch_name
       }
     }
@@ -69,120 +69,6 @@ resource "aws_codepipeline" "alert_processor" {
       configuration = {
         PrimarySource = "git_alert_processor"
         ProjectName = module.codebuild_get_actions_required.project_name
-      }
-    }
-  }
-
-  stage {
-    name = "Build"
-
-    action {
-      name             = "TestAlertController"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = ["git_alert_processor", "changed_files"]
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = aws_codebuild_project.codebuild_run_tests_alert_controller.name
-      }
-    }
-
-    action {
-      name             = "TestReportNetcraft"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = ["git_alert_processor", "changed_files"]
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = aws_codebuild_project.codebuild_run_tests_report_netcraft.name
-      }
-    }
-
-    action {
-      name             = "BuildAlertController"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = ["git_alert_processor", "changed_files"]
-      output_artifacts = ["alert_controller_lambda"]
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = aws_codebuild_project.codebuild_build_lambda_alert_controller.name
-      }
-    }
-
-    action {
-      name             = "BuildReportNetcraft"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = ["git_alert_processor", "changed_files"]
-      output_artifacts = ["report_netcraft_lambda"]
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = aws_codebuild_project.codebuild_build_lambda_report_netcraft.name
-      }
-    }
-  }
-
-  stage {
-    name = "Staging"
-    action {
-      name             = "TerraformApply"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = [
-        "git_alert_processor",
-        "ssh_config",
-        "alert_controller_lambda",
-        "report_netcraft_lambda"
-      ]
-      output_artifacts = [
-        "staging_terraform_output"
-      ]
-
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = module.codebuild_terraform_staging.project_name
-      }
-    }
-  }
-
-  stage {
-    name = "Production"
-    action {
-      name             = "TerraformApply"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = [
-        "git_alert_processor",
-        "ssh_config",
-        "alert_controller_lambda",
-        "report_netcraft_lambda"
-      ]
-      output_artifacts = [
-        "production_terraform_output"
-      ]
-
-      configuration = {
-        PrimarySource = "git_alert_processor"
-        ProjectName = module.codebuild_terraform_production.project_name
       }
     }
   }

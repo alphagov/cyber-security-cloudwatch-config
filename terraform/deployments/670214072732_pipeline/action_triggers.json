@@ -1,0 +1,8 @@
+[
+  {
+      "action": "UpdatePipeline",
+      "trigger_paths": [
+        "terraform/deployments/670214072732_pipeline"
+      ]
+  }
+]
