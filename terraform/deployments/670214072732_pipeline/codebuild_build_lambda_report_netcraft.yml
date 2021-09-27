@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - |
+        set -c
+        set -e
+        cd lambda/report_netcraft
+        make zip
+        mv report_netcraft.zip /opt
+        echo "Built zip file for lambda distribution"
+
+artifacts:
+  name: report_netcraft_lambda
+  files:
+    - report_netcraft.zip
+  discard-paths: no
+  base-directory: /opt
