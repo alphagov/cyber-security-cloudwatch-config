@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_metric_alarm" "use1_cloudwatch_alarms" {
   # iterate over count to setup multiple alarms
   count               = length(var.us-east-1_alarms)
-  provider            = aws.eu-west-2
+  provider            = aws.us-east-1
   alarm_name          = join("_", [
     var.us-east-1_alarms[count.index].ResourceName,
     var.us-east-1_alarms[count.index].MetricName,
