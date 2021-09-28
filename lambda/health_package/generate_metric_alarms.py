@@ -127,7 +127,7 @@ def get_caller():
 def get_output_file_path():
     """ Generate path to output tfvars and ensure directory exists """
     caller_response = get_caller()
-    file_path = f"../../terraform/per_account/deployments/{caller_response.Account}/"
+    file_path = f"../../terraform/deployments/{caller_response.Account}/"
     os.makedirs(file_path, exist_ok=True)
     return file_path
 
