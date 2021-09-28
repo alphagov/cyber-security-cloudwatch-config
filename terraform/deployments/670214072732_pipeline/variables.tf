@@ -72,3 +72,12 @@ variable "non_prod_accounts" {
     "489877524855"
   ]
 }
+
+variable "prod_accounts" {
+  type        = list(string)
+  default     = [
+    "670214072732",
+    "779799343306",
+    "885513274347"
+  ]
+}

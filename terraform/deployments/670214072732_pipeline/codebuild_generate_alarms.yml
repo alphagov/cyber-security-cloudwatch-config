@@ -1,0 +1,30 @@
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - |
+        set -c
+        set -e
+        cd lambda/health_package
+        target_arn="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${IAM_ROLE_NAME}"
+        source sts-assume-role.sh $target_arn
+        source sts-get-caller-identity.sh
+
+        if [[ $AWS_ACCOUNT_ID == $AWS_ASSUMED_ACCOUNT_ID ]]; then
+         echo $AWS_ASSUMED_ACCOUNT_ID
+         echo $AWS_ASSUMED_ROLE_ARN
+         make run
+        else
+         echo "FAILED TO ASSUME ${AWS_ACCOUNT_ID}"
+        fi
+
+artifacts:
+  name: terraform/deployments/${AWS_ACCOUNT_ID}
+  files:
+    - alarms.tfvars
+  discard-paths: no
+  base-directory: /opt

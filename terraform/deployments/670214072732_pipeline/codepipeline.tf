@@ -104,49 +104,76 @@ resource "aws_codepipeline" "cloudwatch_config" {
         ProjectName = aws_codebuild_project.codebuild_build_lambda.name
       }
     }
-  }
 
-  stage {
-    name = "NonProd"
     dynamic "action" {
-      for_each         = toset(var.non_prod_accounts)
+      for_each         = toset(concat(var.non_prod_accounts, var.prod_accounts))
       content {
-        name             = "TerraformApply${action.value}"
+        name             = "GenerateAlarms${action.value}"
         category         = "Build"
         owner            = "AWS"
         provider         = "CodeBuild"
         version          = "1"
         run_order        = 1
         input_artifacts  = [
-          "git_cloudwatch_config",
-          "ssh_config",
-          "lambda"
+          "git_cloudwatch_config"
+        ]
+        output_artifacts = [
+          "alarms_${action.value}"
         ]
 
         configuration = {
-          PrimarySource = "git_cloudwatch_config"
-          ProjectName = module.codebuild_terraform_non_prod[action.key].project_name
+          PrimarySource         = "git_cloudwatch_config"
+          ProjectName           = module.codebuild_generate_alarms[action.key].project_name
+          EnvironmentVariables  = jsonencode([
+            {"name":"AWS_ACCOUNT_ID", "value": action.value},
+            {"name":"IAM_ROLE_NAME", "value": "CodePipelineDeployerRole_${action.value}"}
+          ])
         }
       }
     }
   }
+  
+  # stage {
+  #   name = "NonProd"
+  #   dynamic "action" {
+  #     for_each         = toset(var.non_prod_accounts)
+  #     content {
+  #       name             = "TerraformApply${action.value}"
+  #       category         = "Build"
+  #       owner            = "AWS"
+  #       provider         = "CodeBuild"
+  #       version          = "1"
+  #       run_order        = 1
+  #       input_artifacts  = [
+  #         "git_cloudwatch_config",
+  #         "ssh_config",
+  #         "lambda"
+  #       ]
+  #
+  #       configuration = {
+  #         PrimarySource = "git_cloudwatch_config"
+  #         ProjectName = module.codebuild_terraform_non_prod[action.key].project_name
+  #       }
+  #     }
+  #   }
+  # }
 
-  stage {
-    name = "Pipeline"
-
-    action {
-      name             = "UpdatePipeline"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      version          = "1"
-      run_order        = 1
-      input_artifacts  = ["git_cloudwatch_config"]
-      output_artifacts = []
-
-      configuration = {
-        ProjectName = module.codebuild_self_update.project_name
-      }
-    }
-  }
+  # stage {
+  #   name = "Pipeline"
+  #
+  #   action {
+  #     name             = "UpdatePipeline"
+  #     category         = "Build"
+  #     owner            = "AWS"
+  #     provider         = "CodeBuild"
+  #     version          = "1"
+  #     run_order        = 1
+  #     input_artifacts  = ["git_cloudwatch_config"]
+  #     output_artifacts = []
+  #
+  #     configuration = {
+  #       ProjectName = module.codebuild_self_update.project_name
+  #     }
+  #   }
+  # }
 }
