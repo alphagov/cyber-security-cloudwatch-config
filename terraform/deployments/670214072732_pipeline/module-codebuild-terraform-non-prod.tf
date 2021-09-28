@@ -4,6 +4,7 @@ module "codebuild_terraform_non_prod" {
   codebuild_service_role_name = data.aws_iam_role.pipeline_role.name
   deployment_account_id       = each.value
   deployment_role_name        = "CodePipelineDeployerRole_${each.value}"
+  terraform_version           = "0.14.7"
   terraform_directory         = "terraform/deployments/${each.value}"
   codebuild_image             = var.default_container_image
   pipeline_name               = var.service_name

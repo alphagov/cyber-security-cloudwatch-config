@@ -68,6 +68,7 @@ variable "github_branch_name" {
 variable "non_prod_accounts" {
   type        = list(string)
   default     = [
-    "103495720024"
+    "103495720024",
+    "489877524855"
   ]
 }

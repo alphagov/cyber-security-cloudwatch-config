@@ -1,9 +1,9 @@
 locals {
-  build_alert_controller_project_name = "${var.service_name}-Build-BuildAlertController"
+  build_lambda_project_name = "${var.service_name}-Build-BuildLambda"
 }
 
-resource "aws_codebuild_project" "codebuild_build_lambda_alert_controller" {
-  name        = local.build_alert_controller_project_name
+resource "aws_codebuild_project" "codebuild_build_lambda" {
+  name        = local.build_lambda_project_name
   description = "Run Terraform init and validate"
 
   service_role = data.aws_iam_role.pipeline_role.arn
@@ -33,8 +33,8 @@ resource "aws_codebuild_project" "codebuild_build_lambda_alert_controller" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = file("${path.module}/codebuild_build_lambda_alert_controller.yml")
+    buildspec = file("${path.module}/codebuild_build_lambda.yml")
   }
 
-  tags = merge(local.tags, { "Name" : local.build_alert_controller_project_name })
+  tags = merge(local.tags, { "Name" : local.build_lambda_project_name })
 }
