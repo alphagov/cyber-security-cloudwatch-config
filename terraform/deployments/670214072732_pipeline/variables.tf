@@ -64,3 +64,10 @@ variable "github_branch_name" {
   type        = string
   default     = "ce-287-refactor-terraform"
 }
+
+variable "non_prod_accounts" {
+  type        = list(string)
+  default     = [
+    "103495720024"
+  ]
+}
