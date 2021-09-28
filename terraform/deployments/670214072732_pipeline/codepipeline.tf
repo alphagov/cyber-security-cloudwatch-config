@@ -67,7 +67,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
       input_artifacts  = ["git_cloudwatch_config", "changed_files"]
       output_artifacts = ["actions_required"]
       configuration = {
-        PrimarySource = "git_alert_processor"
+        PrimarySource = "git_cloudwatch_config"
         ProjectName = module.codebuild_get_actions_required.project_name
       }
     }
