@@ -22,8 +22,8 @@ resource "aws_cloudwatch_metric_alarm" "euw1_cloudwatch_alarms" {
       var.eu-west-1_alarms[count.index].DimensionValue
     )
   )
-  alarm_actions       = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
-  ok_actions          = ["${local.euw1_sns_cloudwatch_forwarder_topic}"]
+  alarm_actions       = [local.euw1_sns_cloudwatch_forwarder_topic]
+  ok_actions          = [local.euw1_sns_cloudwatch_forwarder_topic]
   tags                = merge(
     module.tags.tags,
     map("Name", join("_", [
