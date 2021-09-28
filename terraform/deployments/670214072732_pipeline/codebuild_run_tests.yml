@@ -1,0 +1,24 @@
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  pre_build:
+    commands:
+      - |
+        set -c
+        set -e
+        cd lambda/health_package
+        # Not sure why this venv is necessary
+        # For some reason without it pip install fails
+        pip install virtualenv
+        virtualenv ~/venv
+  build:
+    commands:
+      - |
+        set -c
+        set -e
+        . ~/venv/bin/activate
+        make test
+        echo "Linting and tests passed"

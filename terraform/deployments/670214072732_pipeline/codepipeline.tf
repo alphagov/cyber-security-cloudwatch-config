@@ -17,7 +17,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
       version          = "1"
-      output_artifacts = ["git_alert_processor"]
+      output_artifacts = ["git_cloudwatch_config"]
       configuration = {
         ConnectionArn    = "arn:aws:codestar-connections:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:connection/${var.codestar_connection_id}"
         FullRepositoryId = "alphagov/cyber-security-cloudwatch-config"
@@ -36,7 +36,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
       provider         = "CodeBuild"
       version          = "1"
       run_order        = 1
-      input_artifacts  = ["git_alert_processor"]
+      input_artifacts  = ["git_cloudwatch_config"]
       output_artifacts = ["ssh_config"]
       configuration = {
         ProjectName = module.codebuild_build_ssh_config.project_name
@@ -50,7 +50,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
       provider         = "CodeBuild"
       version          = "1"
       run_order        = 1
-      input_artifacts  = ["git_alert_processor"]
+      input_artifacts  = ["git_cloudwatch_config"]
       output_artifacts = ["changed_files"]
       configuration = {
         ProjectName = module.codebuild_get_changed_file_list.project_name
@@ -64,11 +64,29 @@ resource "aws_codepipeline" "cloudwatch_config" {
       provider         = "CodeBuild"
       version          = "1"
       run_order        = 2
-      input_artifacts  = ["git_alert_processor", "changed_files"]
+      input_artifacts  = ["git_cloudwatch_config", "changed_files"]
       output_artifacts = ["actions_required"]
       configuration = {
         PrimarySource = "git_alert_processor"
         ProjectName = module.codebuild_get_actions_required.project_name
+      }
+    }
+  }
+
+  stage {
+    name = "Build"
+
+    action {
+      name             = "RunTests"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      version          = "1"
+      run_order        = 1
+      input_artifacts  = ["git_cloudwatch_config"]
+      configuration = {
+        PrimarySource = "git_cloudwatch_config"
+        ProjectName = aws_codebuild_project.codebuild_run_tests.name
       }
     }
   }
@@ -83,7 +101,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
       provider         = "CodeBuild"
       version          = "1"
       run_order        = 1
-      input_artifacts  = ["git_alert_processor"]
+      input_artifacts  = ["git_cloudwatch_config"]
       output_artifacts = []
 
       configuration = {
