@@ -6,13 +6,12 @@ env:
 phases:
   build:
     commands:
-      - |
-        set -c
-        set -e
-        cd lambda/health_package
-        make zip
-        cp health_package.zip /opt
-        echo "Built zip file lambda distribution"
+      - set -c
+      - set -e
+      - cd lambda/health_package
+      - make zip
+      - cp health_package.zip /opt
+      - echo "Built zip file lambda distribution"
 
 artifacts:
   name: lambda
