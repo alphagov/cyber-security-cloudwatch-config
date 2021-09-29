@@ -225,22 +225,22 @@ resource "aws_codepipeline" "cloudwatch_config" {
     }
   }
 
-  # stage {
-  #   name = "Pipeline"
-  #
-  #   action {
-  #     name             = "UpdatePipeline"
-  #     category         = "Build"
-  #     owner            = "AWS"
-  #     provider         = "CodeBuild"
-  #     version          = "1"
-  #     run_order        = 1
-  #     input_artifacts  = ["git_cloudwatch_config"]
-  #     output_artifacts = []
-  #
-  #     configuration = {
-  #       ProjectName = module.codebuild_self_update.project_name
-  #     }
-  #   }
-  # }
+  stage {
+    name = "Pipeline"
+
+    action {
+      name             = "UpdatePipeline"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      version          = "1"
+      run_order        = 1
+      input_artifacts  = ["git_cloudwatch_config"]
+      output_artifacts = []
+
+      configuration = {
+        ProjectName = module.codebuild_self_update.project_name
+      }
+    }
+  }
 }
