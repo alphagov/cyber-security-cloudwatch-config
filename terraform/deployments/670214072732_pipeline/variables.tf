@@ -81,3 +81,11 @@ variable "prod_accounts" {
     "885513274347"
   ]
 }
+
+variable "monitor_environments" {
+  type        = map(string)
+  default     = {
+    "test" = "103495720024"
+    "prod" = "779799343306"
+  }
+}

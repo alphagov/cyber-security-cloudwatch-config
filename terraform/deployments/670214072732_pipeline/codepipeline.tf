@@ -142,7 +142,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
     dynamic "action" {
       for_each         = toset(var.non_prod_accounts)
       content {
-        name             = "TerraformApply${action.value}"
+        name             = "TerraformAlarms${action.value}"
         category         = "Build"
         owner            = "AWS"
         provider         = "CodeBuild"
@@ -157,8 +157,26 @@ resource "aws_codepipeline" "cloudwatch_config" {
 
         configuration = {
           PrimarySource = "git_cloudwatch_config"
-          ProjectName = module.codebuild_terraform_non_prod[action.key].project_name
+          ProjectName   = module.codebuild_terraform_non_prod_alarms[action.key].project_name
         }
+      }
+    }
+
+    action {
+      name             = "TerraformMonitor"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      version          = "1"
+      run_order        = 2
+      input_artifacts  = [
+        "git_cloudwatch_config",
+        "ssh_config",
+        "lambda",
+      ]
+      configuration = {
+        PrimarySource = "git_cloudwatch_config"
+        ProjectName   = module.codebuild_terraform_non_prod_monitor.project_name
       }
     }
   }
