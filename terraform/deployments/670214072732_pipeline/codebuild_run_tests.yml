@@ -6,7 +6,6 @@ env:
 phases:
   pre_build:
     commands:
-      - set -c
       - set -e
       - cd lambda/health_package
       - # Not sure why this venv is necessary
@@ -15,7 +14,6 @@ phases:
       - virtualenv ~/venv
   build:
     commands:
-      - set -c
       - set -e
       - . ~/venv/bin/activate
       - make test

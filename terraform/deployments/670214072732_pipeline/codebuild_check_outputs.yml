@@ -6,7 +6,6 @@ env:
 phases:
   build:
     commands:
-      - set -c
       - set -e
       - env | grep CODEBUILD_SRC_DIR
       - input=CODEBUILD_SRC_DIR_alarms_$AWS_ACCOUNT_ID
