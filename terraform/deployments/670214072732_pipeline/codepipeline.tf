@@ -181,6 +181,50 @@ resource "aws_codepipeline" "cloudwatch_config" {
     }
   }
 
+  stage {
+    name = "Prod"
+    dynamic "action" {
+      for_each         = toset(var.prod_accounts)
+      content {
+        name             = "TerraformAlarms${action.value}"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        run_order        = 1
+        input_artifacts  = [
+          "git_cloudwatch_config",
+          "ssh_config",
+          "lambda",
+          "alarms_${action.value}"
+        ]
+
+        configuration = {
+          PrimarySource = "git_cloudwatch_config"
+          ProjectName   = module.codebuild_terraform_prod_alarms[action.key].project_name
+        }
+      }
+    }
+
+    action {
+      name             = "TerraformMonitor"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      version          = "1"
+      run_order        = 2
+      input_artifacts  = [
+        "git_cloudwatch_config",
+        "ssh_config",
+        "lambda",
+      ]
+      configuration = {
+        PrimarySource = "git_cloudwatch_config"
+        ProjectName   = module.codebuild_terraform_prod_monitor.project_name
+      }
+    }
+  }
+
   # stage {
   #   name = "Pipeline"
   #
