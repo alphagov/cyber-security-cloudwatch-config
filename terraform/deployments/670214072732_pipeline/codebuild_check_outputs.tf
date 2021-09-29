@@ -1,9 +1,9 @@
 locals {
-  generate_alarms_project_name = "${var.service_name}-Alarms-GenerateAlarms"
+  check_outputs_project_name = "${var.service_name}-CheckOutputs-CheckOutputs"
 }
 
-resource "aws_codebuild_project" "codebuild_generate_alarms" {
-  name        = local.generate_alarms_project_name
+resource "aws_codebuild_project" "codebuild_check_outputs" {
+  name        = local.check_outputs_project_name
   description = "Run Terraform init and validate"
 
   service_role = data.aws_iam_role.pipeline_role.arn
@@ -33,8 +33,8 @@ resource "aws_codebuild_project" "codebuild_generate_alarms" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = file("${path.module}/codebuild_generate_alarms.yml")
+    buildspec = file("${path.module}/codebuild_check_outputs.yml")
   }
 
-  tags = merge(local.tags, { "Name" : local.generate_alarms_project_name })
+  tags = merge(local.tags, { "Name" : local.check_outputs_project_name })
 }

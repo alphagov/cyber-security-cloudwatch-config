@@ -104,6 +104,10 @@ resource "aws_codepipeline" "cloudwatch_config" {
         ProjectName = aws_codebuild_project.codebuild_build_lambda.name
       }
     }
+  }
+
+  stage {
+    name = "Alarms"
 
     dynamic "action" {
       for_each         = toset(concat(var.non_prod_accounts, var.prod_accounts))
@@ -123,7 +127,7 @@ resource "aws_codepipeline" "cloudwatch_config" {
 
         configuration = {
           PrimarySource         = "git_cloudwatch_config"
-          ProjectName           = module.codebuild_generate_alarms[action.key].project_name
+          ProjectName           = aws_codebuild_project.codebuild_generate_alarms.name
           EnvironmentVariables  = jsonencode([
             {"name":"AWS_ACCOUNT_ID", "value": action.value},
             {"name":"IAM_ROLE_NAME", "value": "CodePipelineDeployerRole_${action.value}"}
@@ -132,7 +136,30 @@ resource "aws_codepipeline" "cloudwatch_config" {
       }
     }
   }
-  
+  stage {
+    name = "CheckOutputs"
+
+    dynamic "action" {
+      for_each         = toset(var.non_prod_accounts)
+      content {
+        name             = "CheckOutputs${action.value}"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        run_order        = 1
+        input_artifacts  = ["git_cloudwatch_config", "alarms_${action.value}"]
+        configuration = {
+          PrimarySource = "git_cloudwatch_config"
+          ProjectName = aws_codebuild_project.codebuild_check_outputs.name
+          EnvironmentVariables  = jsonencode([
+            {"name":"AWS_ACCOUNT_ID", "value": action.value}
+          ])
+        }
+      }
+    }
+  }
+
   # stage {
   #   name = "NonProd"
   #   dynamic "action" {
