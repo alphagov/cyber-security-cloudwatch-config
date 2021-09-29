@@ -18,12 +18,14 @@ phases:
          echo $AWS_ASSUMED_ACCOUNT_ID
          echo $AWS_ASSUMED_ROLE_ARN
          make run
+         cd ../..
+         cp terraform/deployments/${AWS_ACCOUNT_ID}/alarms.tfvars /opt
         else
          echo "FAILED TO ASSUME ${AWS_ACCOUNT_ID}"
         fi
 
 artifacts:
-  name: terraform/deployments/${AWS_ACCOUNT_ID}
+  name: alarms_${AWS_ACCOUNT_ID}
   files:
     - alarms.tfvars
   discard-paths: no
