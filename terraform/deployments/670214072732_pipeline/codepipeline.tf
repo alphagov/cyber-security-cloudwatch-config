@@ -136,54 +136,32 @@ resource "aws_codepipeline" "cloudwatch_config" {
       }
     }
   }
-  stage {
-    name = "CheckOutputs"
 
+  stage {
+    name = "NonProd"
     dynamic "action" {
       for_each         = toset(var.non_prod_accounts)
       content {
-        name             = "CheckOutputs${action.value}"
+        name             = "TerraformApply${action.value}"
         category         = "Build"
         owner            = "AWS"
         provider         = "CodeBuild"
         version          = "1"
         run_order        = 1
-        input_artifacts  = ["git_cloudwatch_config", "alarms_${action.value}"]
+        input_artifacts  = [
+          "git_cloudwatch_config",
+          "ssh_config",
+          "lambda",
+          "alarms_${action.value}"
+        ]
+
         configuration = {
           PrimarySource = "git_cloudwatch_config"
-          ProjectName = aws_codebuild_project.codebuild_check_outputs.name
-          EnvironmentVariables  = jsonencode([
-            {"name":"AWS_ACCOUNT_ID", "value": action.value}
-          ])
+          ProjectName = module.codebuild_terraform_non_prod[action.key].project_name
         }
       }
     }
   }
-
-  # stage {
-  #   name = "NonProd"
-  #   dynamic "action" {
-  #     for_each         = toset(var.non_prod_accounts)
-  #     content {
-  #       name             = "TerraformApply${action.value}"
-  #       category         = "Build"
-  #       owner            = "AWS"
-  #       provider         = "CodeBuild"
-  #       version          = "1"
-  #       run_order        = 1
-  #       input_artifacts  = [
-  #         "git_cloudwatch_config",
-  #         "ssh_config",
-  #         "lambda"
-  #       ]
-  #
-  #       configuration = {
-  #         PrimarySource = "git_cloudwatch_config"
-  #         ProjectName = module.codebuild_terraform_non_prod[action.key].project_name
-  #       }
-  #     }
-  #   }
-  # }
 
   # stage {
   #   name = "Pipeline"

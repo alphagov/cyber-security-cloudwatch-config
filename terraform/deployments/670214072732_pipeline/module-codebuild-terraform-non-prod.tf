@@ -8,8 +8,9 @@ module "codebuild_terraform_non_prod" {
   terraform_directory         = "terraform/deployments/${each.value}"
   codebuild_image             = var.default_container_image
   pipeline_name               = var.service_name
-  stage_name                  = "Production"
+  stage_name                  = "NonProd"
   action_name                 = "TerraformApply${each.value}"
+  apply_var_file              = "alarms.tfvars"
   environment                 = var.environment
   docker_hub_credentials      = var.docker_hub_creds_secret
   tags                        = local.tags
@@ -23,6 +24,11 @@ module "codebuild_terraform_non_prod" {
       artifact = "lambda",
       source   = "health_package.zip"
       target   = "lambda/health_package"
+    },
+    {
+      artifact = "alarms_${each.value}",
+      source   = "alarms.tfvars"
+      target   = "terraform/deployments/${each.value}"
     }
   ]
 }
