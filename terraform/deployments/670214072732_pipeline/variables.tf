@@ -62,7 +62,7 @@ variable "aws_account_id_production" {
 variable "github_branch_name" {
   description = "The Github branch to trigger the pipeline from"
   type        = string
-  default     = "ce-287-refactor-terraform"
+  default     = "master"
 }
 
 variable "non_prod_accounts" {
