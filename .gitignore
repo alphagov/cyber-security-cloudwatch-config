@@ -106,6 +106,8 @@ venv.bak/
 .mypy_cache/
 
 *.json
+!metric-settings.json
+!action_triggers.json
 
 # terraform
 .terraform
@@ -122,7 +124,7 @@ setup.cfg
 # PyCharm
 .idea/
 
-deployments
+deployments/**/*.tfvars
 
 # MacOS
 .DS_Store

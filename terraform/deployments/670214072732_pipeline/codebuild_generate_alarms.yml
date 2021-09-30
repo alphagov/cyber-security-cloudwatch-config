@@ -1,0 +1,23 @@
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - set -e
+      - cd lambda/health_package
+      - target_arn="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${IAM_ROLE_NAME}"
+      - source sts-assume-role.sh $target_arn
+      - source sts-get-caller-identity.sh
+      - make run
+      - cd ../..
+      - cp terraform/deployments/${AWS_ACCOUNT_ID}/alarms.tfvars /opt
+
+artifacts:
+  name: alarms_${AWS_ACCOUNT_ID}
+  files:
+    - alarms.tfvars
+  discard-paths: no
+  base-directory: /opt
