@@ -110,7 +110,7 @@
     "EvaluationPeriods": 2,
     "Period": 300,
     "Multiplier": 1.1,
-    "Minimum": 100,
+    "Minimum": 1,
     "Maximum": 1000,
     "Description": "The number of function instances that are processing events. If the number reaches the maximum for a region, Lambda throttles additional invocation requests. This can be increased to tens of thousands by raising an AWS support request."
   },
