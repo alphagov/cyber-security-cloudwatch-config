@@ -103,6 +103,18 @@
     "Description": "Any lambda running for less than 3 secs should be fine. The maximum is calculated based on the lambda's timeout. This is measured in milliseconds (I think that has changed)."
   },
   {
+    "Namespace": "AWS/Lambda",
+    "MetricName": "ConcurrentExecutions",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 1,
+    "Maximum": 1000,
+    "Description": "The number of function instances that are processing events. If the number reaches the maximum for a region, Lambda throttles additional invocation requests. This can be increased to tens of thousands by raising an AWS support request."
+  },
+  {
     "Namespace": "AWS/SQS",
     "MetricName": "ApproximateAgeOfOldestMessage",
     "Statistic": "Maximum",
@@ -124,7 +136,7 @@
     "Multiplier": 1.1,
     "Minimum": 500,
     "Maximum": 5000,
-    "Description" : "This is an initial guess to be tuned later"
+    "Description": "This is an initial guess to be tuned later"
   },
   {
     "Namespace": "AWS/SQS",
@@ -136,6 +148,6 @@
     "Multiplier": 1.1,
     "Minimum": 500,
     "Maximum": 5000,
-    "Description" : "This is an initial guess to be tuned later"
+    "Description": "This is an initial guess to be tuned later"
   }
 ]
