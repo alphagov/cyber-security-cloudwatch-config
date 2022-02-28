@@ -62,7 +62,7 @@
     "Statistic": "Minimum",
     "ComparisonOperator": "LessThanThreshold",
     "EvaluationPeriods": 2,
-    "Period": 300,
+    "Period": 700,
     "Multiplier": 1,
     "Minimum": 0.99,
     "Description": "Alert on 1% failure"
