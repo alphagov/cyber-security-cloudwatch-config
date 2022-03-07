@@ -114,6 +114,7 @@ venv.bak/
 *.tfstate
 *.tfstate.backup
 *.tfvars
+.terraform.lock.hcl
 lambda/generate_metric_alarms/output/*/alarms.tfvars
 
 # Lambda

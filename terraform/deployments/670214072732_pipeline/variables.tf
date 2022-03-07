@@ -62,20 +62,21 @@ variable "aws_account_id_production" {
 variable "github_branch_name" {
   description = "The Github branch to trigger the pipeline from"
   type        = string
-  default     = "master"
+  #default     = "master"
+  default = "ce-418-add-additional-metrics-for-kinesis"
 }
 
 variable "non_prod_accounts" {
-  type        = list(string)
-  default     = [
+  type = list(string)
+  default = [
     "103495720024",
     "489877524855"
   ]
 }
 
 variable "prod_accounts" {
-  type        = list(string)
-  default     = [
+  type = list(string)
+  default = [
     "670214072732",
     "779799343306",
     "885513274347"
@@ -83,8 +84,8 @@ variable "prod_accounts" {
 }
 
 variable "monitor_environments" {
-  type        = map(string)
-  default     = {
+  type = map(string)
+  default = {
     "test" = "103495720024"
     "prod" = "779799343306"
   }

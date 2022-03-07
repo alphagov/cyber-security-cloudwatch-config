@@ -46,6 +46,52 @@
     "Description": "Not interested in less than 3 seconds delay. We'd want to know if there was a minute delay in kinesis."
   },
   {
+    "Namespace": "AWS/Firehose",
+    "MetricName": "ExecuteProcessing.Success",
+    "Statistic": "Minimum",
+    "ComparisonOperator": "LessThanThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1,
+    "Minimum": 0.99,
+    "Description": "Alert on 1% failure"
+  },
+  {
+    "Namespace": "AWS/Firehose",
+    "MetricName": "ExecuteProcessing.Duration",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1,
+    "Minimum": 0.99,
+    "Description": "Alert on 1% failure"
+  },
+  {
+    "Namespace": "AWS/Firehose",
+    "MetricName": "ThrottledGetShardIterator",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 2,
+    "Maximum": 10,
+    "Description": "Number of incidents of throttling"
+  },
+  {
+    "Namespace": "AWS/Firehose",
+    "MetricName": "KinesisMillisBehindLatest",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 3000,
+    "Maximum": 60000,
+    "Description": "Not interested in less than 3 seconds delay. We'd want to know if there was a minute delay in kinesis."
+  },
+  {
     "Namespace": "AWS/Kinesis",
     "MetricName": "GetRecords.Success",
     "Statistic": "Minimum",
@@ -62,7 +108,41 @@
     "Statistic": "Minimum",
     "ComparisonOperator": "LessThanThreshold",
     "EvaluationPeriods": 2,
+    "Period": 900,
+    "Multiplier": 1,
+    "Minimum": 0.99,
+    "Description": "Alert on 1% failure"
+  },
+  {
+    "Namespace": "AWS/Kinesis",
+    "MetricName": "GetRecords.IteratorAgeMilliseconds",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
     "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 5000,
+    "Maximum": 1800000,
+    "Description": "Maximum 1/2 an hour"
+  },
+  {
+    "Namespace": "AWS/Kinesis",
+    "MetricName": "GetRecords.Success",
+    "Statistic": "Minimum",
+    "ComparisonOperator": "LessThanThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1,
+    "Minimum": 0.99,
+    "Description": "Alert on 1% failure"
+  },
+  {
+    "Namespace": "AWS/Kinesis",
+    "MetricName": "PutRecord.Success",
+    "Statistic": "Minimum",
+    "ComparisonOperator": "LessThanThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 900,
     "Multiplier": 1,
     "Minimum": 0.99,
     "Description": "Alert on 1% failure"
@@ -113,6 +193,77 @@
     "Minimum": 1,
     "Maximum": 1000,
     "Description": "The number of function instances that are processing events. If the number reaches the maximum for a region, Lambda throttles additional invocation requests. This can be increased to tens of thousands by raising an AWS support request."
+  },
+  {
+    "Namespace": "AWS/Lambda",
+    "MetricName": "Errors",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 10,
+    "Maximum": 200,
+    "Description": "We probably don't want to know the first few times a lambda errors. We definitely want to know if it errors frequently."
+  },
+  {
+    "Namespace": "AWS/Lambda",
+    "MetricName": "Duration",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 3000,
+    "Description": "Any lambda running for less than 3 secs should be fine. The maximum is calculated based on the lambda's timeout. This is measured in milliseconds (I think that has changed)."
+  },
+  {
+    "Namespace": "AWS/Lambda",
+    "MetricName": "ConcurrentExecutions",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 1,
+    "Maximum": 1000,
+    "Description": "The number of function instances that are processing events. If the number reaches the maximum for a region, Lambda throttles additional invocation requests. This can be increased to tens of thousands by raising an AWS support request."
+  },
+  {
+    "Namespace": "AWS/SQS",
+    "MetricName": "ApproximateAgeOfOldestMessage",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 2,
+    "Maximum": 300,
+    "Description": "This is an initial guess to be tuned later"
+  },
+  {
+    "Namespace": "AWS/SQS",
+    "MetricName": "ApproximateNumberOfMessagesVisible",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 500,
+    "Maximum": 5000,
+    "Description": "This is an initial guess to be tuned later"
+  },
+  {
+    "Namespace": "AWS/SQS",
+    "MetricName": "ApproximateNumberOfMessagesNotVisible",
+    "Statistic": "Maximum",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "Period": 300,
+    "Multiplier": 1.1,
+    "Minimum": 500,
+    "Maximum": 5000,
+    "Description": "This is an initial guess to be tuned later"
   },
   {
     "Namespace": "AWS/SQS",
