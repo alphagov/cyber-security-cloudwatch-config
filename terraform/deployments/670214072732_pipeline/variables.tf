@@ -89,3 +89,9 @@ variable "monitor_environments" {
     "prod" = "779799343306"
   }
 }
+
+variable "docker_hub_creds" {
+  description = "description of the secret in SSM that stores the Docker Hub credentials"
+  type        = string
+  default     = "docker_hub_credentials"
+}
