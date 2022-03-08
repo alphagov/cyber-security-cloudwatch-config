@@ -7,6 +7,6 @@ module "codebuild_build_ssh_config" {
   action_name                 = "BuildSSHConfig"
   environment                 = var.environment
   deploy_key                  = var.ssm_deploy_key
-  docker_hub_credentials      = var.docker_hub_creds
+  docker_hub_credentials      = var.docker_hub_creds_secret
   tags                        = local.tags
 }
